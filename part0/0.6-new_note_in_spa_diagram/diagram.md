@@ -2,13 +2,16 @@
 
 ```mermaid
 sequenceDiagram
-participant browser
-participant server
+    participant User
+    participant Browser
+    participant Server
 
-    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
-    activate server
-    server-->>browser: Payload that contains the created resource
-    deactivate server
+    User->>Browser: Writes new note and clicks "Save"
+    Browser->>Server: POST /exampleapp/new_note_spa (JSON body: { content, important })
+    activate Server
+    Server-->>Browser: 201 Created (JSON with created note object)
+    deactivate Server
 
-    Note right of browser: The browser executes the callback function that renders the notes
+    Browser->>Browser: execute callback -> add created note to UI (render/update list)
+    Note right of Browser: No full page reload — SPA updates DOM dynamically
 ```

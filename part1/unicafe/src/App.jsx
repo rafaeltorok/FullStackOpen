@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Statistics from './components/Statistics';
+import Button from './components/Button';
 
 function App() {
   const [good, setGood] = useState(0);
@@ -7,8 +8,8 @@ function App() {
   const [bad, setBad] = useState(0);
 
   const all = good + neutral + bad;
-  const average = (good - bad) / (all);
-  const percentage = (good / all) * 100;
+  const average = all > 0 ? ((good - bad) / all).toFixed(1) : 0;
+  const percentage = all > 0 ? ((good / all) * 100).toFixed(1) + "%" : "0%";
 
   function handleClick(event) {
     switch (event.target.value) {
@@ -28,9 +29,18 @@ function App() {
     <>
       <h1>Give feedback</h1>
       <div>
-        <button onClick={handleClick} value="good">good</button>
-        <button onClick={handleClick} value="neutral">neutral</button>
-        <button onClick={handleClick} value="bad">bad</button>
+        <Button
+          handleClick={handleClick}
+          value={"good"}
+        />
+        <Button
+          handleClick={handleClick}
+          value={"neutral"}
+        />
+        <Button
+          handleClick={handleClick}
+          value={"bad"}
+        />
       </div>
       <h2>Statistics</h2>
       {all > 0 ? (
@@ -43,7 +53,9 @@ function App() {
           percentage={percentage}
         />
       ) : (
-        <p>no feedback was given</p>
+        <div>
+          <p>no feedback was given</p>
+        </div>
       )}
       
     </>

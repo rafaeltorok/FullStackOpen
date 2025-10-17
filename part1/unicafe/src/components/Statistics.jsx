@@ -1,12 +1,18 @@
+import StatisticsLine from "./StatisticsLine";
+
 export default function Statistics({ good, neutral, bad, all, average, percentage }) {
   return (
     <>
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {all}</p>
-      <p>average {average}</p>
-      <p>percentage {percentage} %</p>
+      <table>
+        <tbody>
+          <StatisticsLine text={"good"} value={good}/>
+          <StatisticsLine text={"neutral"} value={neutral}/>
+          <StatisticsLine text={"bad"} value={bad}/>
+          <StatisticsLine text={"all"} value={all}/>
+          <StatisticsLine text={"average"} value={average}/>
+          <StatisticsLine text={"percentage"} value={percentage}/>
+        </tbody>
+      </table>
     </>
   );
 }

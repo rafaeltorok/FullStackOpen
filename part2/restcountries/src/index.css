@@ -1,0 +1,9 @@
+.country-flag {
+  max-width: 200px;
+}
+
+img.weather-icon {
+  width: 100px;
+  height: 100px;
+  vertical-align: middle;
+}

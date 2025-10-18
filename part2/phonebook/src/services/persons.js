@@ -11,6 +11,15 @@ async function getData() {
   }
 }
 
+async function getDataById(id) {
+  try {
+    const response = await axios.get(`${baseUrl}/${id}`);
+    return response.data;
+  } catch (err) {
+    throw new Error(`Error fetching id ${id}: ` + err.message);
+  }
+}
+
 async function storeData(newObject) {
   try {
     const request = await axios.post(baseUrl, newObject);
@@ -38,4 +47,4 @@ async function updateNumber(id, newObject) {
   }
 }
 
-export default { getData, storeData, removeData, updateNumber };
+export default { getData, getDataById, storeData, removeData, updateNumber };

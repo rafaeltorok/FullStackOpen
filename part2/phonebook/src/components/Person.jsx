@@ -1,9 +1,10 @@
 export default function Person({ person, handleDelete }) {
   return (
-    <p>
-      {person.name} {person.number} 
+    <li>
       <button 
         onClick={() => handleDelete(person.id, person.name)
-      }>delete</button></p>
+      }>delete</button>
+      {person.name} {person.number} 
+    </li>
   );
 }

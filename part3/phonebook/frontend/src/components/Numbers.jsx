@@ -8,7 +8,7 @@ export default function Numbers({ search, persons, handleDelete }) {
         <ul>
           {persons.filter(person => person.name.toLowerCase().includes(search)).map(person => (
             <Person
-              key={person.id}
+              key={person._id}
               person={person}
             />
           ))}
@@ -17,7 +17,7 @@ export default function Numbers({ search, persons, handleDelete }) {
         <ul>
           {persons.map(person => (
             <Person
-              key={person.id}
+              key={person._id}
               person={person}
               handleDelete={handleDelete}
             />

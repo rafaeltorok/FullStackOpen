@@ -1,9 +1,16 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import phonebookRouter from './controllers/routes.js';
 
+dotenv.config();
 const app = express();
+const url = process.env.MONGODB_URI;
+
+mongoose.set('strictQuery',false);
+mongoose.connect(url);
 
 morgan.token('body', (req) => {
   return req.method === 'POST' ? JSON.stringify(req.body) : '';

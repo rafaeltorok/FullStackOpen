@@ -39,19 +39,19 @@ const App = () => {
   };
 
   const handleNumberUpdate = async (personId, updatedNumber) => {
-    const personToUpdate = persons.find(p => p.id === personId);
+    const personToUpdate = persons.find(p => p._id === personId);
     if (!personToUpdate) return;
 
     try {
       const updatedPerson = { ...personToUpdate, number: updatedNumber.trim() };
       const returnedPerson = await personService.updateNumber(personId, updatedPerson);
-      setPersons(persons.map(p => (p.id !== returnedPerson.id ? p : returnedPerson)));
+      setPersons(persons.map(p => (p._id !== returnedPerson._id ? p : returnedPerson)));
       handleNotification('success-message', `${returnedPerson.name}'s number has been updated!`);
     } catch (err) {
       console.error(err);
 
       handleNotification('error-message', `${personToUpdate.name}'s has already been removed from server`);
-      setPersons(persons.filter(p => p.id !== personId));
+      setPersons(persons.filter(p => p._id !== personId));
     }
   }
 
@@ -64,7 +64,7 @@ const App = () => {
     }, 5000);
   }
 
-  // Checks for invalid input, such as empty fields
+  // Checks for inval_id input, such as empty fields
   const verifyData = () => {
     // Verifies if both fields have been filled
     if (!newName.trim() || !newNumber.trim()) {
@@ -79,7 +79,7 @@ const App = () => {
       if (person.name.toLowerCase() === newName.toLowerCase().trim()) {
         const confirm = window.confirm(`${newName.trim()} is already added to the Phonebook, replace the old number with a new one?`);
         if (confirm) {
-          await handleNumberUpdate(person.id, newNumber.trim());
+          await handleNumberUpdate(person._id, newNumber.trim());
         }
         return true;
       }
@@ -90,7 +90,7 @@ const App = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // If the data verified is valid, proceed to add a new person
+    // If the data verified is val_id, proceed to add a new person
     if (verifyData()) {
       try {
         const isDuplicate = await checkDuplicates();
@@ -109,9 +109,9 @@ const App = () => {
   };
 
   // Checks if the ID is still present on the server database before attempting to remove it
-  const verifyId = async (id) => {
+  const verifyId = async (_id) => {
     try {
-      const person = await personService.getDataById(id);
+      const person = await personService.getDataById(_id);
       if (!person) {
         return false;
       }
@@ -121,18 +121,18 @@ const App = () => {
     }
   }
 
-  const handleDelete = async (id, name) => {
+  const handleDelete = async (_id, name) => {
     try {
-      const personToRemove = await verifyId(id);
+      const personToRemove = await verifyId(_id);
       if (!personToRemove) {
         handleNotification('error-message', `${name} was already removed from the server`);
-        setPersons(persons.filter(p => p.id !== id));
+        setPersons(persons.filter(p => p._id !== _id));
         return;
       }
       const confirm = window.confirm(`Remove ${name} from the Phonebook?`);
       if (confirm) {
-        await personService.removeData(id);
-        setPersons(persons.filter(p => p.id !== id));
+        await personService.removeData(_id);
+        setPersons(persons.filter(p => p._id !== _id));
         handleNotification('success-message', `${name} was removed from the Phonebook`);
       }
     } catch (err) {

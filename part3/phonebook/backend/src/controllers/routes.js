@@ -1,31 +1,35 @@
-import express, { request, response } from 'express';
+import express from 'express';
 import { Person } from '../models/Person.js';
 
 const phonebookRouter = express.Router();
 
 // GET all people from the Phonebook
-phonebookRouter.get('/api/persons', async (request, response) => {
+phonebookRouter.get('/api/persons', async (request, response, next) => {
   try {
     const people = await Person.find({});
     return response.json(people);
   } catch (err) {
-    return response.status(500).json({ error: "Failed to fetch data from the server" });
+    next(err);
   }
 });
 
 // GET a single person by the id
-phonebookRouter.get('/api/persons/:id', async (request, response) => {
-  const personToFind = await Person.findById(request.params.id);
+phonebookRouter.get('/api/persons/:id', async (request, response, next) => {
+  try {
+    const personToFind = await Person.findById(request.params.id);
 
-  if (personToFind) {
-    return response.json(personToFind);
-  } else {
-    response.status(404).end();
+    if (personToFind) {
+      return response.json(personToFind);
+    } else {
+      response.status(404).end(); // Valid ID, but doesn't exist
+    }
+  } catch (err) {
+    next(err);
   }
 });
 
 // POST a new person into the Phonebook
-phonebookRouter.post('/api/persons', async (request, response) => {
+phonebookRouter.post('/api/persons', async (request, response, next) => {
   try {
     let { name, number } = request.body || {};
 
@@ -58,12 +62,12 @@ phonebookRouter.post('/api/persons', async (request, response) => {
     await newPerson.save();
     return response.json(newPerson);
   } catch (err) {
-    return response.status(500).json({ error: "Failed to store person into the database" });
+    next(err);
   }
 });
 
 // PUT: updates a phone number from the Phonebook
-phonebookRouter.put('/api/persons/:id', async (request, response) => {
+phonebookRouter.put('/api/persons/:id', async (request, response, next) => {
   try {
     // First, check if the number has been properly sent in the request
     let number = request.body.number;
@@ -95,12 +99,12 @@ phonebookRouter.put('/api/persons/:id', async (request, response) => {
       response.status(404).end();
     }
   } catch (err) {
-    return response.status(500).json({ error: "Failed to update the phone number" });
+    next(err);
   }
 });
 
 // DELETE a person by the id
-phonebookRouter.delete('/api/persons/:id', async (request, response) => {
+phonebookRouter.delete('/api/persons/:id', async (request, response, next) => {
   try {
     const id = request.params.id;
     const personToFind = await Person.findById(id);
@@ -112,14 +116,18 @@ phonebookRouter.delete('/api/persons/:id', async (request, response) => {
       response.status(404).end();
     }
   } catch (err) {
-    return response.status(500).json({ error: "Failed to remove person from the database" });
+    next(err);
   }
 });
 
 // GET information about the Phonebook
-phonebookRouter.get('/info', async (request, response) => {
-  const personsList = await Person.find({});
-  return response.send(`Phonebook has info for ${personsList.length} people ${new Date()}`);
+phonebookRouter.get('/info', async (request, response, next) => {
+  try {
+    const personsList = await Person.find({});
+    return response.send(`Phonebook has info for ${personsList.length} people ${new Date()}`);
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default phonebookRouter;

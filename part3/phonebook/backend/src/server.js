@@ -28,6 +28,7 @@ app.use((request, response) => {
 });
 
 // Error-handling middleware
+// eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   console.error(err); // Log on the server for debugging
 

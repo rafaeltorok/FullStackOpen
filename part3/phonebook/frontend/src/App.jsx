@@ -43,13 +43,15 @@ const App = () => {
     if (!personToUpdate) return;
 
     try {
-      const updatedPerson = { ...personToUpdate, number: updatedNumber.trim() };
+      const updatedPerson = { ...personToUpdate, number: updatedNumber };
       const returnedPerson = await personService.updateNumber(personId, updatedPerson);
       setPersons(persons.map(p => (p._id !== returnedPerson._id ? p : returnedPerson)));
       handleNotification('success-message', `${returnedPerson.name}'s number has been updated!`);
     } catch (err) {
-      console.error(err);
-
+      if (err.name === 'ValidationError') {
+        handleNotification('err-message', err.response.data.error);
+        return;
+      }
       handleNotification('error-message', `${personToUpdate.name}'s has already been removed from server`);
       setPersons(persons.filter(p => p._id !== personId));
     }
@@ -64,22 +66,12 @@ const App = () => {
     }, 5000);
   }
 
-  // Checks for inval_id input, such as empty fields
-  const verifyData = () => {
-    // Verifies if both fields have been filled
-    if (!newName.trim() || !newNumber.trim()) {
-      handleNotification('error-message', 'All fields are required');
-      return false;
-    }
-    return true;
-  };
-
   const checkDuplicates = async () => {
     for (const person of persons) {
       if (person.name.toLowerCase() === newName.toLowerCase().trim()) {
         const confirm = window.confirm(`${newName.trim()} is already added to the Phonebook, replace the old number with a new one?`);
         if (confirm) {
-          await handleNumberUpdate(person._id, newNumber.trim());
+          await handleNumberUpdate(person._id, newNumber);
         }
         return true;
       }
@@ -90,21 +82,18 @@ const App = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // If the data verified is val_id, proceed to add a new person
-    if (verifyData()) {
-      try {
-        const isDuplicate = await checkDuplicates();
-        if (!isDuplicate) {
-          const newPerson = { name: newName.trim(), number: newNumber.trim() }
-          const savedPerson = await personService.storeData(newPerson);
-          setPersons(persons.concat(savedPerson));
-          setNewName('');
-          setNewNumber('');
-          handleNotification('success-message', `${savedPerson.name} was added to the Phonebook`);
-        }
-      } catch (err) {
-        console.error(err);
+    try {
+      const isDuplicate = await checkDuplicates();
+      if (!isDuplicate) {
+        const newPerson = { name: newName, number: newNumber }
+        const savedPerson = await personService.storeData(newPerson);
+        setPersons(persons.concat(savedPerson));
+        setNewName('');
+        setNewNumber('');
+        handleNotification('success-message', `${savedPerson.name} was added to the Phonebook`);
       }
+    } catch (err) {
+      handleNotification('error-message', err.response.data.error);
     }
   };
 

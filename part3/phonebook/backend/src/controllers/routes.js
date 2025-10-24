@@ -31,24 +31,9 @@ phonebookRouter.get('/api/persons/:id', async (request, response, next) => {
 // POST a new person into the Phonebook
 phonebookRouter.post('/api/persons', async (request, response, next) => {
   try {
-    let { name, number } = request.body || {};
-
-    // Checks if any of the fields are missing from the request
-    if (typeof name !== 'string' || typeof number !== 'string') {
-      return response.status(400).json({ message: 'Both name and number are required' });
-    }
-
-    name = name.trim();
-    number = number.trim();
-
-    // Checks if the string was made of whitespaces only
-    if (!name || !number) {
-      return response.status(400).json({ message: 'Both name and number are required' });
-    }
-
     const newPerson = new Person ({
-      name: name.trim(),
-      number: number.trim()
+      name: request.body.name,
+      number: request.body.number
     });
 
     // Checks for a duplicated entry
@@ -69,18 +54,10 @@ phonebookRouter.post('/api/persons', async (request, response, next) => {
 // PUT: updates a phone number from the Phonebook
 phonebookRouter.put('/api/persons/:id', async (request, response, next) => {
   try {
+    const number = request.body.number;
+
     // First, check if the number has been properly sent in the request
-    let number = request.body.number;
-
-    // Checks if any of the fields are missing from the request
-    if (typeof number !== 'string') {
-      return response.status(400).json({ message: 'The number is required' });
-    }
-
-    number = number.trim();
-
-    // Checks if the string was made of whitespaces only
-    if (!number) {
+    if (!number || number.trim() === '') {
       return response.status(400).json({ message: 'The number is required' });
     }
 
@@ -92,7 +69,7 @@ phonebookRouter.put('/api/persons/:id', async (request, response, next) => {
       const updatedPerson = await Person.findByIdAndUpdate(
         id,
         { name: personToUpdate.name, number: number },
-        { new: true }
+        { new: true, runValidators: true, context: 'query' }
       );
       return response.json(updatedPerson);
     } else {

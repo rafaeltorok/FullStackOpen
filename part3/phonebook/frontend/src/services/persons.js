@@ -3,48 +3,28 @@ const baseUrl = '/api/persons';
 
 
 async function getData() {
-  try {
-    const response = await axios.get(baseUrl);
-    return response.data;
-  } catch (err) {
-    throw new Error('Error fetching data from the server: ' + err.message);
-  }
+  const response = await axios.get(baseUrl);
+  return response.data;
 }
 
 async function getDataById(id) {
-  try {
-    const response = await axios.get(`${baseUrl}/${id}`);
-    return response.data;
-  } catch (err) {
-    throw new Error(`Error fetching id ${id}: ` + err.message);
-  }
+  const response = await axios.get(`${baseUrl}/${id}`);
+  return response.data;
 }
 
 async function storeData(newObject) {
-  try {
-    const request = await axios.post(baseUrl, newObject);
-    return request.data;
-  } catch (err) {
-    throw new Error('Error storing new person to the server: ' + err.message);
-  }
+  const request = await axios.post(baseUrl, newObject);
+  return request.data;
 }
 
 async function removeData(id) {
-  try {
-    const request = await axios.delete(`${baseUrl}/${id}`);
-    return request.data;
-  } catch (err) {
-    throw new Error('Error removing person from the database: ' + err.message);
-  }
+  const request = await axios.delete(`${baseUrl}/${id}`);
+  return request.data;
 }
 
 async function updateNumber(id, newObject) {
-  try {
-    const request = await axios.put(`${baseUrl}/${id}`, newObject);
-    return request.data;
-  } catch (err) {
-    throw new Error('Error updating the number: ' + err.message);
-  }
+  const request = await axios.put(`${baseUrl}/${id}`, newObject);
+  return request.data;
 }
 
 export default { getData, getDataById, storeData, removeData, updateNumber };

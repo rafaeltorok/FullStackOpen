@@ -48,12 +48,12 @@ const App = () => {
       setPersons(persons.map(p => (p._id !== returnedPerson._id ? p : returnedPerson)));
       handleNotification('success-message', `${returnedPerson.name}'s number has been updated!`);
     } catch (err) {
-      if (err.name === 'ValidationError') {
-        handleNotification('err-message', err.response.data.error);
-        return;
+      if (err.response && err.response.status === 400) {
+        handleNotification('error-message', err.response.data.error);
+      } else {
+        handleNotification('error-message', `${personToUpdate.name}'s has already been removed from server`);
+        setPersons(persons.filter(p => p._id !== personId));
       }
-      handleNotification('error-message', `${personToUpdate.name}'s has already been removed from server`);
-      setPersons(persons.filter(p => p._id !== personId));
     }
   }
 

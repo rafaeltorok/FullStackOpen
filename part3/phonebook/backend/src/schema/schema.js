@@ -10,8 +10,14 @@ export const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    required: true,
     trim: true,
-    minLength: [6, 'Numbers must be at least 6 chars long']
+    minLength: [8, 'Numbers must be at least 8 chars long'],
+    validate: {
+      validator: function(v) {
+        return /^\d{2,3}-\d+$/.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    },
+    required: [true, 'User phone number required']
   }
 });

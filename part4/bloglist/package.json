@@ -4,18 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test",
-    "start": "node ./src/index.js",
-    "dev": "nodemon ./src/index.js"
+    "test": "cross-env NODE_ENV=test node --test",
+    "start": "cross-env NODE_ENV=production node ./src/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "lodash": "^4.17.21",
     "mongoose": "^8.19.2",
     "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.4"
   }
 }

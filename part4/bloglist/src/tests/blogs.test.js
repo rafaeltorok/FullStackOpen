@@ -101,3 +101,149 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(result, blogs[0])
   })
 })
+
+describe('most blogs', () => {
+  test('the function correctly returns the author with the most blogs', () => {
+    const blogs = [
+      {
+        title: "My personal blog",
+        author: "Myself",
+        url: "https://myblog.com",
+        likes: 10,
+      },
+      {
+        title: "Learning FullStack development",
+        author: "The Programmer",
+        url: "https://learnfullstack.com",
+        likes: 10,
+      },
+      {
+        title: "Another blog",
+        author: "Myself",
+        url: "https://anotherblog.com",
+        likes: 5,
+      },
+      {
+        title: "One more blog to the list",
+        author: "Myself",
+        url: "https://andanother.com",
+        likes: 15,
+      }
+    ]
+
+    const result = listHelper.mostBlogs(blogs)
+    assert.deepStrictEqual(result, { author: "Myself", blogs: 3 })
+  })
+
+  test('when there is a tie, return the first one with most blogs', () => {
+    const blogs = [
+      {
+        title: "My personal blog",
+        author: "Myself",
+        url: "https://myblog.com",
+        likes: 10,
+      },
+      {
+        title: "Learning FullStack development",
+        author: "The Programmer",
+        url: "https://learnfullstack.com",
+        likes: 10,
+      },
+      {
+        title: "Another blog",
+        author: "Myself",
+        url: "https://anotherblog.com",
+        likes: 5,
+      },
+      {
+        title: "One more blog to the list",
+        author: "The Programmer",
+        url: "https://andanother.com",
+        likes: 15,
+      }
+    ]
+
+    const result = listHelper.mostBlogs(blogs)
+    assert.deepStrictEqual(result, { author: "Myself", blogs: 2 })
+  })
+
+  test('when there are no blogs, return a warning message', () => {
+    const blogs = []
+
+    const result = listHelper.mostBlogs(blogs)
+    assert.strictEqual(result, "No blogs are present on the list")
+  })
+})
+
+describe('most likes', () => {
+  test('the function correctly returns the author with the most likes', () => {
+    const blogs = [
+      {
+        title: "My personal blog",
+        author: "Myself",
+        url: "https://myblog.com",
+        likes: 10,
+      },
+      {
+        title: "Learning FullStack development",
+        author: "The Programmer",
+        url: "https://learnfullstack.com",
+        likes: 10,
+      },
+      {
+        title: "Another blog",
+        author: "Myself",
+        url: "https://anotherblog.com",
+        likes: 5,
+      },
+      {
+        title: "One more blog to the list",
+        author: "The Programmer",
+        url: "https://andanother.com",
+        likes: 15,
+      }
+    ]
+
+    const result = listHelper.mostLikes(blogs)
+    assert.deepStrictEqual(result, { author: "The Programmer", likes: 25 })
+  })
+
+  test('when there is a tie, return the first one with most blogs', () => {
+    const blogs = [
+      {
+        title: "My personal blog",
+        author: "Myself",
+        url: "https://myblog.com",
+        likes: 10,
+      },
+      {
+        title: "Learning FullStack development",
+        author: "The Programmer",
+        url: "https://learnfullstack.com",
+        likes: 10,
+      },
+      {
+        title: "Another blog",
+        author: "Myself",
+        url: "https://anotherblog.com",
+        likes: 5,
+      },
+      {
+        title: "One more blog to the list",
+        author: "The Programmer",
+        url: "https://andanother.com",
+        likes: 5,
+      }
+    ]
+
+    const result = listHelper.mostLikes(blogs)
+    assert.deepStrictEqual(result, { author: "Myself", likes: 15 })
+  })
+
+  test('when there are no blogs, return a warning message', () => {
+    const blogs = []
+
+    const result = listHelper.mostLikes(blogs)
+    assert.strictEqual(result, "No blogs are present on the list")
+  })
+})

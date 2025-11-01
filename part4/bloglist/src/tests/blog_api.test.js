@@ -10,10 +10,11 @@ const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  for (const blog of helper.initialBlogs) {
-    const blogObject = new Blog(blog)
-    await blogObject.save()
-  }
+
+  const blogObjects = helper.initialBlogs
+    .map(blog => new Blog(blog))
+  const promiseArray = blogObjects.map(blog => blog.save())
+  await Promise.all(promiseArray)
 })
 
 describe('testing the GET method', () => {
@@ -34,11 +35,19 @@ describe('testing the GET method', () => {
     const blogToView = blogsAtStart[0]
 
     const resultBlog = await api
-      .get(`/api/blogs/${noteToView.id}`)
+      .get(`/api/blogs/${blogToView.id}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
     assert.deepStrictEqual(resultBlog.body, blogToView)
+  })
+
+  test('blogs have id property instead of _id', async () => {
+    const response = await api.get('/api/blogs')
+    
+    const blog = response.body[0]
+    assert(blog.id)
+    assert(!blog._id)
   })
 })
 
@@ -107,6 +116,24 @@ describe('testing the POST method', () => {
     const blogsAtEnd = await helper.blogsInDb()
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
   })
+
+  test('if the number of likes has not been set, make sure it defaults to 0 ', async () => {
+    const newBlog = {
+      title: 'Learning async/await calls',
+      author: 'The Teacher',
+      url: 'https://asyncawait.com'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const addedBlog = blogsAtEnd.at(-1)
+    assert.strictEqual(addedBlog.likes, 0)
+  })
 })
 
 describe('testing the DELETE method', () => {
@@ -127,7 +154,7 @@ describe('testing the DELETE method', () => {
   })
 })
 
-// Close connection after ALL tests finish
+// Close connection after ALL tests have finished
 after(async () => {
   await mongoose.connection.close()
 })

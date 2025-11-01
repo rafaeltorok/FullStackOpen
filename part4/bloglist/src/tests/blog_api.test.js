@@ -154,6 +154,53 @@ describe('testing the DELETE method', () => {
   })
 })
 
+describe('testing the PUT method', () => {
+  test('the number of likes of a blog can be updated with a valid number', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart.at(0)
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send({ "likes": 1 })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
+    assert.strictEqual(updatedBlog.likes, 1)
+  })
+
+  test('updating with invalid likes returns 400', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart.at(0)
+    const originalLikes = blogToUpdate.likes
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send({ "likes": -1 })
+      .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
+    assert.strictEqual(updatedBlog.likes, originalLikes)
+  })
+
+  test('updating without likes returns 400', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart.at(0)
+    const originalLikes = blogToUpdate.likes
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send({})
+      .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
+    assert.strictEqual(updatedBlog.likes, originalLikes)
+  })
+})
+
 // Close connection after ALL tests have finished
 after(async () => {
   await mongoose.connection.close()

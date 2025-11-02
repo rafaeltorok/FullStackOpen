@@ -1,19 +1,19 @@
 const blogsRouter = require('express').Router()
-const { request, response } = require('express')
 const Blog = require('../models/blog.js')
+const User = require('../models/user.js')
 
-blogsRouter.get('/api/blogs', async (request, response, next) => {
+blogsRouter.get('/', async (request, response, next) => {
   try {
-    const data = await Blog.find({})
+    const data = await Blog.find({}).populate('user')
     response.json(data)
   } catch (error) {
     next(error)
   }
 })
 
-blogsRouter.get('/api/blogs/:id', async (request, response, next) => {
+blogsRouter.get('/:id', async (request, response, next) => {
   try {
-    const data = await Blog.findById(request.params.id)
+    const data = await Blog.findById(request.params.id).populate('user')
 
     if (data) {
       response.json(data)
@@ -25,25 +25,34 @@ blogsRouter.get('/api/blogs/:id', async (request, response, next) => {
   }
 })
 
-blogsRouter.post('/api/blogs', async (request, response, next) => {
+blogsRouter.post('/', async (request, response, next) => {
   try {
-    const { title, author, url, likes } = request.body
+    const { title, author, url, likes, userId } = request.body
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return response.status(400).json({ error: 'userId missing or not valid' })
+    }
 
     const newBlog = new Blog({
       title,
       author,
       url,
       likes: likes || 0,
+      user: user._id
     })
 
-    await newBlog.save()
-    response.status(201).json(newBlog)
+    const savedBlog = await newBlog.save()
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
+
+    response.status(201).json(savedBlog)
   } catch (error) {
     next(error)
   }
 })
 
-blogsRouter.delete('/api/blogs/:id', async (request, response, next) => {
+blogsRouter.delete('/:id', async (request, response, next) => {
   try {
     const id = request.params.id
     const blogToRemove = await Blog.findById(id)
@@ -59,7 +68,7 @@ blogsRouter.delete('/api/blogs/:id', async (request, response, next) => {
   }
 })
 
-blogsRouter.put('/api/blogs/:id', async (request, response, next) => {
+blogsRouter.put('/:id', async (request, response, next) => {
   try {
     const likes = request.body.likes
 

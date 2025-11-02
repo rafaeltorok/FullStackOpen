@@ -9,6 +9,10 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).json({ error: err.message });
   }
 
+  if (err.name === 'MongoServerError' && err.message.includes('E11000 duplicate key error')) {
+    return res.status(400).json({ error: 'expected `username` to be unique' })
+  }
+
   if (err.code === 11000) {
     return res.status(409).json({ error: 'duplicate key' });
   }

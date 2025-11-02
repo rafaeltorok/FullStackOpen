@@ -5,16 +5,35 @@ const supertest = require('supertest')
 const app = require('../app.js')
 const Blog = require('../models/blog.js')
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
+  // Creates and stores a new user into the database
+  const passwordHash = await bcrypt.hash('password', 10)
+  const user = new User({ 
+    username: 'root',
+    name: 'root',
+    passwordHash 
+  })
+  const savedUser = await user.save()
+
+  // Stores all initial blogs into the database
   const blogObjects = helper.initialBlogs
-    .map(blog => new Blog(blog))
-  const promiseArray = blogObjects.map(blog => blog.save())
-  await Promise.all(promiseArray)
+    .map(blog => new Blog({
+      ...blog,
+      user: savedUser._id
+    }))
+
+  const savedBlogs = await Promise.all(blogObjects.map(blog => blog.save()))
+
+  savedUser.blogs = savedBlogs.map(blog => blog._id)
+  await savedUser.save()
 })
 
 describe('testing the GET method', () => {
@@ -53,10 +72,14 @@ describe('testing the GET method', () => {
 
 describe('testing the POST method', () => {
   test('a valid blog can be added ', async () => {
+    const usersAtStart = await helper.usersInDb()
+    const user = usersAtStart[0]
+
     const newBlog = {
       title: 'Learning async/await calls',
       author: 'The Teacher',
-      url: 'https://asyncawait.com'
+      url: 'https://asyncawait.com',
+      userId: user.id
     }
 
     await api
@@ -73,9 +96,13 @@ describe('testing the POST method', () => {
   })
 
   test('blog without a title is not added', async () => {
+    const usersAtStart = await helper.usersInDb()
+    const user = usersAtStart[0]
+
     const newBlog = {
       author: 'The Blogger',
-      url: 'https://blog.com'
+      url: 'https://blog.com',
+      userId: user.id
     }
 
     await api
@@ -88,9 +115,13 @@ describe('testing the POST method', () => {
   })
 
   test('blog without an author is not added', async () => {
+    const usersAtStart = await helper.usersInDb()
+    const user = usersAtStart[0]
+
     const newBlog = {
       title: 'My Test Blog',
-      url: 'https://blog.com'
+      url: 'https://blog.com',
+      userId: user.id
     }
 
     await api
@@ -103,9 +134,13 @@ describe('testing the POST method', () => {
   })
 
   test('blog without an url is not added', async () => {
+    const usersAtStart = await helper.usersInDb()
+    const user = usersAtStart[0]
+
     const newBlog = {
       title: 'My Test Blog',
-      author: 'The Blogger'
+      author: 'The Blogger',
+      userId: user.id
     }
 
     await api
@@ -118,10 +153,14 @@ describe('testing the POST method', () => {
   })
 
   test('if the number of likes has not been set, make sure it defaults to 0 ', async () => {
+    const usersAtStart = await helper.usersInDb()
+    const user = usersAtStart[0]
+
     const newBlog = {
       title: 'Learning async/await calls',
       author: 'The Teacher',
-      url: 'https://asyncawait.com'
+      url: 'https://asyncawait.com',
+      userId: user.id
     }
 
     await api
@@ -133,6 +172,22 @@ describe('testing the POST method', () => {
     const blogsAtEnd = await helper.blogsInDb()
     const addedBlog = blogsAtEnd.at(-1)
     assert.strictEqual(addedBlog.likes, 0)
+  })
+
+  test('blog without an user id is not added', async () => {
+    const newBlog = {
+      title: 'My Test Blog',
+      author: 'The Blogger',
+      url: 'http://myblog.com'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
   })
 })
 
@@ -198,6 +253,51 @@ describe('testing the PUT method', () => {
     const blogsAtEnd = await helper.blogsInDb()
     const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
     assert.strictEqual(updatedBlog.likes, originalLikes)
+  })
+})
+
+describe('when there is initially one user in db', () => {
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'newusername',
+      name: 'New User',
+      password: 'password',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    assert(usernames.includes(newUser.username))
+  })
+
+  test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'root',
+      name: 'root',
+      password: 'password',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('expected `username` to be unique'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
 })
 

@@ -1,6 +1,8 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog.js')
 const User = require('../models/user.js')
+const { decodedToken } = require('../utils/token.js')
+
 
 blogsRouter.get('/', async (request, response, next) => {
   try {
@@ -27,8 +29,14 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
 blogsRouter.post('/', async (request, response, next) => {
   try {
-    const { title, author, url, likes, userId } = request.body
-    const user = await User.findById(userId)
+    const { title, author, url, likes } = request.body
+    const userToken = decodedToken(request)
+
+    if (!userToken) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+
+    const user = await User.findById(userToken.id)
 
     if (!user) {
       return response.status(400).json({ error: 'userId missing or not valid' })

@@ -18,6 +18,16 @@ const errorHandler = (err, req, res, next) => {
     return res.status(409).json({ error: 'duplicate key' });
   }
 
+  if (err.name ===  'JsonWebTokenError') {
+    return res.status(401).json({ error: 'token invalid' })
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      error: 'token expired'
+    })
+  }
+
   res.status(500).json({ error: 'internal server error' });
 };
 

@@ -74,7 +74,7 @@ describe('favorite blog', () => {
     const result = listHelper.favoriteBlog(blogs)
     assert.strictEqual(result, "No blogs are present on the list")
   })
-  
+
   test('when the favorite blog is a tie, return any of them', () => {
     const blogs = [
       {

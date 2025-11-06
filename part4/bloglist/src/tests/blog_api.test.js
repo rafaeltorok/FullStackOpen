@@ -16,10 +16,10 @@ beforeEach(async () => {
 
   // Creates and stores a new user into the database
   const passwordHash = await bcrypt.hash('password', 10)
-  const user = new User({ 
+  const user = new User({
     username: 'root',
     name: 'root',
-    passwordHash 
+    passwordHash
   })
   const savedUser = await user.save()
 
@@ -63,7 +63,6 @@ describe('testing the GET method', () => {
 
   test('blogs have id property instead of _id', async () => {
     const response = await api.get('/api/blogs')
-    
     const blog = response.body[0]
     assert(blog.id)
     assert(!blog._id)

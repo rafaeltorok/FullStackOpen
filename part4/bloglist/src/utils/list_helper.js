@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-const dummy = (blogs) => {
+const dummy = () => {
   return 1;
 }
 
@@ -43,7 +43,7 @@ const mostBlogs = (blogs) => {
       blogs: maxCount
     }
   }
-  
+
   return blogs.length === 0
     ? "No blogs are present on the list"
     : getMostBlogs(blogs)
@@ -72,7 +72,7 @@ const mostLikes = (blogs) => {
       likes: maxCount
     }
   }
-  
+
   return blogs.length === 0
     ? "No blogs are present on the list"
     : getMostLikes(blogs)

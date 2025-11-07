@@ -212,12 +212,23 @@ describe('testing the POST method', () => {
 })
 
 describe('testing the DELETE method', () => {
+  let token
+
+  beforeEach(async () => {
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'password' })
+
+    token = loginResponse.body.token
+  })
+
   test('a blog can be deleted', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -226,6 +237,43 @@ describe('testing the DELETE method', () => {
     assert(!titles.includes(blogToDelete.title))
 
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+  })
+
+  test('a user cannot remove a blog created by another', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    const passwordHash = await bcrypt.hash('secret', 10)
+    const user = new User({ username: 'newuser', name: 'New user', passwordHash })
+    await user.save()
+
+    // Login to get token
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'newuser', password: 'secret' })
+
+    token = loginResponse.body.token
+
+    const result = await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert(result.body.error.includes('Only the original owner can remove a blog'))
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  })
+
+  test('blog removal fails with 401 if token is missing', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .post('/api/blogs')
+      // No Authorization header
+      .send(blogToDelete)
+      .expect(401)
   })
 })
 

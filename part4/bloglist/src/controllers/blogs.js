@@ -1,7 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog.js')
 const User = require('../models/user.js')
-const { decodedToken } = require('../utils/token.js')
 
 
 blogsRouter.get('/', async (request, response, next) => {
@@ -30,13 +29,11 @@ blogsRouter.get('/:id', async (request, response, next) => {
 blogsRouter.post('/', async (request, response, next) => {
   try {
     const { title, author, url, likes } = request.body
-    const userToken = decodedToken(request)
 
-    if (!userToken) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
+    if (request.tokenError) return response.status(401).json({ error: 'token invalid' })
+    if (!request.userToken) return response.status(401).json({ error: 'token missing' })
 
-    const user = await User.findById(userToken.id)
+    const user = await User.findById(request.userToken.id)
 
     if (!user) {
       return response.status(400).json({ error: 'userId missing or not valid' })
@@ -62,11 +59,24 @@ blogsRouter.post('/', async (request, response, next) => {
 
 blogsRouter.delete('/:id', async (request, response, next) => {
   try {
-    const id = request.params.id
-    const blogToRemove = await Blog.findById(id)
+    if (request.tokenError) return response.status(401).json({ error: 'token invalid' })
+    if (!request.userToken) return response.status(401).json({ error: 'token missing' })
+
+    const user = await User.findById(request.userToken.id)
+
+    if (!user) {
+      return response.status(400).json({ error: 'userId missing or not valid' })
+    }
+
+    const blogId = request.params.id
+    const blogToRemove = await Blog.findById(blogId)
 
     if (blogToRemove) {
-      await Blog.findByIdAndDelete(id)
+      if (blogToRemove.user.toString() !== user._id.toString()) {
+        return response.status(401).json({ error: 'Only the original owner can remove a blog' })
+      }
+
+      await Blog.findByIdAndDelete(blogId)
       response.status(204).end()
     } else {
       response.status(404).end()

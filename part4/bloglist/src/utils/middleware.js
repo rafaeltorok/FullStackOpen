@@ -1,3 +1,7 @@
+const jwt = require('jsonwebtoken')
+const User = require('../models/user.js')
+require('dotenv').config()
+
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   console.error(err); // Log on the server for debugging
@@ -31,4 +35,50 @@ const errorHandler = (err, req, res, next) => {
   res.status(500).json({ error: 'internal server error' });
 };
 
-module.exports = { errorHandler }
+const tokenExtractor = (req, res, next) => {
+  const authorization = req.get('authorization')
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    req.tokenError = 'missing'
+    return next()
+  }
+
+  const token = authorization.replace('Bearer ', '')
+
+  try {
+    req.userToken = jwt.verify(token, process.env.SECRET)
+    // eslint-disable-next-line no-unused-vars
+  } catch (err) {
+    req.tokenError = 'invalid'
+  }
+
+  next()
+}
+
+
+const userExtractor = async (req, res, next) => {
+  if (!req.userToken || !req.userToken.id) {
+    // preserve a prior 'missing' tokenError set by tokenExtractor
+    if (!req.tokenError) {
+      req.tokenError = 'invalid'
+    }
+    return next()
+  }
+
+  try {
+    const user = await User.findById(req.userToken.id)
+    if (!user) {
+      req.tokenError = 'user not found'
+    } else {
+      req.user = user
+    }
+    // eslint-disable-next-line no-unused-vars
+  } catch (err) {
+    if (!req.tokenError) req.tokenError = 'invalid'
+  }
+
+  next()
+}
+
+
+module.exports = { errorHandler, tokenExtractor, userExtractor }

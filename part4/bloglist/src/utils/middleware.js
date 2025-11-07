@@ -4,14 +4,14 @@ require('dotenv').config()
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
-  console.error(err); // Log on the server for debugging
+  console.error(err) // Log on the server for debugging
 
   if (err.name === 'CastError') {
-    return res.status(400).json({ error: 'malformatted id' });
+    return res.status(400).json({ error: 'malformatted id' })
   }
 
   if (err.name === 'ValidationError') {
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message })
   }
 
   if (err.name === 'MongoServerError' && err.message.includes('E11000 duplicate key error')) {
@@ -19,7 +19,7 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (err.code === 11000) {
-    return res.status(409).json({ error: 'duplicate key' });
+    return res.status(409).json({ error: 'duplicate key' })
   }
 
   if (err.name ===  'JsonWebTokenError') {
@@ -32,8 +32,22 @@ const errorHandler = (err, req, res, next) => {
     })
   }
 
-  res.status(500).json({ error: 'internal server error' });
-};
+  res.status(500).json({ error: 'internal server error' })
+}
+
+const requireAuth = (req, res, next) => {
+  if (req.tokenError === 'invalid') {
+    return res.status(401).json({ error: 'token invalid' })
+  }
+  if (req.tokenError === 'missing') {
+    return res.status(401).json({ error: 'token missing' })
+  }
+  if (!req.userToken) {
+    return res.status(401).json({ error: 'token missing' })
+  }
+  // at this point req.user or req.userToken exists (or will be filled by userExtractor)
+  return next()
+}
 
 const tokenExtractor = (req, res, next) => {
   const authorization = req.get('authorization')
@@ -54,7 +68,6 @@ const tokenExtractor = (req, res, next) => {
 
   next()
 }
-
 
 const userExtractor = async (req, res, next) => {
   if (!req.userToken || !req.userToken.id) {
@@ -81,4 +94,4 @@ const userExtractor = async (req, res, next) => {
 }
 
 
-module.exports = { errorHandler, tokenExtractor, userExtractor }
+module.exports = { errorHandler, tokenExtractor, userExtractor, requireAuth }

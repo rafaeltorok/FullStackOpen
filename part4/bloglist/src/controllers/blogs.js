@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog.js')
 const User = require('../models/user.js')
+const middleware = require('../utils/middleware.js')
 
 
 blogsRouter.get('/', async (request, response, next) => {
@@ -18,66 +19,6 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
     if (data) {
       response.json(data)
-    } else {
-      response.status(404).end()
-    }
-  } catch (error) {
-    next(error)
-  }
-})
-
-blogsRouter.post('/', async (request, response, next) => {
-  try {
-    const { title, author, url, likes } = request.body
-
-    if (request.tokenError) return response.status(401).json({ error: 'token invalid' })
-    if (!request.userToken) return response.status(401).json({ error: 'token missing' })
-
-    const user = await User.findById(request.userToken.id)
-
-    if (!user) {
-      return response.status(400).json({ error: 'userId missing or not valid' })
-    }
-
-    const newBlog = new Blog({
-      title,
-      author,
-      url,
-      likes: likes || 0,
-      user: user._id
-    })
-
-    const savedBlog = await newBlog.save()
-    user.blogs = user.blogs.concat(savedBlog._id)
-    await user.save()
-
-    response.status(201).json(savedBlog)
-  } catch (error) {
-    next(error)
-  }
-})
-
-blogsRouter.delete('/:id', async (request, response, next) => {
-  try {
-    if (request.tokenError) return response.status(401).json({ error: 'token invalid' })
-    if (!request.userToken) return response.status(401).json({ error: 'token missing' })
-
-    const user = await User.findById(request.userToken.id)
-
-    if (!user) {
-      return response.status(400).json({ error: 'userId missing or not valid' })
-    }
-
-    const blogId = request.params.id
-    const blogToRemove = await Blog.findById(blogId)
-
-    if (blogToRemove) {
-      if (blogToRemove.user.toString() !== user._id.toString()) {
-        return response.status(401).json({ error: 'Only the original owner can remove a blog' })
-      }
-
-      await Blog.findByIdAndDelete(blogId)
-      response.status(204).end()
     } else {
       response.status(404).end()
     }
@@ -105,6 +46,63 @@ blogsRouter.put('/:id', async (request, response, next) => {
     }
 
     response.json(updatedBlog)
+  } catch (error) {
+    next(error)
+  }
+})
+
+// any middleware declared after this line will apply to routes declared after it
+blogsRouter.use(middleware.requireAuth)
+
+blogsRouter.post('/', async (request, response, next) => {
+  try {
+    const { title, author, url, likes } = request.body
+
+    const user = await User.findById(request.userToken.id)
+
+    if (!user) {
+      return response.status(400).json({ error: 'userId missing or not valid' })
+    }
+
+    const newBlog = new Blog({
+      title,
+      author,
+      url,
+      likes: likes || 0,
+      user: user._id
+    })
+
+    const savedBlog = await newBlog.save()
+    user.blogs = user.blogs.concat(savedBlog._id)
+    await user.save()
+
+    response.status(201).json(savedBlog)
+  } catch (error) {
+    next(error)
+  }
+})
+
+blogsRouter.delete('/:id', async (request, response, next) => {
+  try {
+    const user = await User.findById(request.userToken.id)
+
+    if (!user) {
+      return response.status(400).json({ error: 'userId missing or not valid' })
+    }
+
+    const blogId = request.params.id
+    const blogToRemove = await Blog.findById(blogId)
+
+    if (blogToRemove) {
+      if (blogToRemove.user.toString() !== user._id.toString()) {
+        return response.status(401).json({ error: 'Only the original owner can remove a blog' })
+      }
+
+      await Blog.findByIdAndDelete(blogId)
+      response.status(204).end()
+    } else {
+      response.status(404).end()
+    }
   } catch (error) {
     next(error)
   }

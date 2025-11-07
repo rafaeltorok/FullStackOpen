@@ -6,7 +6,7 @@ const { decodedToken } = require('../utils/token.js')
 
 blogsRouter.get('/', async (request, response, next) => {
   try {
-    const data = await Blog.find({}).populate('user')
+    const data = await Blog.find({}).populate('user', '-blogs')
     response.json(data)
   } catch (error) {
     next(error)
@@ -15,7 +15,7 @@ blogsRouter.get('/', async (request, response, next) => {
 
 blogsRouter.get('/:id', async (request, response, next) => {
   try {
-    const data = await Blog.findById(request.params.id).populate('user')
+    const data = await Blog.findById(request.params.id).populate('user', '-blogs')
 
     if (data) {
       response.json(data)

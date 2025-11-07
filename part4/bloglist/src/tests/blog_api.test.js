@@ -70,6 +70,24 @@ describe('testing the GET method', () => {
 })
 
 describe('testing the POST method', () => {
+  let token
+
+  beforeEach(async () => {
+    // Clear DB and create test user
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('secret', 10)
+    const user = new User({ username: 'root', name: 'root', passwordHash })
+    await user.save()
+
+    // Login to get token
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'root', name: 'root', password: 'secret' })
+
+    token = loginResponse.body.token
+  })
+
   test('a valid blog can be added ', async () => {
     const usersAtStart = await helper.usersInDb()
     const user = usersAtStart[0]
@@ -83,6 +101,7 @@ describe('testing the POST method', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -106,6 +125,7 @@ describe('testing the POST method', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
 
@@ -125,6 +145,7 @@ describe('testing the POST method', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
 
@@ -144,6 +165,7 @@ describe('testing the POST method', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
 
@@ -164,6 +186,7 @@ describe('testing the POST method', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -173,7 +196,7 @@ describe('testing the POST method', () => {
     assert.strictEqual(addedBlog.likes, 0)
   })
 
-  test('blog without an user id is not added', async () => {
+  test('blog creation fails with 401 if token is missing', async () => {
     const newBlog = {
       title: 'My Test Blog',
       author: 'The Blogger',
@@ -182,11 +205,9 @@ describe('testing the POST method', () => {
 
     await api
       .post('/api/blogs')
+      // No Authorization header
       .send(newBlog)
-      .expect(400)
-
-    const blogsAtEnd = await helper.blogsInDb()
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+      .expect(401)
   })
 })
 
@@ -255,7 +276,7 @@ describe('testing the PUT method', () => {
   })
 })
 
-describe('when there is initially one user in db', () => {
+describe('testing the Users route', () => {
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
 
@@ -295,6 +316,88 @@ describe('when there is initially one user in db', () => {
 
     const usersAtEnd = await helper.usersInDb()
     assert(result.body.error.includes('expected `username` to be unique'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails if username has less than 3 chars', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'a',
+      name: 'New user',
+      password: 'password'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('Username must be at least 3 chars long'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails if password is smaller than 3 chars', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'newuser',
+      name: 'New user',
+      password: 'p'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('Password must be at least 3 chars long'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails if no username has been provided', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      name: 'New user',
+      password: 'password'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('Username must be at least 3 chars long'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails if no password has been provided', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: "newuser",
+      name: 'New user'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('Password must be at least 3 chars long'))
 
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import blogService from './services/blogService'
 import Notification from './components/Notification'
-import BlogList from './components/BlogList';
-import AddBlogForm from './components/AddBlogForm';
+import BlogList from './components/BlogList'
+import AddBlogForm from './components/AddBlogForm'
+
 
 function App() {
   const [blogList, setBlogList] = useState([]);
@@ -28,7 +29,7 @@ function App() {
   }, [])
 
   const handleNotification = (type, message) => {
-    setNotification(type);
+    setNotificationType(type);
     setNotification(message);
     setTimeout(() => {
       setNotificationType('');
@@ -37,14 +38,20 @@ function App() {
   }
 
   const addBlog = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      ...newBlog
-    }
+    try {
+      event.preventDefault()
+      const blogObject = {
+        ...newBlog
+      }
 
-    const savedBlog = await blogService.storeData(blogObject)
-    setBlogList(blogList.concat(savedBlog))
-    setNewBlog({ title: '', author: '', url: '', likes: 0 })
+      const savedBlog = await blogService.storeData(blogObject)
+      setBlogList(blogList.concat(savedBlog))
+      setNewBlog({ title: '', author: '', url: '', likes: 0 })
+      handleNotification('success-message', `The blog "${savedBlog.title}" was added to the list!`)
+    } catch (err) {
+      console.error(err)
+      handleNotification('error-message', `Failed to add a new blog`)
+    }
   }
 
   if (!blogList) {
@@ -57,15 +64,15 @@ function App() {
 
   return (
     <>
-      <h1>Blogs List</h1>
-      <Notification
-        message={notification}
-        messageType={notificationType}
-      />
+      <h1 className='main-title'>Blogs List</h1>
       <AddBlogForm
         newBlog={newBlog}
         setNewBlog={setNewBlog}
         addBlog={addBlog}
+      />
+      <Notification
+        messageType={notificationType}
+        message={notification}
       />
       <BlogList
         blogList={blogList}

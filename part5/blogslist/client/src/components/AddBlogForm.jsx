@@ -1,39 +1,35 @@
 export default function AddBlogForm({ newBlog, setNewBlog, addBlog }) {
-  const handleBlogChange = (event) => {
-    setNewBlog({
-      title: event.target.value.title,
-      author: event.target.value.author,
-      url: event.target.value.url,
-      likes: 0
-    })
-    console.log(newBlog)
-  }
-
   return (
-    <div>
+    <div className="container">
       <form onSubmit={addBlog}>
-        <label htmlFor="title">Title</label>
-        <input
-          id="title"
-          type="text"
-          value={newBlog.title}
-          onChange={handleBlogChange}
-        ></input>
-        <label>Author</label>
-        <input
-          id="author"
-          type="text"
-          value={newBlog.author}
-          onChange={handleBlogChange}
-        ></input>
-        <label>URL</label>
-        <input
-          id="url"
-          type="text"
-          value={newBlog.url}
-          onChange={handleBlogChange}
-        ></input>
-        <button type="submit">Submit</button>
+        <div>
+          <label htmlFor="title">Title</label>
+          <input
+            id="title"
+            type="text"
+            value={newBlog.title}
+            onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
+          ></input>
+        </div>
+        <div>
+          <label htmlFor="author">Author</label>
+          <input
+            id="author"
+            type="text"
+            value={newBlog.author}
+            onChange={(e) => setNewBlog({ ...newBlog, author: e.target.value })}
+          ></input>  
+        </div>
+        <div>
+          <label htmlFor="url">URL</label>
+          <input
+            id="url"
+            type="text"
+            value={newBlog.url}
+            onChange={(e) => setNewBlog({ ...newBlog, url: e.target.value })}
+          ></input>
+        </div>
+        <button type="submit" className="submit-button">Submit</button>
       </form>
     </div>
   )

@@ -42,14 +42,14 @@ form input {
   text-align: left;
 }
 
-.submit-button {
+button {
   font-weight: bold;
   border-style: outset;
   background-color: black;
   color: white;
 }
 
-.submit-button:active {
+button:active {
   border-style: inset;
   background-color: #202020;
   color: #505050;

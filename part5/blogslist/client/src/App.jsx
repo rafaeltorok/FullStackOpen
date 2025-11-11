@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import blogService from './services/blogService'
+import Login from './components/Login'
+import AddBlogForm from './components/AddBlogForm'
 import Notification from './components/Notification'
 import BlogList from './components/BlogList'
-import AddBlogForm from './components/AddBlogForm'
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +29,51 @@ function App() {
     }
     fetchData()
   }, [])
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogsListUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
+  }, [])
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    
+    try {
+      const user = await blogService.userLogin({ username, password })
+
+      window.localStorage.setItem(
+        'loggedBlogsListUser', JSON.stringify(user)
+      )
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    } catch (err) {
+      console.error(err)
+      handleNotification('error-message', 'Incorrect credentials')
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      const isLogged = window.localStorage.getItem('loggedBlogsListUser')
+      if (!isLogged) {
+        handleNotification('error-message', 'User has already been logged out')
+        setUser(null)
+      } else {
+        window.localStorage.removeItem('loggedBlogsListUser')
+        handleNotification('success-message', `${user.name} has logged out`)
+        setUser(null)
+      }
+    } catch (err) {
+      console.error(err)
+      handleNotification('error-message', 'Failed to logout the current user')
+    }
+  }
 
   const handleNotification = (type, message) => {
     setNotificationType(type);
@@ -47,7 +94,7 @@ function App() {
       const savedBlog = await blogService.storeData(blogObject)
       setBlogList(blogList.concat(savedBlog))
       setNewBlog({ title: '', author: '', url: '', likes: 0 })
-      handleNotification('success-message', `The blog "${savedBlog.title}" was added to the list!`)
+      handleNotification('success-message', `The blog "${savedBlog.title}" by ${savedBlog.author} was added to the list!`)
     } catch (err) {
       console.error(err)
       handleNotification('error-message', `Failed to add a new blog`)
@@ -65,15 +112,32 @@ function App() {
   return (
     <>
       <h1 className='main-title'>Blogs List</h1>
-      <AddBlogForm
-        newBlog={newBlog}
-        setNewBlog={setNewBlog}
-        addBlog={addBlog}
-      />
-      <Notification
+      {!user && (
+        <Login
+          handleLogin={handleLogin}
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+        />
+      )}
+      {user && (
+        <div>
+          <p>
+            <strong>{user.name}</strong> logged in
+            <button onClick={handleLogout}>logout</button>
+          </p>
+          <AddBlogForm
+            newBlog={newBlog}
+            setNewBlog={setNewBlog}
+            addBlog={addBlog}
+          />
+        </div>
+      )}
+      {notification && <Notification
         messageType={notificationType}
         message={notification}
-      />
+      />}
       <BlogList
         blogList={blogList}
       />

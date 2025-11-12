@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import blogService from './services/blogService'
 import Login from './components/Login'
 import AddBlogForm from './components/AddBlogForm'
 import Notification from './components/Notification'
 import BlogList from './components/BlogList'
+import Togglable from './components/Togglable'
 
 
 function App() {
   const [blogList, setBlogList] = useState([]);
-  const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '', likes: 0 })
   const [notification, setNotification] = useState('')
   const [notificationType, setNotificationType] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,20 +86,37 @@ function App() {
     }, 5000);
   }
 
-  const addBlog = async (event) => {
+  const addBlog = async (blogObject) => {
     try {
-      event.preventDefault()
-      const blogObject = {
-        ...newBlog
-      }
-
       const savedBlog = await blogService.storeData(blogObject)
       setBlogList(blogList.concat(savedBlog))
-      setNewBlog({ title: '', author: '', url: '', likes: 0 })
+      blogFormRef.current.toggleVisibility()
       handleNotification('success-message', `The blog "${savedBlog.title}" by ${savedBlog.author} was added to the list!`)
     } catch (err) {
       console.error(err)
       handleNotification('error-message', `Failed to add a new blog`)
+    }
+  }
+
+  const handleLikes = async (blogToUpdate) => {
+    try {
+      const updatedBlog = await blogService.updateData(blogToUpdate.id, {
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1
+      })
+      setBlogList(blogList.map(blog => blog.id === blogToUpdate.id ? updatedBlog : blog))
+    } catch (err) {
+      console.error(err)
+      handleNotification('error-message', 'Failed to update the blog\'s like counter')
+    }
+  }
+
+  const handleDelete = async (blogToRemove) => {
+    try {
+      
+    } catch (err) {
+      console.error(err)
+      handleNotification('error-message', 'Failed to remove blog fm the list')
     }
   }
 
@@ -113,13 +132,15 @@ function App() {
     <>
       <h1 className='main-title'>Blogs List</h1>
       {!user && (
-        <Login
-          handleLogin={handleLogin}
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-        />
+        <Togglable buttonLabel='login'>
+          <Login
+            handleLogin={handleLogin}
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+          />
+        </Togglable>
       )}
       {user && (
         <div>
@@ -127,11 +148,11 @@ function App() {
             <strong>{user.name}</strong> logged in
             <button onClick={handleLogout}>logout</button>
           </p>
-          <AddBlogForm
-            newBlog={newBlog}
-            setNewBlog={setNewBlog}
-            addBlog={addBlog}
-          />
+          <Togglable buttonLabel="Add blog" ref={blogFormRef}>
+            <AddBlogForm
+              addBlog={addBlog}
+            />
+          </Togglable>
         </div>
       )}
       {notification && <Notification
@@ -140,6 +161,7 @@ function App() {
       />}
       <BlogList
         blogList={blogList}
+        handleLikes={handleLikes}
       />
     </>
   )

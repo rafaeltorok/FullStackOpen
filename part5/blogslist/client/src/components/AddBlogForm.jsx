@@ -1,7 +1,19 @@
-export default function AddBlogForm({ newBlog, setNewBlog, addBlog }) {
+import { useState } from "react"
+
+export default function AddBlogForm({ addBlog }) {
+  const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '', likes: 0 })
+
+  const createBlog = (event) => {
+    event.preventDefault()
+    addBlog({
+      ...newBlog
+    })
+    setNewBlog({ title: '', author: '', url: '', likes: 0 })
+  }
+
   return (
     <div className="container">
-      <form onSubmit={addBlog}>
+      <form onSubmit={createBlog}>
         <div>
           <label htmlFor="title">Title</label>
           <input

@@ -1,4 +1,10 @@
-export default function Login({ handleLogin, username, setUsername, password, setPassword }) {
+export default function Login({ 
+  handleLogin,
+  username,
+  setUsername,
+  password,
+  setPassword,
+}) {
   return (
     <>
       <h2>Login</h2>

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 export default function AddBlogForm({ addBlog }) {
   const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '', likes: 0 })
@@ -30,7 +30,7 @@ export default function AddBlogForm({ addBlog }) {
             type="text"
             value={newBlog.author}
             onChange={(e) => setNewBlog({ ...newBlog, author: e.target.value })}
-          ></input>  
+          ></input>
         </div>
         <div>
           <label htmlFor="url">URL</label>

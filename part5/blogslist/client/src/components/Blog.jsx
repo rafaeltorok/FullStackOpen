@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from  'react'
 
 export default function Blog({ blog, handleLikes, handleDelete, user }) {
   const [showDetails, setShowDetails] = useState(false)
@@ -49,7 +49,7 @@ export default function Blog({ blog, handleLikes, handleDelete, user }) {
               {user?.username === blog.user?.username && (
                 <tr>
                   <th colSpan={2}>
-                    <button 
+                    <button
                       type="button"
                       onClick={removeBlog}
                     >delete</button>
@@ -60,11 +60,11 @@ export default function Blog({ blog, handleLikes, handleDelete, user }) {
           )}
           <tr>
             <th colSpan={2}  className="display-details-row">
-              <button 
+              <button
                 type="button"
                 onClick={() => setShowDetails(!showDetails)}
               >
-                {showDetails ? "hide" : "show"}
+                {showDetails ? 'hide' : 'show'}
               </button>
             </th>
           </tr>

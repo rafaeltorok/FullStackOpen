@@ -1,4 +1,4 @@
-import Blog from "./Blog"
+import Blog from './Blog.jsx'
 
 export default function BlogList({ blogList, handleLikes, handleDelete, user }) {
   const sortedBlogs = [...blogList].sort((a, b) => b.likes - a.likes)

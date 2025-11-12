@@ -8,11 +8,11 @@ import Togglable from './components/Togglable'
 
 
 function App() {
-  const [blogList, setBlogList] = useState([]);
+  const [blogList, setBlogList] = useState([])
   const [notification, setNotification] = useState('')
   const [notificationType, setNotificationType] = useState('')
   const [isLoading, setIsLoading] = useState(true)
-  const [username, setUsername] = useState('') 
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
@@ -43,7 +43,7 @@ function App() {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await blogService.userLogin({ username, password })
 
@@ -78,12 +78,12 @@ function App() {
   }
 
   const handleNotification = (type, message) => {
-    setNotificationType(type);
-    setNotification(message);
+    setNotificationType(type)
+    setNotification(message)
     setTimeout(() => {
-      setNotificationType('');
-      setNotification('');
-    }, 5000);
+      setNotificationType('')
+      setNotification('')
+    }, 5000)
   }
 
   const addBlog = async (blogObject) => {
@@ -95,7 +95,7 @@ function App() {
       handleNotification('success-message', `The blog "${savedBlog.title}" by ${savedBlog.author} was added to the list!`)
     } catch (err) {
       console.error(err)
-      handleNotification('error-message', `Failed to add a new blog`)
+      handleNotification('error-message', 'Failed to add a new blog')
     }
   }
 

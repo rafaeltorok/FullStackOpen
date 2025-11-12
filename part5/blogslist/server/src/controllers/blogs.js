@@ -99,6 +99,11 @@ blogsRouter.delete('/:id', async (request, response, next) => {
       }
 
       await Blog.findByIdAndDelete(blogId)
+
+      // Remove blog reference from user
+      user.blogs = user.blogs.filter(b => b.toString() !== blogId)
+      await user.save()
+
       response.status(204).end()
     } else {
       response.status(404).end()

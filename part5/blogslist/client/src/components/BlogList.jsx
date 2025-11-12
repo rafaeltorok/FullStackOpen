@@ -1,6 +1,6 @@
 import Blog from "./Blog"
 
-export default function BlogList({ blogList, handleLikes }) {
+export default function BlogList({ blogList, handleLikes, handleDelete, user }) {
   const sortedBlogs = [...blogList].sort((a, b) => b.likes - a.likes)
 
   return (
@@ -10,6 +10,8 @@ export default function BlogList({ blogList, handleLikes }) {
           key={blog.id}
           blog={blog}
           handleLikes={handleLikes}
+          handleDelete={handleDelete}
+          user={user}
         />
       ))}
     </div>

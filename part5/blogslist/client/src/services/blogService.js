@@ -31,7 +31,10 @@ async function storeData(newObject) {
 
 // DELETE an item
 async function removeData(id) {
-  const request = await axios.delete(`${baseUrl}/${id}`)
+  const config = {
+    headers: { Authorization: token }
+  }
+  const request = await axios.delete(`${baseUrl}/${id}`, config)
   return request.data
 }
 

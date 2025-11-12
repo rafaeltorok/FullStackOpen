@@ -89,7 +89,8 @@ function App() {
   const addBlog = async (blogObject) => {
     try {
       const savedBlog = await blogService.storeData(blogObject)
-      setBlogList(blogList.concat(savedBlog))
+      const blogOnDatabase = await blogService.getDataById(savedBlog.id)
+      setBlogList(blogList.concat(blogOnDatabase))
       blogFormRef.current.toggleVisibility()
       handleNotification('success-message', `The blog "${savedBlog.title}" by ${savedBlog.author} was added to the list!`)
     } catch (err) {
@@ -113,10 +114,19 @@ function App() {
 
   const handleDelete = async (blogToRemove) => {
     try {
-      
+      const isInDatabase = await blogService.getDataById(blogToRemove.id)
+
+      if (isInDatabase) {
+        await blogService.removeData(blogToRemove.id)
+        setBlogList(blogList.filter(blog => blog.id !== blogToRemove.id))
+        handleNotification('success-message', `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list"`)
+      } else {
+        setBlogList(blogList.filter(blog => blog.id !== blogToRemove.id))
+        handleNotification('error-message', 'The blog was already removed from the database')
+      }
     } catch (err) {
       console.error(err)
-      handleNotification('error-message', 'Failed to remove blog fm the list')
+      handleNotification('error-message', 'Failed to remove blog from the list')
     }
   }
 
@@ -162,6 +172,8 @@ function App() {
       <BlogList
         blogList={blogList}
         handleLikes={handleLikes}
+        handleDelete={handleDelete}
+        user={user}
       />
     </>
   )

@@ -16,19 +16,15 @@ export default function Blog({ blog, handleLikes, handleDelete, user }) {
 
   return (
     <>
-      <table>
+      <table className='blog'>
         <thead>
           <tr>
-            <th className="blog-title" colSpan={2}>{blog.title}</th>
+            <th className="blog-title" colSpan={2}>{blog.title} by {blog.author}</th>
           </tr>
         </thead>
         <tbody>
           {showDetails && (
             <>
-              <tr>
-                <th>Author:</th>
-                <td>{blog.author}</td>
-              </tr>
               <tr>
                 <th>URL:</th>
                 <td>{blog.url}</td>

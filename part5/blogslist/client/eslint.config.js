@@ -35,4 +35,12 @@ export default defineConfig([
       'no-console': 'off'
     },
   },
+  {
+    files: ['**/*.test.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.vitest
+      }
+    }
+  }
 ])

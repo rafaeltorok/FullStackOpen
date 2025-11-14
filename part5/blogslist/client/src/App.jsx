@@ -89,8 +89,7 @@ function App() {
   const addBlog = async (blogObject) => {
     try {
       const savedBlog = await blogService.storeData(blogObject)
-      const blogOnDatabase = await blogService.getDataById(savedBlog.id)
-      setBlogList(blogList.concat(blogOnDatabase))
+      setBlogList(blogList.concat(savedBlog))
       blogFormRef.current.toggleVisibility()
       handleNotification('success-message', `The blog "${savedBlog.title}" by ${savedBlog.author} was added to the list!`)
     } catch (err) {
@@ -175,6 +174,7 @@ function App() {
         handleDelete={handleDelete}
         user={user}
       />
+      <footer>Blogs List app, from the FullStackOpen course by MOOC Finland 2025.</footer>
     </>
   )
 }

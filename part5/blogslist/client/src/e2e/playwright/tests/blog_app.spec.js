@@ -2,7 +2,8 @@ const { test, expect, describe, beforeEach } = require('@playwright/test')
 const { resetDatabase, loginWith, addBlog } = require('./helper.js')
 
 describe('Blogs List app', () => {
-  beforeEach(async({ page }) => {
+  beforeEach(async({ page, request }) => {
+    await resetDatabase(page, request, 'admin', 'The Administrator', 'password')
     await page.goto('/')
   })
 
@@ -27,10 +28,8 @@ describe('Blogs List app', () => {
   })
 
   describe('when logged in', () => {
-    beforeEach(async({ page, request }) => {
-      await resetDatabase(page, request, 'admin', 'The Administrator', 'password')
+    beforeEach(async({ page }) => {
       await loginWith(page, 'admin', 'password')
-      await addBlog(page, 'New blog', 'Playwright', 'http://testing-blogs.com')
     })
 
     test('user can log in', async ({ page }) => {
@@ -38,10 +37,12 @@ describe('Blogs List app', () => {
     })
 
     test('a new blog can be created', async ({ page }) => {
+      await addBlog(page, 'New blog', 'Playwright', 'http://testing-blogs.com')
       await expect(page.getByText('New blog by Playwright')).toBeVisible()
     })
 
     test('a blog can be liked', async ({ page }) => {
+      await addBlog(page, 'New blog', 'Playwright', 'http://testing-blogs.com')
       await page.getByRole('button', { name: 'show' }).click()
       await page.getByRole('button', { name: 'like' }).click()
       await expect(page.getByText('1')).toBeVisible()

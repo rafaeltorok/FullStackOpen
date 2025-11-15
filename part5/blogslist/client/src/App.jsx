@@ -45,6 +45,11 @@ function App() {
     event.preventDefault()
 
     try {
+      if (!username?.trim() || !password?.trim()) {
+        handleNotification('error-message', 'Both username and password are required')
+        return
+      }
+
       const user = await blogService.userLogin({ username, password })
 
       window.localStorage.setItem(
@@ -54,6 +59,7 @@ function App() {
       setUser(user)
       setUsername('')
       setPassword('')
+      setNotification('')  // Removes any previous log error notification message after logging in
     } catch (err) {
       console.error(err)
       handleNotification('error-message', 'Incorrect credentials')

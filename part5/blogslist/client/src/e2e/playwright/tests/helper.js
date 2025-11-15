@@ -1,5 +1,9 @@
-const resetDatabase = async(page, request, username, name, password) => {
+const resetDatabase = async(page, request) => {
   await request.post('/api/testing/reset')
+  await page.goto('/')
+}
+
+const createUser = async(request, username, name, password) => {
   await request.post('/api/users', {
     data: {
       username: username,
@@ -7,12 +11,9 @@ const resetDatabase = async(page, request, username, name, password) => {
       password: password
     }
   })
-
-  await page.goto('/')
 }
 
 const loginWith = async (page, username, password)  => {
-  await page.getByRole('button', { name: 'login' }).click()
   await page.getByLabel('username').fill(username)
   await page.getByLabel('password').fill(password)
   await page.getByRole('button', { name: 'login' }).click()
@@ -26,4 +27,4 @@ const addBlog = async (page, title, author, url) => {
   await page.getByRole('button', { name: 'Submit' }).click()
 }
 
-export { resetDatabase, loginWith, addBlog }
+export { resetDatabase, createUser, loginWith, addBlog }

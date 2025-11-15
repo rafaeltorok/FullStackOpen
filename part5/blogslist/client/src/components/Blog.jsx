@@ -32,7 +32,7 @@ export default function Blog({ blog, handleLikes, handleDelete, user }) {
               <tr>
                 <th>Likes:</th>
                 <td>
-                  {blog.likes}
+                  <span className="like-count">{blog.likes}</span>
                   {user && (
                     <button onClick={likeBlog}>like</button>
                   )}

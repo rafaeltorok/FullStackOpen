@@ -147,15 +147,13 @@ function App() {
     <>
       <h1 className='main-title'>Blogs List</h1>
       {!user && (
-        <Togglable buttonLabel='login'>
-          <Login
-            handleLogin={handleLogin}
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword}
-          />
-        </Togglable>
+        <Login
+          handleLogin={handleLogin}
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+        />
       )}
       {user && (
         <div>

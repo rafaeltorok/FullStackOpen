@@ -105,15 +105,31 @@ function App() {
   }
 
   const handleLikes = async (blogToUpdate) => {
+    // Store original state for potential rollback
+    const previousLikes = blogToUpdate.likes
+
     try {
-      const updatedBlog = await blogService.updateData(blogToUpdate.id, {
+      // Update the UI immediately, local only
+      const localUpdateBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 }
+      setBlogList(blogList.map(blog =>
+        blog.id === blogToUpdate.id ? localUpdateBlog : blog
+      ))
+
+      // Update on the remote server
+      await blogService.updateData(blogToUpdate.id, {
         ...blogToUpdate,
         likes: blogToUpdate.likes + 1
       })
-      setBlogList(blogList.map(blog => blog.id === blogToUpdate.id ? updatedBlog : blog))
     } catch (err) {
       console.error(err)
       handleNotification('error-message', 'Failed to update the blog\'s like counter')
+
+      // If the remote database update fails, rollback to the previous like counter
+      setBlogList(blogList.map(blog =>
+        blog.id === blogToUpdate.id
+          ? { ...blog, likes: previousLikes }
+          : blog
+      ))
     }
   }
 

@@ -1,9 +1,7 @@
-import { resetDatabase, createUser, loginWith, addBlog } from "./helper"
-
 describe('Note app', function() {
   beforeEach(function() {
-    resetDatabase()
-    createUser('admin', 'The Administrator', 'password')
+    cy.resetDatabase()
+    cy.createUser({ username: 'admin', name: 'The Administrator', password: 'password' })
   })
 
   it('front page can be opened', function() {
@@ -12,25 +10,53 @@ describe('Note app', function() {
   })
   
   it('user can login', function() {
-    loginWith('admin', 'password')
+    cy.login({ username: 'admin', password: 'password' })
     cy.contains('The Administrator logged in')
+  })
+
+  it('login fails with wrong username', function() {
+    cy.loginViaUI({ username: 'wrong', password: 'password' })
+    cy.get('.error-message')
+      .should('contain', 'Incorrect credentials')
+      .and('have.css', 'color', 'rgb(255, 0, 0)')
+      .and('have.css', 'border-style', 'solid')
+
+    cy.get('html').should('not.contain', 'The Administrator logged in')
+  })
+
+  it('login fails with wrong password', function() {
+    cy.loginViaUI({ username: 'admin', password: 'wrong' })
+    cy.get('.error-message')
+      .should('contain', 'Incorrect credentials')
+      .and('have.css', 'color', 'rgb(255, 0, 0)')
+      .and('have.css', 'border-style', 'solid')
+    
+    cy.get('html').should('not.contain', 'The Administrator logged in')
   })
 
   describe('when logged in', function() {
     beforeEach(function() {
-      loginWith('admin', 'password')
+      cy.login({ username: 'admin', password: 'password' })
     })
 
     it('testing the add blog form', function() {
-      addBlog('My test blog', 'Cypress', 'https://testing-with-cypress.com')
+      cy.createBlog({
+        title: 'My test blog',
+        author: 'Cypress',
+        url: 'https://testing-with-cypress.com'
+      })
       cy.contains('My test blog by Cypress')
     })
   })
 
   describe('and a blog exists', function () {
     beforeEach(function () {
-      loginWith('admin', 'password')
-      addBlog('My test blog', 'Cypress', 'https://testing-with-cypress.com')
+      cy.login({ username: 'admin', password: 'password' })
+      cy.createBlog({
+        title: 'My test blog',
+        author: 'Cypress',
+        url: 'https://testing-with-cypress.com'
+      })
     })
 
     it('the blog details can be shown', function () {

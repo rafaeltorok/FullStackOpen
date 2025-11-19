@@ -1,4 +1,4 @@
-describe('Note app', function() {
+describe('Blogs List app', function() {
   beforeEach(function() {
     cy.resetDatabase()
     cy.createUser({ username: 'admin', name: 'The Administrator', password: 'password' })

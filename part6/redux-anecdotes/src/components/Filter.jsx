@@ -1,11 +1,11 @@
 import { useDispatch } from "react-redux"
-import { filterChange } from "../reducers/filterReducer"
+import { setFilter } from "../reducers/filterReducer"
 
 export default function Filter() {
   const dispatch = useDispatch()
 
   const handleChange = (event) => {
-    dispatch(filterChange(event.target.value))
+    dispatch(setFilter(event.target.value))
   }
   
   return (

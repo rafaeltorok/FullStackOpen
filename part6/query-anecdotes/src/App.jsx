@@ -3,21 +3,28 @@ import { getAnecdotes, createAnecdote, updateAnecdote } from '../requests'
 
 import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
+import { useNotification } from './components/NotificationContext'
 
 const App = () => {
   const queryClient = useQueryClient()
+  const setNotification = useNotification()
 
   const newAnecdoteMutation = useMutation({
     mutationFn: createAnecdote,
-    onSuccess: () => {
+    onSuccess: (newAnecdote) => {
       queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+      setNotification(`Added '${newAnecdote.content}'`, 5)
     },
+    onError: () => {
+      setNotification('Anecdote must be at least 5 characters long', 5)
+    }
   })
 
   const updateAnecdoteMutation = useMutation({
     mutationFn: updateAnecdote,
-    onSuccess: () => {
+    onSuccess: (updatedAnecdote) => {
       queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+      setNotification(`Voted '${updatedAnecdote.content}'`, 5)
     }
   })
 
@@ -51,12 +58,10 @@ const App = () => {
   return (
     <div>
       <h3>Anecdote app</h3>
-
       <Notification />
       <AnecdoteForm
         addAnecdote={addAnecdote}
       />
-
       {anecdotes.map((anecdote) => (
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>

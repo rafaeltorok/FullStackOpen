@@ -27,16 +27,16 @@ export default function CreateNew (props) {
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          content
-          <input {...content} />
+          <label htmlFor="content-field">content</label>
+          <input id="content-field" {...content} />
         </div>
         <div>
-          author
-          <input {...author} />
+          <label htmlFor="author-field">author</label>
+          <input id="author-field" {...author} />
         </div>
         <div>
-          url for more info
-          <input {...info} />
+          <label htmlFor="info-field">url for more info</label>
+          <input id="info-field" {...info} />
         </div>
         <button type="submit">create</button>
         <button type="button" onClick={handleReset}>reset</button>

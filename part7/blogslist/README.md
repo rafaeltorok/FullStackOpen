@@ -1,12 +1,12 @@
 # BlogList app
 
 ## Table of Contents
-- [Setup](#setup)
+- [Running the app](#running-the-app)
 - [CRUD operations](#crud-operations)
 - [Prettier](#prettier)
 
 
-## Setup
+## Running the app
 ### Frontend
 - Install dependencies
   ```bash
@@ -38,7 +38,7 @@
 
 - Testing mode
   ```bash
-  cd ./server && npm run test -- ./src/tests/blog_api.test.js
+  cd ./server && npm run start:test
   ```
 
 - ESLint
@@ -46,8 +46,20 @@
   cd ./server && npm run lint
   ```
 
+- Running backend API tests
+  ```bash
+  cd ./server && npm run test
+  ```
+
+  or for running a specific test only
+  ```bash
+  npm run test -- ./src/tests/blog_api.test.js
+  ```
+
 
 ## CRUD operations
+The following requires an **authorization token**: **POST** and **DELETE** on **/api/blogs**.
+
 ### GET
 - Fetch all blogs
   ```bash
@@ -62,12 +74,12 @@
 ### POST
 - Create a new blog (likes field is **optional**)
   ```bash
-  curl -X POST http://localhost:3003/api/blogs -H "Content-Type: application/json" -d '{ "title":"My blog", "author":"The blogger", "url":"https://myblog.com", "likes":10 }'
+  curl -X POST http://localhost:3003/api/blogs -H "Content-Type: application/json" -H "Authorization: Bearer <token>" -d '{ "title":"My blog", "author":"The blogger", "url":"https://myblog.com", "likes":10 }'
   ```
 
 - Create a new user
   ```bash
-  curl -X POST http://localhost:3003/api/users -H "Content-Type: application/json" -d '{ "username":"admin", "name":"The admin", "password":"my_passwd" }'
+  curl -X POST http://localhost:3003/api/users -H "Content-Type: application/json" -d '{ "username":"new_user", "name":"New User", "password":"my_passwd" }'
   ```
 
 - Logging in
@@ -78,7 +90,7 @@
 ### DELETE
 - Delete a blog
   ```bash
-  curl -X DELETE http://localhost:3003/api/blogs/<id>
+  curl -X DELETE http://localhost:3003/api/blogs/<id> -H "Authorization: Bearer <token>"
   ```
 
 ### PUT

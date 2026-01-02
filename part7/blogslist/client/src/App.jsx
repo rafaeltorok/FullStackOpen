@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useQuery } from '@tanstack/react-query'
 import blogService from "./services/blogService";
 import Login from "./components/Login";
 import AddBlogForm from "./components/AddBlogForm";
@@ -7,29 +8,18 @@ import BlogList from "./components/BlogList";
 import Togglable from "./components/Togglable";
 
 function App() {
-  const [blogList, setBlogList] = useState([]);
   const [notification, setNotification] = useState("");
   const [notificationType, setNotificationType] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
   const blogFormRef = useRef();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await blogService.getData();
-        setBlogList(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getData
+  });
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogsListUser");
@@ -173,11 +163,11 @@ function App() {
     }
   };
 
-  if (!blogList) {
+  if (result.isError) {
     return <h2>Failed to get data from the server</h2>;
   }
 
-  if (isLoading) {
+  if (result.isLoading) {
     return <h2>Loading data, please wait...</h2>;
   }
 
@@ -208,7 +198,7 @@ function App() {
         <Notification messageType={notificationType} message={notification} />
       )}
       <BlogList
-        blogList={blogList}
+        blogList={result.data}
         handleLikes={handleLikes}
         handleDelete={handleDelete}
         user={user}

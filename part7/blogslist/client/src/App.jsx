@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, useRef, useReducer } from "react";
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import blogService from "./services/blogService";
 import Login from "./components/Login";
 import AddBlogForm from "./components/AddBlogForm";
@@ -8,18 +8,42 @@ import BlogList from "./components/BlogList";
 import Togglable from "./components/Togglable";
 
 function App() {
-  const [notification, setNotification] = useState("");
-  const [notificationType, setNotificationType] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
   const blogFormRef = useRef();
 
-  const result = useQuery({
+  const queryClient = useQueryClient();
+
+  const blogs = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getData
   });
+
+  const initialState = {
+    message: '',
+    type: ''
+  };
+
+  function notificationReducer(state, action) {
+    switch (action.type) {
+      case 'SHOW':
+        return {
+          message: action.payload.message,
+          type: action.payload.type
+        }
+      case 'CLEAR':
+        return initialState
+      default:
+        return state
+    }
+  }
+
+  const [notification, dispatch] = useReducer(
+    notificationReducer,
+    initialState
+  );
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogsListUser");
@@ -32,7 +56,6 @@ function App() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
     try {
       if (!username?.trim() || !password?.trim()) {
         handleNotification(
@@ -73,101 +96,119 @@ function App() {
     }
   };
 
-  const handleNotification = (type, message) => {
-    setNotificationType(type);
-    setNotification(message);
-    setTimeout(() => {
-      setNotificationType("");
-      setNotification("");
-    }, 5000);
+  const addBlogMutation = useMutation({
+    mutationFn: blogService.storeData,
+    onSuccess: (newBlog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      blogFormRef.current.toggleVisibility();
+      dispatch({
+        type: 'SHOW',
+        payload: {
+          message: `The blog "${newBlog.title}" by ${newBlog.author} was added to the list!`,
+          type: 'success-message'
+        }
+      })
+
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR' })
+      }, 5000)
+    },
+    onError: () => {
+      dispatch({
+        type: 'SHOW',
+        payload: {
+          message: 'Failed to add a new blog',
+          type: 'error-message'
+        }
+      })
+
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR' })
+      }, 5000)
+    }
+  });
+
+  const addBlog = (newBlog) => {
+    addBlogMutation.mutate(newBlog);
   };
 
-  const addBlog = async (blogObject) => {
-    try {
-      const savedBlog = await blogService.storeData(blogObject);
-      setBlogList(blogList.concat(savedBlog));
-      blogFormRef.current.toggleVisibility();
-      handleNotification(
-        "success-message",
-        `The blog "${savedBlog.title}" by ${savedBlog.author} was added to the list!`,
-      );
-    } catch (err) {
-      console.error(err);
-      handleNotification("error-message", "Failed to add a new blog");
+  const updateBlogMutation = useMutation({
+    mutationFn: blogService.updateData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    },
+    onError: () => {
+      dispatch({
+        type: 'SHOW',
+        payload: {
+          message: `Failed to update the blog's like counter`,
+          type: 'error-message'
+        }
+      })
+
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR' })
+      }, 5000)
     }
-  };
+  });
 
   const handleLikes = async (blogToUpdate) => {
-    // Store original state for potential rollback
-    const previousLikes = blogToUpdate.likes;
-
-    try {
-      // Update the UI immediately, local only
-      const localUpdateBlog = {
-        ...blogToUpdate,
-        likes: blogToUpdate.likes + 1,
-      };
-      setBlogList(
-        blogList.map((blog) =>
-          blog.id === blogToUpdate.id ? localUpdateBlog : blog,
-        ),
-      );
-
-      // Update on the remote server
-      await blogService.updateData(blogToUpdate.id, {
-        ...blogToUpdate,
-        likes: blogToUpdate.likes + 1,
-      });
-    } catch (err) {
-      console.error(err);
-      handleNotification(
-        "error-message",
-        "Failed to update the blog's like counter",
-      );
-
-      // If the remote database update fails, rollback to the previous like counter
-      setBlogList(
-        blogList.map((blog) =>
-          blog.id === blogToUpdate.id
-            ? { ...blog, likes: previousLikes }
-            : blog,
-        ),
-      );
-    }
+    const updatedBlog = {
+      ...blogToUpdate,
+      likes: blogToUpdate.likes + 1,
+    };
+      
+    updateBlogMutation.mutate(updatedBlog);
   };
+
+  const removeBlogMutation = useMutation({
+    mutationFn: (blogToRemove) => blogService.removeData(blogToRemove.id),
+    onSuccess: (_, blogToRemove) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      dispatch({
+        type: 'SHOW',
+        payload: {
+          message: `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list`,
+          type: 'success-message'
+        }
+      })
+
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR' })
+      }, 5000)
+    },
+    onError: () => {
+      dispatch({
+        type: 'SHOW',
+        payload: {
+          message: 'Failed to remove blog from the list',
+          type: 'error-message'
+        }
+      })
+
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR' })
+      }, 5000)
+    }
+  });
 
   const handleDelete = async (blogToRemove) => {
     try {
       const isInDatabase = await blogService.getDataById(blogToRemove.id);
 
       if (isInDatabase) {
-        await blogService.removeData(blogToRemove.id);
-        setBlogList(blogList.filter((blog) => blog.id !== blogToRemove.id));
-        handleNotification(
-          "success-message",
-          `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list"`,
-        );
-      } else {
-        setBlogList(blogList.filter((blog) => blog.id !== blogToRemove.id));
-        handleNotification(
-          "error-message",
-          "The blog was already removed from the database",
-        );
+        removeBlogMutation.mutate(blogToRemove)
       }
     } catch (err) {
       console.error(err);
-      handleNotification(
-        "error-message",
-        "Failed to remove blog from the list",
-      );
     }
   };
 
-  if (result.isError) {
+  if (blogs.isError) {
     return <h2>Failed to get data from the server</h2>;
   }
 
-  if (result.isLoading) {
+  if (blogs.isLoading) {
     return <h2>Loading data, please wait...</h2>;
   }
 
@@ -194,11 +235,14 @@ function App() {
           </Togglable>
         </div>
       )}
-      {notification && (
-        <Notification messageType={notificationType} message={notification} />
+      {notification.message && (
+        <Notification
+          messageType={notification.type}
+          message={notification.message}
+        />
       )}
       <BlogList
-        blogList={result.data}
+        blogList={blogs.data}
         handleLikes={handleLikes}
         handleDelete={handleDelete}
         user={user}

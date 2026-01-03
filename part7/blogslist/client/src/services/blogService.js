@@ -39,8 +39,8 @@ async function removeData(id) {
 }
 
 // PUT updates an item
-async function updateData(id, newObject) {
-  const request = await axios.put(`${baseUrl}/${id}`, newObject);
+async function updateData(newObject) {
+  const request = await axios.put(`${baseUrl}/${newObject.id}`, newObject);
   return request.data;
 }
 

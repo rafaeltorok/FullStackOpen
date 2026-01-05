@@ -10,7 +10,7 @@ export default function BlogList({ blogList }) {
           <li key={blog.id}>
             <Link 
               to={`/blogs/${blog.id}`}
-            >{blog.title} {blog.author}</Link>
+            >{blog.title} by {blog.author}</Link>
           </li>
         ))}
       </ul>

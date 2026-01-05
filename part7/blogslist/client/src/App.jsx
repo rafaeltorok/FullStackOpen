@@ -6,15 +6,16 @@ import AddBlogForm from "./components/AddBlogForm";
 import Notification from "./components/Notification";
 import BlogList from "./components/BlogList";
 import Togglable from "./components/Togglable";
+import { useUserValue, useUserDispatch } from "./context/UserContext";
 
 function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
 
   const blogFormRef = useRef();
-
   const queryClient = useQueryClient();
+  const user = useUserValue();
+  const dispatchUser = useUserDispatch();
 
   const blogs = useQuery({
     queryKey: ['blogs'],
@@ -32,11 +33,11 @@ function App() {
         return {
           message: action.payload.message,
           type: action.payload.type
-        }
+        };
       case 'CLEAR':
-        return initialState
+        return initialState;
       default:
-        return state
+        return state;
     }
   }
 
@@ -49,10 +50,24 @@ function App() {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogsListUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      dispatchUser({ type: 'LOGIN', payload: user });
       blogService.setToken(user.token);
     }
   }, []);
+
+  const handleNotification = (messageType, message) => {
+    dispatch({
+      type: 'SHOW',
+      payload: {
+        message: message,
+        type: messageType
+      }
+    })
+
+    setTimeout(() => {
+      dispatch({ type: 'CLEAR' })
+    }, 5000)
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -69,13 +84,13 @@ function App() {
 
       window.localStorage.setItem("loggedBlogsListUser", JSON.stringify(user));
       blogService.setToken(user.token);
-      setUser(user);
+      dispatchUser({ type: 'LOGIN', payload: user });
       setUsername("");
       setPassword("");
-      setNotification(""); // Removes any previous log error notification message after logging in
+      handleNotification('success-message',  `${user.name} has logged in`);
     } catch (err) {
       console.error(err);
-      handleNotification("error-message", "Incorrect credentials");
+      handleNotification('error-message', 'Incorrect credentials');
     }
   };
 
@@ -84,11 +99,11 @@ function App() {
       const isLogged = window.localStorage.getItem("loggedBlogsListUser");
       if (!isLogged) {
         handleNotification("error-message", "User has already been logged out");
-        setUser(null);
+        dispatchUser({ type: 'LOGOUT'});
       } else {
         window.localStorage.removeItem("loggedBlogsListUser");
         handleNotification("success-message", `${user.name} has logged out`);
-        setUser(null);
+        dispatchUser({ type: 'LOGOUT'});
       }
     } catch (err) {
       console.error(err);
@@ -101,30 +116,13 @@ function App() {
     onSuccess: (newBlog) => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
       blogFormRef.current.toggleVisibility();
-      dispatch({
-        type: 'SHOW',
-        payload: {
-          message: `The blog "${newBlog.title}" by ${newBlog.author} was added to the list!`,
-          type: 'success-message'
-        }
-      })
-
-      setTimeout(() => {
-        dispatch({ type: 'CLEAR' })
-      }, 5000)
+      handleNotification(
+        'success-message',
+        `The blog "${newBlog.title}" by ${newBlog.author} was added to the list!`,
+      );
     },
     onError: () => {
-      dispatch({
-        type: 'SHOW',
-        payload: {
-          message: 'Failed to add a new blog',
-          type: 'error-message'
-        }
-      })
-
-      setTimeout(() => {
-        dispatch({ type: 'CLEAR' })
-      }, 5000)
+      handleNotification('error-message', 'Failed to add a new blog');
     }
   });
 
@@ -138,17 +136,7 @@ function App() {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
     },
     onError: () => {
-      dispatch({
-        type: 'SHOW',
-        payload: {
-          message: `Failed to update the blog's like counter`,
-          type: 'error-message'
-        }
-      })
-
-      setTimeout(() => {
-        dispatch({ type: 'CLEAR' })
-      }, 5000)
+      handleNotification('error-message', 'Failed to update the blog\'s like counter');
     }
   });
 
@@ -165,30 +153,13 @@ function App() {
     mutationFn: (blogToRemove) => blogService.removeData(blogToRemove.id),
     onSuccess: (_, blogToRemove) => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
-      dispatch({
-        type: 'SHOW',
-        payload: {
-          message: `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list`,
-          type: 'success-message'
-        }
-      })
-
-      setTimeout(() => {
-        dispatch({ type: 'CLEAR' })
-      }, 5000)
+      handleNotification(
+        'success-message',
+        `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list`
+      );
     },
     onError: () => {
-      dispatch({
-        type: 'SHOW',
-        payload: {
-          message: 'Failed to remove blog from the list',
-          type: 'error-message'
-        }
-      })
-
-      setTimeout(() => {
-        dispatch({ type: 'CLEAR' })
-      }, 5000)
+      handleNotification('error-message', 'Failed to remove blog from the list')
     }
   });
 

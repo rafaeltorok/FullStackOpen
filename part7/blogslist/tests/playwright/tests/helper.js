@@ -25,6 +25,7 @@ const addBlog = async (page, title, author, url) => {
   await page.getByLabel('Author').fill(author)
   await page.getByLabel('URL').fill(url)
   await page.getByRole('button', { name: 'Submit' }).click()
+  await page.getByText(`${title} by ${author}`).waitFor()  // Prevents flaky tests on Firefox
 }
 
 export { resetDatabase, createUser, loginWith, addBlog }

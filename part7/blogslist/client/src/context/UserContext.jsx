@@ -1,32 +1,31 @@
-import { createContext, useReducer, useContext, useEffect } from 'react'
-import blogService from '../services/blogService'
+import { createContext, useReducer, useContext, useEffect } from "react";
+import blogService from "../services/blogService";
 
-const UserContext = createContext()
-const UserDispatchContext = createContext()
+const UserContext = createContext();
+const UserDispatchContext = createContext();
 
 const userReducer = (state, action) => {
   switch (action.type) {
-    case 'LOGIN':
-      return action.payload
-    case 'LOGOUT':
-      return null
+    case "LOGIN":
+      return action.payload;
+    case "LOGOUT":
+      return null;
     default:
-      return state
+      return state;
   }
-}
+};
 
 export const UserProvider = ({ children }) => {
-  const [user, dispatch] = useReducer(userReducer, null)
+  const [user, dispatch] = useReducer(userReducer, null);
 
-  // 4️⃣ Restore login ONCE
   useEffect(() => {
-    const loggedUserJSON = localStorage.getItem('loggedBlogsListUser')
+    const loggedUserJSON = localStorage.getItem("loggedBlogsListUser");
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      dispatch({ type: 'LOGIN', payload: user })
-      blogService.setToken(user.token)
+      const user = JSON.parse(loggedUserJSON);
+      dispatch({ type: "LOGIN", payload: user });
+      blogService.setToken(user.token);
     }
-  }, [])
+  }, []);
 
   return (
     <UserContext.Provider value={user}>
@@ -34,13 +33,13 @@ export const UserProvider = ({ children }) => {
         {children}
       </UserDispatchContext.Provider>
     </UserContext.Provider>
-  )
-}
+  );
+};
 
 export const useUserValue = () => {
-  return useContext(UserContext)
-}
+  return useContext(UserContext);
+};
 
 export const useUserDispatch = () => {
-  return useContext(UserDispatchContext)
-}
+  return useContext(UserDispatchContext);
+};

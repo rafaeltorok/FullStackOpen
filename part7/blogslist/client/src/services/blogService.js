@@ -1,6 +1,5 @@
 import axios from "axios";
-const baseUrl = "/api/blogs";
-const loginUrl = "/api/login";
+const blogsUrl = "/api/blogs";
 
 let token = null;
 
@@ -10,13 +9,13 @@ const setToken = (newToken) => {
 
 // GET all data
 async function getData() {
-  const response = await axios.get(baseUrl);
+  const response = await axios.get(blogsUrl);
   return response.data;
 }
 
 // GET item by id
 async function getDataById(id) {
-  const response = await axios.get(`${baseUrl}/${id}`);
+  const response = await axios.get(`${blogsUrl}/${id}`);
   return response.data;
 }
 
@@ -25,7 +24,7 @@ async function storeData(newObject) {
   const config = {
     headers: { Authorization: token },
   };
-  const request = await axios.post(baseUrl, newObject, config);
+  const request = await axios.post(blogsUrl, newObject, config);
   return request.data;
 }
 
@@ -34,19 +33,13 @@ async function removeData(id) {
   const config = {
     headers: { Authorization: token },
   };
-  const request = await axios.delete(`${baseUrl}/${id}`, config);
+  const request = await axios.delete(`${blogsUrl}/${id}`, config);
   return request.data;
 }
 
 // PUT updates an item
 async function updateData(newObject) {
-  const request = await axios.put(`${baseUrl}/${newObject.id}`, newObject);
-  return request.data;
-}
-
-// Login an user
-async function userLogin(credentials) {
-  const request = await axios.post(loginUrl, credentials);
+  const request = await axios.put(`${blogsUrl}/${newObject.id}`, newObject);
   return request.data;
 }
 
@@ -56,6 +49,5 @@ export default {
   storeData,
   removeData,
   updateData,
-  userLogin,
-  setToken,
+  setToken
 };

@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useParams } from "react-router-dom";
 
-export default function Blog({ blog, handleLikes, handleDelete, user }) {
-  const [showDetails, setShowDetails] = useState(false);
+export default function Blog({ handleLikes, handleDelete, user, blogById }) {
+  const { id } = useParams();
+  const blog = blogById(id);
+
+  if (!blog) {
+    return <h2>Blog not found</h2>;
+  }
 
   const likeBlog = () => {
     handleLikes(blog);
@@ -27,48 +32,36 @@ export default function Blog({ blog, handleLikes, handleDelete, user }) {
           </tr>
         </thead>
         <tbody>
-          {showDetails && (
-            <>
-              <tr>
-                <th>URL:</th>
-                <td>{blog.url}</td>
-              </tr>
-              <tr>
-                <th>Likes:</th>
-                <td>
-                  <span className="like-count">{blog.likes}</span>
-                  {user && (
-                    <button className="like-button" onClick={likeBlog}>
-                      like
-                    </button>
-                  )}
-                </td>
-              </tr>
-              <tr>
-                <th>User:</th>
-                <td>{blog.user?.name}</td>
-              </tr>
-              {user?.username === blog.user?.username && (
-                <tr>
-                  <th colSpan={2}>
-                    <button type="button" onClick={removeBlog}>
-                      delete
-                    </button>
-                  </th>
-                </tr>
-              )}
-            </>
-          )}
           <tr>
-            <th colSpan={2} className="display-details-row">
-              <button
-                type="button"
-                onClick={() => setShowDetails(!showDetails)}
-              >
-                {showDetails ? "hide" : "show"}
-              </button>
-            </th>
+            <th>URL:</th>
+            <td>
+              <a href={`${blog.url}`}>{blog.url}</a>
+            </td>
           </tr>
+          <tr>
+            <th>Likes:</th>
+            <td>
+              <span className="like-count">{blog.likes}</span>
+              {user && (
+                <button className="like-button" onClick={likeBlog}>
+                  like
+                </button>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <th>Added by:</th>
+            <td>{blog.user?.name}</td>
+          </tr>
+          {user?.username === blog.user?.username && (
+            <tr>
+              <th colSpan={2}>
+                <button type="button" onClick={removeBlog}>
+                  delete
+                </button>
+              </th>
+            </tr>
+          )}
         </tbody>
       </table>
     </>

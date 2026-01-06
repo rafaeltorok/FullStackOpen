@@ -206,15 +206,18 @@ describe('Blogs List app', () => {
 
     test('Multiple comments can be added', async({ page }) => {
       await page.getByText('New blog by Playwright').click()
+      const comments = page.locator('.comments-section li')
 
       await page.getByLabel('Add comment: ').fill('My first comment')
       await page.getByRole('button', { name: 'Add' }).click()
+      await expect(comments).toHaveCount(1)
       await page.getByLabel('Add comment: ').fill('My second comment')
       await page.getByRole('button', { name: 'Add' }).click()
+      await expect(comments).toHaveCount(2)
       await page.getByLabel('Add comment: ').fill('My third comment')
       await page.getByRole('button', { name: 'Add' }).click()
+      await expect(comments).toHaveCount(3)
 
-      await expect(page.locator('.comments-section li')).toHaveCount(3)
       await expect(page.getByText('Comments:')).toBeVisible()
       await expect(page.getByText('My first comment')).toBeVisible()
       await expect(page.getByText('My second comment')).toBeVisible()

@@ -164,4 +164,61 @@ describe('Blogs List app', () => {
       await expect(page.getByRole('button', { name: 'delete' })).not.toBeAttached()
     })
   })
+
+  describe('Testing the comments section', () => {
+    beforeEach(async({ page, request }) => {
+      await createUser(request, 'test', 'The Tester', 'password')
+      await loginWith(page, 'test', 'password')
+      await addBlog(page, 'New blog', 'Playwright', 'http://testing-blogs.com')
+    })
+
+    test('When there are no comments, a proper message will be displayed', async({ page }) => {
+      await page.getByText('New blog by Playwright').click()
+
+      await expect(page.getByText('Comments:')).toBeVisible()
+      await expect(page.getByText('No comments')).toBeVisible()
+    })
+
+    test('A new comment can be added', async({ page }) => {
+      await page.getByText('New blog by Playwright').click()
+
+      await page.getByLabel('Add comment: ').fill('My awesome new comment')
+      await page.getByRole('button', { name: 'Add' }).click()
+
+      await expect(page.getByText('Comments:')).toBeVisible()
+      await expect(page.getByText('My awesome new comment')).toBeVisible()
+    })
+
+    test('An empty comment cannot be added', async({ page }) => {
+      await page.getByText('New blog by Playwright').click()
+
+      await page.getByLabel('Add comment: ').fill(' ')
+      await page.getByRole('button', { name: 'Add' }).click()
+
+      const errorDiv = page.locator('.error-message')
+      await expect(errorDiv).toContainText('Comment cannot be empty')
+      await expect(errorDiv).toHaveCSS('border-style', 'solid')
+      await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
+      await expect(page.getByText('Comments:')).toBeVisible()
+      await expect(page.getByText('No comments')).toBeVisible()
+      await expect(page.locator('.comments-section li')).toHaveCount(0)
+    })
+
+    test('Multiple comments can be added', async({ page }) => {
+      await page.getByText('New blog by Playwright').click()
+
+      await page.getByLabel('Add comment: ').fill('My first comment')
+      await page.getByRole('button', { name: 'Add' }).click()
+      await page.getByLabel('Add comment: ').fill('My second comment')
+      await page.getByRole('button', { name: 'Add' }).click()
+      await page.getByLabel('Add comment: ').fill('My third comment')
+      await page.getByRole('button', { name: 'Add' }).click()
+
+      await expect(page.locator('.comments-section li')).toHaveCount(3)
+      await expect(page.getByText('Comments:')).toBeVisible()
+      await expect(page.getByText('My first comment')).toBeVisible()
+      await expect(page.getByText('My second comment')).toBeVisible()
+      await expect(page.getByText('My third comment')).toBeVisible()
+    })
+  })
 })

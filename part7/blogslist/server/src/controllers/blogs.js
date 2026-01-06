@@ -53,7 +53,30 @@ blogsRouter.put("/:id", async (request, response, next) => {
   }
 });
 
-// any middleware declared after this line will apply to routes declared after it
+blogsRouter.post("/:id/comments", async (request, response, next) => {
+  try {
+    const { content } = request.body;
+
+    if (!content) {
+      return response.status(400).json({ error: "Content missing" });
+    }
+
+    const blog = await Blog.findById(request.params.id);
+
+    if (!blog) {
+      return response.status(404).end();
+    }
+
+    blog.comments = blog.comments.concat({ content });
+    const savedBlog = await blog.save();
+
+    response.status(201).json(savedBlog);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Routes below this line will require an authentication token
 blogsRouter.use(middleware.requireAuth);
 
 blogsRouter.post("/", async (request, response, next) => {
@@ -74,6 +97,7 @@ blogsRouter.post("/", async (request, response, next) => {
       url,
       likes: likes || 0,
       user: user._id,
+      comments: []
     });
 
     const savedBlog = await newBlog.save();

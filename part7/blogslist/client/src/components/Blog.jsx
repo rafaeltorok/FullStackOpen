@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 
-export default function Blog({ handleLikes, handleDelete, user, blogById }) {
+export default function Blog({ handleLikes, handleDelete, user, blogById, addComment }) {
+  const [newComment, setNewComment] = useState("");
   const { id } = useParams();
   const blog = blogById(id);
 
@@ -20,6 +22,11 @@ export default function Blog({ handleLikes, handleDelete, user, blogById }) {
       handleDelete(blog);
     }
   };
+
+  const handleComment = (blogId) => {
+    addComment(newComment, blogId);
+    setNewComment("");
+  }
 
   return (
     <>
@@ -64,6 +71,24 @@ export default function Blog({ handleLikes, handleDelete, user, blogById }) {
           )}
         </tbody>
       </table>
+      <h3>Comments:</h3>
+      <div className="comments-section">
+        <div className="comment-input-container">
+          <label htmlFor="comment-input-field">Add comment: </label>
+          <input id="comment-input-field" type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)}></input>
+          <button onClick={() => handleComment(id)}>Add</button>
+        </div>
+        {blog.comments.length > 0 &&
+          <ul>
+            {blog.comments.map(comment => (
+              <li key={comment.id}>{comment.content}</li>
+            ))}
+          </ul>
+        }
+        {blog.comments.length === 0 &&
+          <p>No comments</p>
+        }
+      </div>
     </>
   );
 }

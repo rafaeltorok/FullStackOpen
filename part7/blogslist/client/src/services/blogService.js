@@ -43,11 +43,18 @@ async function updateData(newObject) {
   return request.data;
 }
 
+// POST a new comment
+async function addComment(blogId, comment) {
+  const request = await axios.post(`${blogsUrl}/${blogId}/comments`, comment);
+  return request.data;
+}
+
 export default {
   getData,
   getDataById,
   storeData,
   removeData,
   updateData,
-  setToken
+  setToken,
+  addComment
 };

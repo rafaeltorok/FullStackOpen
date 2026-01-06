@@ -211,6 +211,28 @@ function App() {
     }
   };
 
+  const addCommentMutation = useMutation({
+    mutationFn: ({ comment, blogId }) => blogService.addComment(blogId, { content: comment }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      handleNotification(
+        "success-message",
+        `Comment added!`,
+      );
+    },
+    onError: () => {
+      handleNotification("error-message", "Failed to add comment");
+    },
+  });
+
+  const addComment = (comment, blogId) => {
+    if (!comment.trim()) {
+      handleNotification("error-message", "Comment cannot be empty");
+    } else {
+      addCommentMutation.mutate({ comment, blogId });
+    }
+  };
+
   const userById = (id) => {
     return users.find(u => u.id === id) || null;
   };
@@ -299,6 +321,7 @@ function App() {
               handleDelete={handleDelete}
               user={user}
               blogById={blogById}
+              addComment={addComment}
             />
           }
         />

@@ -172,4 +172,61 @@ describe('Blogs List app', function() {
       cy.get('.blogs-list li').eq(2).should('contain', 'New blog')
     })
   })
+
+  describe('Testing the comments section', function() {
+    beforeEach(function () {
+      cy.login({ username: 'admin', password: 'password' })
+      cy.createBlog({
+        title: 'New blog',
+        author: 'Cypress',
+        url: 'https://testing-with-cypress.com'
+      })
+    })
+
+    it('When there are no comments, a proper message will be displayed', function() {
+      cy.contains('li', 'New blog by Cypress').click()
+
+      cy.contains('Comments')
+      cy.contains('No comments')
+    })
+
+    it('A new comment can be added', function() {
+      cy.contains('li', 'New blog by Cypress').click()
+      cy.get('#comment-input-field').type('This is a test comment')
+      cy.contains('button', 'Add').click()
+
+      cy.get('.success-message')
+        .should('contain', 'Comment added')
+      cy.contains('Comments')
+      cy.contains('This is a test comment')
+    })
+
+    it('An empty comment cannot be added', function() {
+      cy.contains('li', 'New blog by Cypress').click()
+      cy.get('#comment-input-field').type(' ')
+      cy.contains('button', 'Add').click()
+
+      cy.get('.error-message')
+        .should('contain', 'Comment cannot be empty')
+      cy.contains('Comments')
+      cy.contains('No comments')
+    })
+
+    it('Multiple comments can be added', function() {
+      cy.contains('li', 'New blog by Cypress').click()
+      
+      cy.get('#comment-input-field').type('My first comment')
+      cy.contains('button', 'Add').click()
+      cy.get('#comment-input-field').type('My second comment')
+      cy.contains('button', 'Add').click()
+      cy.get('#comment-input-field').type('My third comment')
+      cy.contains('button', 'Add').click()
+
+      cy.get('.comments-section li').should('have.length', 3)
+      cy.contains('Comments')
+      cy.contains('My first comment')
+      cy.contains('My second comment')
+      cy.contains('My third comment')
+    })
+  })
 })

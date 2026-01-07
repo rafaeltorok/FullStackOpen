@@ -31,7 +31,10 @@ export default function Users({ users }) {
                 <TableCell>
                   <Link 
                     to={`/users/${user.id}`}
-                  >{user.name}</Link>
+                    style={{ color: 'inherit' }}
+                  >
+                    {user.name}
+                  </Link>
                 </TableCell>
                 <TableCell>
                   {user.blogs.length}

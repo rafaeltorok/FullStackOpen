@@ -1,9 +1,6 @@
 body {
-  min-width: 400px;
-  display: 0 auto;
+  margin: 0;
   text-align: center;
-  background-color: #151515;
-  color: white;
 }
 
 .main-title {
@@ -13,5 +10,5 @@ body {
 }
 
 a {
-  color: white;
+  text-decoration: none;
 }

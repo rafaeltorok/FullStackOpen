@@ -28,7 +28,9 @@ import {
   Container,
   AppBar,
   Toolbar,
-  Button
+  Button,
+  Box,
+  Typography
 } from '@mui/material';
 
 function App() {
@@ -141,6 +143,7 @@ function App() {
         window.localStorage.removeItem("loggedBlogsListUser");
         handleNotification("success", `${user.name} has logged out`);
         dispatchUser({ type: "LOGOUT" });
+        navigate('/');
       }
     } catch (err) {
       console.error(err);
@@ -262,22 +265,33 @@ function App() {
   }
 
   return (
-    <Container>
+    <Container maxWidth="md">
       <h1 className="main-title">Blogs List</h1>
-      <AppBar position="static">
-        <Toolbar>
+      <AppBar position="static" elevation={1}>
+        <Toolbar sx={{ gap: 2 }}>
           <Button color="inherit" component={Link} to="/">
-            home
+            Home
           </Button>
           <Button color="inherit" component={Link} to="/users">
-            users
+            Users
           </Button>
-          {user
-            ? <em>{user.name} logged in <Button onClick={handleLogout}>logout</Button></em>
-            : <Button color="inherit" component={Link} to="/login">
-                login
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          {user ? (
+            <>
+              <Typography variant="body2" sx={{ mr: 2 }}>
+                {user.name}
+              </Typography>
+              <Button color="secondary" variant="outlined" onClick={handleLogout}>
+                Logout
               </Button>
-          }                              
+            </>
+          ) : (
+            <Button color="secondary" variant="contained" component={Link} to="/login">
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
 
@@ -339,9 +353,17 @@ function App() {
         />
       </Routes>
 
-      <footer>
+      <Box
+        component="footer"
+        sx={{
+          mt: 6,
+          py: 3,
+          textAlign: 'center',
+          color: 'text.secondary',
+        }}
+      >
         Blogs List app, from the FullStackOpen course by MOOC Finland 2025.
-      </footer>
+      </Box>
     </Container>
   );
 }

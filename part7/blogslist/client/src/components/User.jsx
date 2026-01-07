@@ -1,4 +1,11 @@
 import { useParams } from "react-router-dom";
+import {
+  Paper,
+  List,
+  ListItem,
+  ListItemText
+} from '@mui/material';
+
 
 export default function User({ userById }) {
   const { id } = useParams();
@@ -12,11 +19,19 @@ export default function User({ userById }) {
     <div>
       <h2>{user.name}</h2>
       <h3>Added blogs</h3>
-      <ul className="blogs-list">
+      <List>
         {user.blogs.map(blog => (
-          <li key={blog.id}>{blog.title}</li>
+          <Paper
+            key={blog.id}
+            elevation={2}
+            sx={{ mb: 2 }}
+          >
+            <ListItem key={blog.id} divider>
+              <ListItemText primary={blog.title} />
+            </ListItem>
+          </Paper>
         ))}
-      </ul>
+      </List>
     </div>
   );
 }

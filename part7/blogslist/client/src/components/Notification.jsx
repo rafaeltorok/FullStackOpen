@@ -10,25 +10,8 @@ export default function Notification({ messageType, message }) {
         my: 2,
       }}
     >
-      <Alert
-        severity={messageType}
-        sx={{
-          width: '100%',
-          maxWidth: 600,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 'bold',
-          bgcolor:
-            messageType === 'success'
-              ? 'success.dark'
-              : 'error.dark',
-          color: 'white',
-        }}
-      >
-        <Typography align="center">
-          {message}
-        </Typography>
+      <Alert severity={messageType} sx={{ width: '100%', maxWidth: 600 }}>
+        {message}
       </Alert>
     </Box>
   );

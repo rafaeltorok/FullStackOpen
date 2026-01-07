@@ -1,19 +1,33 @@
 import { Link } from "react-router-dom";
+import {
+  Container,
+  Card,
+  CardContent,
+  CardActions,
+  CardActionArea,
+  Typography,
+  Button
+} from '@mui/material';
 
 export default function BlogList({ blogList }) {
   const sortedBlogs = [...blogList].sort((a, b) => b.likes - a.likes);
 
   return (
-    <div>
-      <ul className="blogs-list">
-        {sortedBlogs.map((blog) => (
-          <li key={blog.id}>
-            <Link 
-              to={`/blogs/${blog.id}`}
-            >{blog.title} by {blog.author}</Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Container maxWidth="md">
+      {sortedBlogs.map((blog) => (
+        <Card sx={{ mb: 2 }} key={blog.id}>
+          <CardActionArea component={Link} to={`/blogs/${blog.id}`}>
+            <CardContent>
+              <Typography variant="h6">
+                {blog.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                by {blog.author}
+              </Typography>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+      ))}
+    </Container>
   );
 }

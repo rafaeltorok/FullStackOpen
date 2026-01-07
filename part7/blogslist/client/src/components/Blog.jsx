@@ -11,7 +11,12 @@ import {
   TableCell,
   TableRow,
   TableHead,
-  Table
+  Table,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  Link
 } from "@mui/material";
 
 export default function Blog({ handleLikes, handleDelete, user, blogById, addComment }) {
@@ -64,7 +69,12 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
               URL
             </TableCell>
             <TableCell>
-              <a href={`${blog.url}`}>{blog.url}</a>
+              <Link
+                href={`${blog.url}`}
+                style={{ color: 'inherit' }}
+              >
+                {blog.url}
+              </Link>
             </TableCell>
           </TableRow>
           <TableRow>
@@ -74,7 +84,7 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
             <TableCell>
               <span className="like-count">{blog.likes}</span>
               {user && (
-                <Button className="like-button" onClick={likeBlog}>
+                <Button className="like-button" variant="outlined" sx={{ marginLeft: 2 }} onClick={likeBlog}>
                   like
                 </Button>
               )}
@@ -86,7 +96,7 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
                 Added by
               </TableCell>
               <TableCell>   
-                <Button type="button" onClick={removeBlog}>
+                <Button type="button" color="error" variant="outlined" onClick={removeBlog}>
                   delete
                 </Button>
               </TableCell>
@@ -129,14 +139,24 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
       </Container>
       <div className="comments-section">
         {blog.comments.length > 0 &&
-          <ul>
+          <List>
             {blog.comments.map(comment => (
-              <li key={comment.id}>{comment.content}</li>
+              <Paper
+                key={comment.id}
+                elevation={2}
+                sx={{ mb: 2 }}
+              >
+                <ListItem divider>
+                  <ListItemText primary={comment.content} />
+                </ListItem>
+              </Paper>
             ))}
-          </ul>
+          </List>
         }
         {blog.comments.length === 0 &&
-          <p>No comments</p>
+          <Typography color="text.secondary">
+            No comments yet
+          </Typography>
         }
       </div>
     </>

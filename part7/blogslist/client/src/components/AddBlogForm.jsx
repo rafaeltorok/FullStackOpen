@@ -4,7 +4,8 @@ import {
   Paper,
   Button,
   TextField,
-  Box
+  Box,
+  Stack
 } from '@mui/material';
 
 export default function AddBlogForm({ addBlog }) {
@@ -35,35 +36,29 @@ export default function AddBlogForm({ addBlog }) {
           }}
         >
           <form onSubmit={createBlog}>
-            <div>
+            <Stack spacing={2}>
               <TextField 
                 label="Title" 
                 type="text"
                 value={newBlog.title}
                 onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
               />
-            </div>
-            <div>
               <TextField 
                 label="Author" 
                 type="text"
                 value={newBlog.author}
                 onChange={(e) => setNewBlog({ ...newBlog, author: e.target.value })}
               />
-            </div>
-            <div>
               <TextField 
                 label="URL" 
                 type="text"
                 value={newBlog.url}
                 onChange={(e) => setNewBlog({ ...newBlog, url: e.target.value })}
               />
-            </div>
-            <div>
               <Button variant="contained" color="primary" type="submit">
                 Submit
               </Button>
-            </div>
+            </Stack>
           </form>
         </Box>
       </Paper>

@@ -1,0 +1,150 @@
+body {
+  min-width: 400px;
+  display: 0 auto;
+  text-align: center;
+  background-color: #151515;
+  color: white;
+}
+
+.main-title {
+  text-decoration: underline;
+  padding: 1rem;
+  font-size: 3rem;
+}
+
+.container {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid gray;
+  border-style: groove;
+  max-width: 300px;
+  background-color: #252525;
+  padding: 1rem;
+}
+
+form div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+form label {
+  width: 30%;
+  text-align: right;
+  padding-right: 10px;
+}
+
+form input {
+  width: 70%;
+  background-color: black;
+  color: inherit;
+  text-align: left;
+}
+
+button {
+  font-weight: bold;
+  border-style: outset;
+  background-color: black;
+  color: white;
+}
+
+button:active {
+  border-style: inset;
+  background-color: #202020;
+  color: #505050;
+}
+
+.error-message,
+.success-message {
+  margin: 1rem auto;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 3px;
+  padding: 10px;
+  background-color: #303030;
+  max-width: 350px;
+}
+
+.error-message {
+  color: red;
+}
+
+.success-message {
+  color: #76b900;
+}
+
+table {
+  margin: 2rem auto;
+  width: 400px;
+  border: 2px solid gray;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 1rem;
+  border: 1px solid gray;
+}
+
+th {
+  background-color: #303030;
+}
+
+td {
+  background-color: #202020;
+}
+
+.blog-title {
+  font-size: 1.75rem;
+  background-color: black;
+}
+
+.login-form-buttons {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.display-details-row {
+  background-color: #202020;
+}
+
+.blogs-list li {
+  border: 2px solid gray;
+  padding: 0.5rem;
+  background-color: #252525;
+  list-style: none;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+}
+
+.comments-section {
+  list-style: square;
+  text-align: left;
+}
+
+.comments-section ul,
+.comments-section p,
+.comments-section .comment-input-container {
+  margin: 2rem auto;
+}
+
+.comments-section ul,
+.comments-section .comment-input-container {
+  width: 400px;
+}
+
+.comments-section p {
+  width: 100px;
+}
+
+.comments-section li {
+  margin-bottom: 10px;
+}

@@ -46,16 +46,6 @@
   cd ./server && npm run lint
   ```
 
-- Running backend API tests
-  ```bash
-  cd ./server && npm run test
-  ```
-
-  or for running a specific test only
-  ```bash
-  npm run test -- ./src/tests/blog_api.test.js
-  ```
-
 
 ## CRUD operations
 The following requires an **authorization token**: **POST** and **DELETE** on **/api/blogs**.

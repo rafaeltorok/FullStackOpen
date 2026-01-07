@@ -30,7 +30,6 @@ import {
 function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [users, setUsers] = useState([]);
 
   const blogFormRef = useRef();
   const queryClient = useQueryClient();
@@ -43,22 +42,15 @@ function App() {
     queryFn: blogService.getData,
   });
 
+  const users = useQuery({
+    queryKey: ["users"],
+    queryFn: userService.getUsers,
+  });
+
   const initialState = {
     message: "",
     type: "",
   };
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await userService.getUsers();
-        setUsers(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchUsers();
-  }, []);
 
   function notificationReducer(state, action) {
     switch (action.type) {
@@ -146,6 +138,7 @@ function App() {
     mutationFn: blogService.storeData,
     onSuccess: (newBlog) => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       blogFormRef.current.toggleVisibility();
       handleNotification(
         "success",
@@ -184,6 +177,7 @@ function App() {
     mutationFn: (blogToRemove) => blogService.removeData(blogToRemove.id),
     onSuccess: (_, blogToRemove) => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       handleNotification(
         "success",
         `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list`,
@@ -227,16 +221,11 @@ function App() {
     }
   };
 
-  const userById = (id) => {
-    return users.find((u) => u.id === id) || null;
-  };
+  const userById = (id) =>
+    users.data?.find((u) => u.id === id) || null;
 
   const blogById = (id) => {
     return blogs.data.find((b) => b.id === id) || null;
-  };
-
-  const padding = {
-    padding: 5,
   };
 
   if (blogs.isError) {
@@ -308,7 +297,7 @@ function App() {
         <Route
           path="/users"
           element={
-            user ? <Users users={users} /> : <Navigate replace to="/login" />
+            user ? <Users users={users.data} /> : <Navigate replace to="/login" />
           }
         />
         <Route

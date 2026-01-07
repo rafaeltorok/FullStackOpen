@@ -1,29 +1,46 @@
 import { Link } from "react-router-dom";
+import {
+  Paper,
+  TableContainer,
+  TableBody,
+  TableCell,
+  TableRow,
+  TableHead,
+  Table
+} from "@mui/material";
 
 export default function Users({ users }) {
   return (
     <div>
       <h2>Users</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>User</th>
-            <td>blogs created</td>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <th>
-                <Link 
-                  to={`/users/${user.id}`}
-                >{user.name}</Link>
-              </th>
-              <td>{user.blogs.length}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                User
+              </TableCell>
+              <TableCell>
+                Blogs created
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>
+                  <Link 
+                    to={`/users/${user.id}`}
+                  >{user.name}</Link>
+                </TableCell>
+                <TableCell>
+                  {user.blogs.length}
+                </TableCell>
+            </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 }

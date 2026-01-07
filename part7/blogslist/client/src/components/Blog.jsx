@@ -1,5 +1,18 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import { 
+  TextField,
+  Button,
+  Container,
+  Paper,
+  Box,
+  TableContainer,
+  TableBody,
+  TableCell,
+  TableRow,
+  TableHead,
+  Table
+} from "@mui/material";
 
 export default function Blog({ handleLikes, handleDelete, user, blogById, addComment }) {
   const [newComment, setNewComment] = useState("");
@@ -30,54 +43,91 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
 
   return (
     <>
-      <table className="blog">
-        <thead>
-          <tr>
-            <th className="blog-title" colSpan={2}>
+      <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell 
+              colSpan={2} 
+              align="center"
+              sx={{
+                fontSize: 'x-large'
+              }}
+            >
               {blog.title} by {blog.author}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>URL:</th>
-            <td>
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              URL
+            </TableCell>
+            <TableCell>
               <a href={`${blog.url}`}>{blog.url}</a>
-            </td>
-          </tr>
-          <tr>
-            <th>Likes:</th>
-            <td>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              Likes
+            </TableCell>
+            <TableCell>
               <span className="like-count">{blog.likes}</span>
               {user && (
-                <button className="like-button" onClick={likeBlog}>
+                <Button className="like-button" onClick={likeBlog}>
                   like
-                </button>
+                </Button>
               )}
-            </td>
-          </tr>
-          <tr>
-            <th>Added by:</th>
-            <td>{blog.user?.name}</td>
-          </tr>
+            </TableCell>
+          </TableRow>
           {user?.username === blog.user?.username && (
-            <tr>
-              <th colSpan={2}>
-                <button type="button" onClick={removeBlog}>
+            <TableRow>
+              <TableCell>
+                Added by
+              </TableCell>
+              <TableCell>   
+                <Button type="button" onClick={removeBlog}>
                   delete
-                </button>
-              </th>
-            </tr>
+                </Button>
+              </TableCell>
+            </TableRow>
           )}
-        </tbody>
-      </table>
-      <h3>Comments:</h3>
+        </TableBody>
+      </Table>
+    </TableContainer>
+      <h2>Comments:</h2>
+      <Container maxWidth="sm">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Paper elevation={3} sx={{ p: 3 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'stretch',
+              }}
+            >
+              <TextField
+                label="New comment"
+                fullWidth
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+
+              <Button
+                variant="contained"
+                onClick={() => handleComment(id)}
+              >
+                Add
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
+      </Container>
       <div className="comments-section">
-        <div className="comment-input-container">
-          <label htmlFor="comment-input-field">Add comment: </label>
-          <input id="comment-input-field" type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)}></input>
-          <button onClick={() => handleComment(id)}>Add</button>
-        </div>
         {blog.comments.length > 0 &&
           <ul>
             {blog.comments.map(comment => (

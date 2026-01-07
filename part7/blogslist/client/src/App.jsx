@@ -23,6 +23,14 @@ import Users from "./components/Users";
 import User from './components/User';
 import Blog from './components/Blog';
 
+// Material UI
+import { 
+  Container,
+  AppBar,
+  Toolbar,
+  Button
+} from '@mui/material';
+
 function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -103,7 +111,7 @@ function App() {
     try {
       if (!username?.trim() || !password?.trim()) {
         handleNotification(
-          "error-message",
+          "error",
           "Both username and password are required",
         );
         return;
@@ -116,10 +124,10 @@ function App() {
       dispatchUser({ type: "LOGIN", payload: user });
       setUsername("");
       setPassword("");
-      handleNotification("success-message", `${user.name} has logged in`);
+      handleNotification("success", `${user.name} has logged in`);
     } catch (err) {
       console.error(err);
-      handleNotification("error-message", "Incorrect credentials");
+      handleNotification("error", "Incorrect credentials");
     }
   };
 
@@ -127,16 +135,16 @@ function App() {
     try {
       const isLogged = window.localStorage.getItem("loggedBlogsListUser");
       if (!isLogged) {
-        handleNotification("error-message", "User has already been logged out");
+        handleNotification("error", "User has already been logged out");
         dispatchUser({ type: "LOGOUT" });
       } else {
         window.localStorage.removeItem("loggedBlogsListUser");
-        handleNotification("success-message", `${user.name} has logged out`);
+        handleNotification("success", `${user.name} has logged out`);
         dispatchUser({ type: "LOGOUT" });
       }
     } catch (err) {
       console.error(err);
-      handleNotification("error-message", "Failed to logout the current user");
+      handleNotification("error", "Failed to logout the current user");
     }
   };
 
@@ -146,12 +154,12 @@ function App() {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       blogFormRef.current.toggleVisibility();
       handleNotification(
-        "success-message",
+        "success",
         `The blog "${newBlog.title}" by ${newBlog.author} was added to the list!`,
       );
     },
     onError: () => {
-      handleNotification("error-message", "Failed to add a new blog");
+      handleNotification("error", "Failed to add a new blog");
     },
   });
 
@@ -166,7 +174,7 @@ function App() {
     },
     onError: () => {
       handleNotification(
-        "error-message",
+        "error",
         "Failed to update the blog's like counter",
       );
     },
@@ -186,14 +194,14 @@ function App() {
     onSuccess: (_, blogToRemove) => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       handleNotification(
-        "success-message",
+        "success",
         `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list`,
       );
       navigate('/');
     },
     onError: () => {
       handleNotification(
-        "error-message",
+        "error",
         "Failed to remove blog from the list",
       );
     },
@@ -216,18 +224,18 @@ function App() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       handleNotification(
-        "success-message",
+        "success",
         `Comment added!`,
       );
     },
     onError: () => {
-      handleNotification("error-message", "Failed to add comment");
+      handleNotification("error", "Failed to add comment");
     },
   });
 
   const addComment = (comment, blogId) => {
     if (!comment.trim()) {
-      handleNotification("error-message", "Comment cannot be empty");
+      handleNotification("error", "Comment cannot be empty");
     } else {
       addCommentMutation.mutate({ comment, blogId });
     }
@@ -254,20 +262,24 @@ function App() {
   }
 
   return (
-    <>
+    <Container>
       <h1 className="main-title">Blogs List</h1>
-      <div className="navbar">
-        <Link style={padding} to="/">home</Link>
-        <Link style={padding} to="/users">users</Link>
-        {user && (
-          <div>
-            <p>
-              <strong>{user.name}</strong> logged in
-              <button onClick={handleLogout}>logout</button>
-            </p>
-          </div>
-        )}
-      </div>
+      <AppBar position="static">
+        <Toolbar>
+          <Button color="inherit" component={Link} to="/">
+            home
+          </Button>
+          <Button color="inherit" component={Link} to="/users">
+            users
+          </Button>
+          {user
+            ? <em>{user.name} logged in <Button onClick={handleLogout}>logout</Button></em>
+            : <Button color="inherit" component={Link} to="/login">
+                login
+              </Button>
+          }                              
+        </Toolbar>
+      </AppBar>
 
       {notification.message && (
         <Notification
@@ -330,7 +342,7 @@ function App() {
       <footer>
         Blogs List app, from the FullStackOpen course by MOOC Finland 2025.
       </footer>
-    </>
+    </Container>
   );
 }
 

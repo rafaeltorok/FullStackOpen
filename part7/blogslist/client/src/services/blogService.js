@@ -56,5 +56,5 @@ export default {
   removeData,
   updateData,
   setToken,
-  addComment
+  addComment,
 };

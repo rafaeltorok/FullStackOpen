@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Container,
-  Paper,
-  Button,
-  TextField,
-  Box,
-  Stack
-} from '@mui/material';
+import { Container, Paper, Button, TextField, Box, Stack } from "@mui/material";
 
 export default function AddBlogForm({ addBlog }) {
   const [newBlog, setNewBlog] = useState({
@@ -29,31 +22,37 @@ export default function AddBlogForm({ addBlog }) {
       <Paper elevation={3} sx={{ padding: 3 }}>
         <Box
           sx={{
-            minHeight: '100px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            minHeight: "100px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <form onSubmit={createBlog}>
             <Stack spacing={2}>
-              <TextField 
-                label="Title" 
+              <TextField
+                label="Title"
                 type="text"
                 value={newBlog.title}
-                onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
+                onChange={(e) =>
+                  setNewBlog({ ...newBlog, title: e.target.value })
+                }
               />
-              <TextField 
-                label="Author" 
+              <TextField
+                label="Author"
                 type="text"
                 value={newBlog.author}
-                onChange={(e) => setNewBlog({ ...newBlog, author: e.target.value })}
+                onChange={(e) =>
+                  setNewBlog({ ...newBlog, author: e.target.value })
+                }
               />
-              <TextField 
-                label="URL" 
+              <TextField
+                label="URL"
                 type="text"
                 value={newBlog.url}
-                onChange={(e) => setNewBlog({ ...newBlog, url: e.target.value })}
+                onChange={(e) =>
+                  setNewBlog({ ...newBlog, url: e.target.value })
+                }
               />
               <Button variant="contained" color="primary" type="submit">
                 Submit

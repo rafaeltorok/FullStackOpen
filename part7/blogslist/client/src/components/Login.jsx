@@ -1,12 +1,4 @@
-import { 
-  TextField,
-  Button,
-  Container,
-  Paper,
-  Box,
-  Stack
-} from "@mui/material";
-
+import { TextField, Button, Container, Paper, Box, Stack } from "@mui/material";
 
 export default function Login({
   handleLogin,
@@ -21,23 +13,23 @@ export default function Login({
       <Container maxWidth="sm">
         <Box
           sx={{
-            minHeight: '100px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            minHeight: "100px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <Paper elevation={3} sx={{ padding: 3 }}>
             <form onSubmit={handleLogin}>
               <Stack spacing={2}>
                 <TextField
-                  label="Username" 
+                  label="Username"
                   type="text"
                   value={username}
                   onChange={({ target }) => setUsername(target.value)}
                 />
-                <TextField 
-                  label="Password" 
+                <TextField
+                  label="Password"
                   type="password"
                   value={password}
                   onChange={({ target }) => setPassword(target.value)}

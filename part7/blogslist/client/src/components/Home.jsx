@@ -10,5 +10,5 @@ export default function Home({ blogFormRef, addBlog, blogs }) {
       </Togglable>
       <BlogList blogList={blogs.data} />
     </div>
-  )
+  );
 }

@@ -2,13 +2,7 @@
 import { useState, useEffect, useRef, useReducer } from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useUserValue, useUserDispatch } from "./context/UserContext";
-import {
-  Routes,
-  Route,
-  Link,
-  Navigate,
-  useNavigate
-} from "react-router-dom"
+import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 
 // Services
 import loginService from "./services/loginService";
@@ -20,18 +14,18 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Notification from "./components/Notification";
 import Users from "./components/Users";
-import User from './components/User';
-import Blog from './components/Blog';
+import User from "./components/User";
+import Blog from "./components/Blog";
 
 // Material UI
-import { 
+import {
   Container,
   AppBar,
   Toolbar,
   Button,
   Box,
-  Typography
-} from '@mui/material';
+  Typography,
+} from "@mui/material";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -62,7 +56,7 @@ function App() {
       } catch (err) {
         console.error(err);
       }
-    }
+    };
     fetchUsers();
   }, []);
 
@@ -112,10 +106,7 @@ function App() {
     event.preventDefault();
     try {
       if (!username?.trim() || !password?.trim()) {
-        handleNotification(
-          "error",
-          "Both username and password are required",
-        );
+        handleNotification("error", "Both username and password are required");
         return;
       }
 
@@ -143,7 +134,7 @@ function App() {
         window.localStorage.removeItem("loggedBlogsListUser");
         handleNotification("success", `${user.name} has logged out`);
         dispatchUser({ type: "LOGOUT" });
-        navigate('/');
+        navigate("/");
       }
     } catch (err) {
       console.error(err);
@@ -176,10 +167,7 @@ function App() {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
     },
     onError: () => {
-      handleNotification(
-        "error",
-        "Failed to update the blog's like counter",
-      );
+      handleNotification("error", "Failed to update the blog's like counter");
     },
   });
 
@@ -200,13 +188,10 @@ function App() {
         "success",
         `The blog "${blogToRemove.title}" by ${blogToRemove.author} was removed from the list`,
       );
-      navigate('/');
+      navigate("/");
     },
     onError: () => {
-      handleNotification(
-        "error",
-        "Failed to remove blog from the list",
-      );
+      handleNotification("error", "Failed to remove blog from the list");
     },
   });
 
@@ -223,13 +208,11 @@ function App() {
   };
 
   const addCommentMutation = useMutation({
-    mutationFn: ({ comment, blogId }) => blogService.addComment(blogId, { content: comment }),
+    mutationFn: ({ comment, blogId }) =>
+      blogService.addComment(blogId, { content: comment }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      handleNotification(
-        "success",
-        `Comment added!`,
-      );
+      handleNotification("success", `Comment added!`);
     },
     onError: () => {
       handleNotification("error", "Failed to add comment");
@@ -245,11 +228,11 @@ function App() {
   };
 
   const userById = (id) => {
-    return users.find(u => u.id === id) || null;
+    return users.find((u) => u.id === id) || null;
   };
 
   const blogById = (id) => {
-    return blogs.data.find(b => b.id === id) || null;
+    return blogs.data.find((b) => b.id === id) || null;
   };
 
   const padding = {
@@ -283,12 +266,21 @@ function App() {
               <Typography variant="body2" sx={{ mr: 2 }}>
                 {user.name}
               </Typography>
-              <Button color="secondary" variant="outlined" onClick={handleLogout}>
+              <Button
+                color="secondary"
+                variant="outlined"
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             </>
           ) : (
-            <Button color="secondary" variant="contained" component={Link} to="/login">
+            <Button
+              color="secondary"
+              variant="contained"
+              component={Link}
+              to="/login"
+            >
               Login
             </Button>
           )}
@@ -303,44 +295,41 @@ function App() {
       )}
 
       <Routes>
-        <Route 
+        <Route
           path="/"
           element={
-            user
-              ?
-              <Home
-                blogFormRef={blogFormRef}
-                addBlog={addBlog}
-                blogs={blogs}
-              /> 
-              : <Navigate replace to="/login" />
+            user ? (
+              <Home blogFormRef={blogFormRef} addBlog={addBlog} blogs={blogs} />
+            ) : (
+              <Navigate replace to="/login" />
+            )
           }
         />
-        <Route 
-          path="/users" 
+        <Route
+          path="/users"
           element={
-            user
-              ? <Users users={users} />
-              : <Navigate replace to="/login" />
+            user ? <Users users={users} /> : <Navigate replace to="/login" />
           }
         />
         <Route
           path="/login"
           element={
-            user
-              ? <Navigate to="/" replace />
-              : <Login
-                  handleLogin={handleLogin}
-                  username={username}
-                  setUsername={setUsername}
-                  password={password}
-                  setPassword={setPassword}
-                />
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Login
+                handleLogin={handleLogin}
+                username={username}
+                setUsername={setUsername}
+                password={password}
+                setPassword={setPassword}
+              />
+            )
           }
         />
-        <Route path='/users/:id' element={<User userById={userById} />} />
-        <Route 
-          path='/blogs/:id'
+        <Route path="/users/:id" element={<User userById={userById} />} />
+        <Route
+          path="/blogs/:id"
           element={
             <Blog
               handleLikes={handleLikes}
@@ -358,8 +347,8 @@ function App() {
         sx={{
           mt: 6,
           py: 3,
-          textAlign: 'center',
-          color: 'text.secondary',
+          textAlign: "center",
+          color: "text.secondary",
         }}
       >
         Blogs List app, from the FullStackOpen course by MOOC Finland 2025.

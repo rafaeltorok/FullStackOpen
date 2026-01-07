@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { 
+import {
   TextField,
   Button,
   Container,
@@ -16,10 +16,16 @@ import {
   ListItem,
   ListItemText,
   Typography,
-  Link
+  Link,
 } from "@mui/material";
 
-export default function Blog({ handleLikes, handleDelete, user, blogById, addComment }) {
+export default function Blog({
+  handleLikes,
+  handleDelete,
+  user,
+  blogById,
+  addComment,
+}) {
   const [newComment, setNewComment] = useState("");
   const { id } = useParams();
   const blog = blogById(id);
@@ -44,80 +50,81 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
   const handleComment = (blogId) => {
     addComment(newComment, blogId);
     setNewComment("");
-  }
+  };
 
   return (
     <>
       <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell 
-              colSpan={2} 
-              align="center"
-              sx={{
-                fontSize: 'x-large'
-              }}
-            >
-              {blog.title} by {blog.author}
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          <TableRow>
-            <TableCell>
-              URL
-            </TableCell>
-            <TableCell>
-              <Link
-                href={`${blog.url}`}
-                style={{ color: 'inherit' }}
-              >
-                {blog.url}
-              </Link>
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>
-              Likes
-            </TableCell>
-            <TableCell>
-              <span className="like-count">{blog.likes}</span>
-              {user && (
-                <Button className="like-button" variant="outlined" sx={{ marginLeft: 2 }} onClick={likeBlog}>
-                  like
-                </Button>
-              )}
-            </TableCell>
-          </TableRow>
-          {user?.username === blog.user?.username && (
+        <Table>
+          <TableHead>
             <TableRow>
-              <TableCell>
-                Added by
-              </TableCell>
-              <TableCell>   
-                <Button type="button" color="error" variant="outlined" onClick={removeBlog}>
-                  delete
-                </Button>
+              <TableCell
+                colSpan={2}
+                align="center"
+                sx={{
+                  fontSize: "x-large",
+                }}
+              >
+                {blog.title} by {blog.author}
               </TableCell>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>URL</TableCell>
+              <TableCell>
+                <Link href={`${blog.url}`} style={{ color: "inherit" }}>
+                  {blog.url}
+                </Link>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Likes</TableCell>
+              <TableCell>
+                <span className="like-count">{blog.likes}</span>
+                {user && (
+                  <Button
+                    className="like-button"
+                    variant="outlined"
+                    sx={{ marginLeft: 2 }}
+                    onClick={likeBlog}
+                  >
+                    like
+                  </Button>
+                )}
+              </TableCell>
+            </TableRow>
+            {user?.username === blog.user?.username && (
+              <TableRow>
+                <TableCell>Added by</TableCell>
+                <TableCell>
+                  <Button
+                    type="button"
+                    color="error"
+                    variant="outlined"
+                    onClick={removeBlog}
+                  >
+                    delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <h2>Comments:</h2>
       <Container maxWidth="sm">
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
+            display: "flex",
+            justifyContent: "center",
           }}
         >
           <Paper elevation={3} sx={{ p: 3 }}>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'stretch',
+                display: "flex",
+                alignItems: "stretch",
               }}
             >
               <TextField
@@ -127,10 +134,7 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
                 onChange={(e) => setNewComment(e.target.value)}
               />
 
-              <Button
-                variant="contained"
-                onClick={() => handleComment(id)}
-              >
+              <Button variant="contained" onClick={() => handleComment(id)}>
                 Add
               </Button>
             </Box>
@@ -138,26 +142,20 @@ export default function Blog({ handleLikes, handleDelete, user, blogById, addCom
         </Box>
       </Container>
       <div className="comments-section">
-        {blog.comments.length > 0 &&
+        {blog.comments.length > 0 && (
           <List>
-            {blog.comments.map(comment => (
-              <Paper
-                key={comment.id}
-                elevation={2}
-                sx={{ mb: 2 }}
-              >
+            {blog.comments.map((comment) => (
+              <Paper key={comment.id} elevation={2} sx={{ mb: 2 }}>
                 <ListItem divider>
                   <ListItemText primary={comment.content} />
                 </ListItem>
               </Paper>
             ))}
           </List>
-        }
-        {blog.comments.length === 0 &&
-          <Typography color="text.secondary">
-            No comments yet
-          </Typography>
-        }
+        )}
+        {blog.comments.length === 0 && (
+          <Typography color="text.secondary">No comments yet</Typography>
+        )}
       </div>
     </>
   );

@@ -97,7 +97,7 @@ blogsRouter.post("/", async (request, response, next) => {
       url,
       likes: likes || 0,
       user: user._id,
-      comments: []
+      comments: [],
     });
 
     const savedBlog = await newBlog.save();

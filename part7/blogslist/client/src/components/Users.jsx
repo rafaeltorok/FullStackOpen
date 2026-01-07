@@ -6,7 +6,7 @@ import {
   TableCell,
   TableRow,
   TableHead,
-  Table
+  Table,
 } from "@mui/material";
 
 export default function Users({ users }) {
@@ -17,29 +17,20 @@ export default function Users({ users }) {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>
-                User
-              </TableCell>
-              <TableCell>
-                Blogs created
-              </TableCell>
+              <TableCell>User</TableCell>
+              <TableCell>Blogs created</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
-                  <Link 
-                    to={`/users/${user.id}`}
-                    style={{ color: 'inherit' }}
-                  >
+                  <Link to={`/users/${user.id}`} style={{ color: "inherit" }}>
                     {user.name}
                   </Link>
                 </TableCell>
-                <TableCell>
-                  {user.blogs.length}
-                </TableCell>
-            </TableRow>
+                <TableCell>{user.blogs.length}</TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>

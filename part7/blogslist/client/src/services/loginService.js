@@ -8,5 +8,5 @@ async function userLogin(credentials) {
 }
 
 export default {
-  userLogin
+  userLogin,
 };

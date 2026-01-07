@@ -1,5 +1,5 @@
 import axios from "axios";
-const usersUrl = '/api/users';
+const usersUrl = "/api/users";
 
 // GET all users
 async function getUsers() {

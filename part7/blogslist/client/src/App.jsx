@@ -221,8 +221,7 @@ function App() {
     }
   };
 
-  const userById = (id) =>
-    users.data?.find((u) => u.id === id) || null;
+  const userById = (id) => users.data?.find((u) => u.id === id) || null;
 
   const blogById = (id) => {
     return blogs.data.find((b) => b.id === id) || null;
@@ -297,7 +296,11 @@ function App() {
         <Route
           path="/users"
           element={
-            user ? <Users users={users.data} /> : <Navigate replace to="/login" />
+            user ? (
+              <Users users={users.data} />
+            ) : (
+              <Navigate replace to="/login" />
+            )
           }
         />
         <Route

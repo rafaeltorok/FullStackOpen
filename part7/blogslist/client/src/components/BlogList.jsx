@@ -13,11 +13,7 @@ export default function BlogList({ blogList }) {
   return (
     <Container maxWidth="md">
       {sortedBlogs.map((blog) => (
-        <Card 
-          data-cy="blog-card"
-          sx={{ mb: 2 }}
-          key={blog.id}
-        >
+        <Card sx={{ mb: 2 }} key={blog.id}>
           <CardActionArea component={Link} to={`/blogs/${blog.id}`}>
             <CardContent>
               <Typography variant="h6">{blog.title}</Typography>

@@ -1,44 +1,43 @@
-import { authors, books } from "../data.js"
-import { v1 as uuid } from 'uuid'
-
+import { authors, books } from "../data.js";
+import { v1 as uuid } from "uuid";
+import { GraphQLError } from "graphql";
 
 export const typeDefs = /* GraphQL */ `
   type Author {
-    name: String!,
-    id: ID!,
-    born: Int,
+    name: String!
+    id: ID!
+    born: Int
     bookCount: Int
   }
 
   type Book {
-    title: String!,
-    published: Int!,
-    author: String!,
-    id: ID!,
+    title: String!
+    published: Int!
+    author: String!
+    id: ID!
     genres: [String!]!
   }
 
   type Mutation {
-    addAuthor(
-      name: String!
-      born: Int
-    ): Author
+    addAuthor(name: String!, born: Int): Author
 
     addBook(
-      title: String!,
-      published: Int!,
-      author: String!,
+      title: String!
+      published: Int!
+      author: String!
       genres: [String!]!
     ): Book
+
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 
   type Query {
-    authorCount: Int!,
-    bookCount: Int!,
-    allAuthors: [Author!]!,
+    authorCount: Int!
+    bookCount: Int!
+    allAuthors: [Author!]!
     allBooks(author: String, genre: String): [Book!]!
   }
-`
+`;
 
 export const resolvers = {
   Query: {
@@ -46,49 +45,64 @@ export const resolvers = {
     bookCount: () => books.length,
     allAuthors: () => authors,
     allBooks: (root, args) => {
-      let filteredBooks = books
+      let filteredBooks = books;
 
       if (args.author) {
-        filteredBooks = filteredBooks.filter(b => b.author === args.author)
+        filteredBooks = filteredBooks.filter((b) => b.author === args.author);
       }
       if (args.genre) {
-        filteredBooks = filteredBooks.filter(b => b.genres.includes(args.genre))
+        filteredBooks = filteredBooks.filter((b) =>
+          b.genres.includes(args.genre),
+        );
       }
 
-      return filteredBooks
-    }
+      return filteredBooks;
+    },
   },
   Author: {
     bookCount: (root) => {
-      return books.filter(book => book.author === root.name).length
-    }
+      return books.filter((book) => book.author === root.name).length;
+    },
   },
   Mutation: {
     addAuthor: (root, args) => {
-      if (authors.find(a => a.name === args.name)) {
+      if (authors.find((a) => a.name === args.name)) {
         throw new GraphQLError(`Author name must be unique: ${args.name}`, {
           extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.name
-          }
-        })
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+          },
+        });
       }
-      const author = { ...args, id: uuid() }
-      authors = authors.concat(author)
-      return author
+      const author = { ...args, id: uuid() };
+      authors.push(author);
+      return author;
     },
     addBook: (root, args) => {
-      if (books.find(b => b.name === args.name)) {
-        throw new GraphQLError(`Book title must be unique: ${args.name}`, {
+      if (books.find((b) => b.title === args.title)) {
+        throw new GraphQLError(`Book title must be unique: ${args.title}`, {
           extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.name
-          }
-        })
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+          },
+        });
       }
-      const book = { ...args, id: uuid() }
-      books = books.concat(book)
-      return book
-    }
-  }
-}
+
+      if (!authors.find((a) => a.name === args.author)) {
+        authors.push({ name: args.author, born: null, id: uuid() });
+      }
+
+      const book = { ...args, id: uuid() };
+      books.push(book);
+      return book;
+    },
+    editAuthor: (root, args) => {
+      const index = authors.findIndex((a) => a.name === args.name);
+      if (index === -1) {
+        return null;
+      }
+      authors[index].born = args.setBornTo;
+      return authors[index];
+    },
+  },
+};

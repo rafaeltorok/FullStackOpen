@@ -1,33 +1,34 @@
-import { useState } from "react"
-import { ALL_AUTHORS, EDIT_AUTHOR } from "../graphql/queries"
-import { useQuery, useMutation } from '@apollo/client/react'
+import { useState } from "react";
+import { ALL_AUTHORS, EDIT_AUTHOR } from "../graphql/queries";
+import { useQuery, useMutation } from "@apollo/client/react";
+import Select from "react-select";
 
 const Authors = ({ setError }) => {
-  const [authorName, setAuthorName] = useState("")
-  const [born, setBorn] = useState("")
-  const result = useQuery(ALL_AUTHORS)
+  const [authorName, setAuthorName] = useState(null);
+  const [born, setBorn] = useState("");
+  const result = useQuery(ALL_AUTHORS);
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }],
-    onError: (error) => setError(error.message)
-  })
+    onError: (error) => setError(error.message),
+  });
+  const options = [];
 
   if (result.loading) {
-    return (
-      <div>Loading authors...</div>
-    )
+    return <div>Loading authors...</div>;
   }
 
   if (result.error) {
-    return (
-      <div>Failed to get the authors list</div>
-    )
+    return <div>Failed to get the authors list</div>;
   }
 
   const changeBirthYear = (event) => {
-    event.preventDefault()
-    editAuthor({ variables: { name: authorName, setBornTo: born } })
-    setAuthorName("")
-    setBorn("")
+    event.preventDefault();
+    editAuthor({ variables: { name: authorName.value, setBornTo: born } });
+    setBorn("");
+  };
+
+  for (const author of result.data.allAuthors) {
+    options.push({ value: author.name, label: author.name });
   }
 
   return (
@@ -53,17 +54,24 @@ const Authors = ({ setError }) => {
       <h3>Set birthyear</h3>
       <form onSubmit={changeBirthYear}>
         <div>
-          <label>name</label>
-          <input type="text" value={authorName} onChange={(e) => setAuthorName(e.target.value)}></input>
+          <Select
+            defaultValue={authorName}
+            onChange={setAuthorName}
+            options={options}
+          />
         </div>
         <div>
           <label>born</label>
-          <input type="number" value={born} onChange={(e) => setBorn(Number(e.target.value))}></input>
+          <input
+            type="number"
+            value={born}
+            onChange={(e) => setBorn(Number(e.target.value))}
+          ></input>
         </div>
         <button type="submit">update author</button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Authors
+export default Authors;

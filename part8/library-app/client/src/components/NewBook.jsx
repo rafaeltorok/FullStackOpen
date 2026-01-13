@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import { useMutation } from '@apollo/client/react'
-import { ADD_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../graphql/queries'
+import { useState } from "react";
+import { useMutation } from "@apollo/client/react";
+import { ADD_BOOK, ALL_BOOKS, ALL_AUTHORS } from "../graphql/queries";
 
 const NewBook = ({ setError }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [published, setPublished] = useState('')
-  const [genre, setGenre] = useState('')
-  const [genres, setGenres] = useState([])
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [published, setPublished] = useState("");
+  const [genre, setGenre] = useState("");
+  const [genres, setGenres] = useState([]);
   const [addBook] = useMutation(ADD_BOOK, {
-    refetchQueries: [
-      { query: ALL_BOOKS },
-      { query: ALL_AUTHORS }
-    ],
-    onError: (error) => setError(error.message)
-  })
+    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    onError: (error) => setError(error.message),
+  });
 
   const submit = async (event) => {
-    event.preventDefault()
-    addBook({ variables: { title, author, published, genres } })
-    setTitle('')
-    setPublished('')
-    setAuthor('')
-    setGenres([])
-    setGenre('')
-  }
+    event.preventDefault();
+    addBook({ variables: { title, author, published, genres } });
+    setTitle("");
+    setPublished("");
+    setAuthor("");
+    setGenres([]);
+    setGenre("");
+  };
 
   const addGenre = () => {
-    setGenres(genres.concat(genre))
-    setGenre('')
-  }
+    setGenres(genres.concat(genre));
+    setGenre("");
+  };
 
   return (
     <div>
@@ -65,11 +62,11 @@ const NewBook = ({ setError }) => {
             add genre
           </button>
         </div>
-        <div>genres: {genres.join(' ')}</div>
+        <div>genres: {genres.join(" ")}</div>
         <button type="submit">create book</button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default NewBook
+export default NewBook;

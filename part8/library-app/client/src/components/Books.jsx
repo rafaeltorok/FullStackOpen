@@ -1,19 +1,15 @@
-import { ALL_BOOKS } from '../graphql/queries'
-import { useQuery } from '@apollo/client/react'
+import { ALL_BOOKS } from "../graphql/queries";
+import { useQuery } from "@apollo/client/react";
 
 const Books = () => {
-  const result = useQuery(ALL_BOOKS)
+  const result = useQuery(ALL_BOOKS);
 
   if (result.loading) {
-    return (
-      <div>Loading books...</div>
-    )
+    return <div>Loading books...</div>;
   }
 
   if (result.error) {
-    return (
-      <div>Failed to get the books list</div>
-    )
+    return <div>Failed to get the books list</div>;
   }
 
   return (
@@ -37,7 +33,7 @@ const Books = () => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default Books
+export default Books;

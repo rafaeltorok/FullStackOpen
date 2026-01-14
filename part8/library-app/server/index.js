@@ -1,15 +1,14 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
-import { typeDefs } from "./schemas/schema.js";
-import { resolvers } from "./resolvers/resolvers.js";
+import connectToDatabase from './db.js'
+import startServer from './server.js'
+import dotenv from 'dotenv'
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+dotenv.config();
+const MONGODB_URI = process.env.MONGODB_URI
+const PORT = process.env.PORT || 4000
 
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-}).then(({ url }) => {
-  console.log(`Server ready at ${url}`);
-});
+const main = async () => {
+  await connectToDatabase(MONGODB_URI)
+  startServer(PORT)
+}
+
+main()

@@ -1,35 +1,36 @@
-import { authors, books } from "../data.js";
-import { v1 as uuid } from "uuid";
 import { GraphQLError } from "graphql";
+import Author from '../models/author.js';
+import Book from '../models/book.js';
+
 
 export const resolvers = {
   Query: {
-    authorCount: () => authors.length,
-    bookCount: () => books.length,
-    allAuthors: () => authors,
-    allBooks: (root, args) => {
-      let filteredBooks = books;
-
+    authorCount: async () => Author.collection.countDocuments(),
+    bookCount: () => Book.collection.countDocuments(),
+    allAuthors: async (root, args) => {
+      return Author.find({})
+    },
+    allBooks: async (root, args) => {
       if (args.author) {
-        filteredBooks = filteredBooks.filter((b) => b.author === args.author);
+        return Book.find({ author: args.author })
       }
       if (args.genre) {
-        filteredBooks = filteredBooks.filter((b) =>
-          b.genres.includes(args.genre),
-        );
+        return Book.find({ genres: { $in: [args.genre] } })
       }
 
-      return filteredBooks;
+      return Book.find({});
     },
   },
   Author: {
-    bookCount: (root) => {
-      return books.filter((book) => book.author === root.name).length;
+    bookCount: async (root, args) => {
+      return Book.countDocuments({ author: root.name });
     },
   },
   Mutation: {
-    addAuthor: (root, args) => {
-      if (authors.find((a) => a.name === args.name)) {
+    addAuthor: async (root, args) => {
+      const authorExists = await Author.exists({ name: args.name });
+
+      if (authorExists) {
         throw new GraphQLError(`Author name must be unique: ${args.name}`, {
           extensions: {
             code: "BAD_USER_INPUT",
@@ -37,12 +38,13 @@ export const resolvers = {
           },
         });
       }
-      const author = { ...args, id: uuid() };
-      authors.push(author);
-      return author;
+      const author = new Author({ ...args });
+      return author.save();
     },
-    addBook: (root, args) => {
-      if (books.find((b) => b.title === args.title)) {
+    addBook: async (root, args) => {
+      const bookExists = await Book.exists({ title: args.title });
+
+      if (bookExists) {
         throw new GraphQLError(`Book title must be unique: ${args.title}`, {
           extensions: {
             code: "BAD_USER_INPUT",
@@ -51,21 +53,22 @@ export const resolvers = {
         });
       }
 
-      if (!authors.find((a) => a.name === args.author)) {
-        authors.push({ name: args.author, born: null, id: uuid() });
+      const authorExists = await Author.exists({ name: args.name });
+
+      if (!authorExists) {
+        const author = new Author({ name: args.author, born: null });
+        author.save();
       }
 
-      const book = { ...args, id: uuid() };
-      books.push(book);
-      return book;
+      const book = new Book({ ...args });
+      return book.save();
     },
-    editAuthor: (root, args) => {
-      const index = authors.findIndex((a) => a.name === args.name);
-      if (index === -1) {
-        return null;
-      }
-      authors[index].born = args.setBornTo;
-      return authors[index];
+    editAuthor: async (root, args) => {
+      return Author.findOneAndUpdate(
+        { name: args.name },
+        { born: args.setBornTo },
+        { new: true }
+      );
     },
   },
 };

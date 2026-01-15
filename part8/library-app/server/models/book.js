@@ -4,13 +4,12 @@ const schema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    minLength: 3,
+    minLength: 5,
     unique: true
   },
   author: {
-    type: String,
-    required: true,
-    minLength: 3
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Author'
   },
   published: {
     type: Number,

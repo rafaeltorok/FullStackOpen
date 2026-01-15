@@ -41,7 +41,12 @@ GraphQL app using Apollo Client and Server to fetch data from a MongoDB database
     allBooks {
       title
       published
-      author
+      author {
+        id
+        name
+        born
+        bookCount
+      }
       id
       genres
     }
@@ -68,14 +73,19 @@ GraphQL app using Apollo Client and Server to fetch data from a MongoDB database
     allBooks(author: $author) {
       title
       published
-      author
+      author {
+        id
+        name
+        born
+        bookCount
+      }
       id
       genres
     }
   }
   ```
 
-  - Variables field
+  - Variables
     ```gql
     {
       "author": "Author name"
@@ -88,16 +98,75 @@ GraphQL app using Apollo Client and Server to fetch data from a MongoDB database
     allBooks(genre: $genre) {
       title
       published
-      author
+      author {
+        id
+        name
+        born
+        bookCount
+      }
       id
       genres
     }
   }
   ```
 
-  - Variables field
+  - Variables
     ```gql
     {
       "genre": "genre name"
+    }
+    ```
+
+- Adding a new book
+  ```gql
+  mutation addBook($title: String!, $published: Int!, $author: String!, $genres: [String!]!) {
+    addBook(title: $title, published: $published, author: $author, genres: $genres) {
+      id
+      title
+      published
+      genres
+      author {
+        id
+        name
+        born
+        bookCount
+      }
+    }
+  }
+  ```
+
+  - Variables
+    ```gql
+    {
+      "title": "New book",
+      "published": 2026,
+      "author": "Author name",
+      "genres": ["genre"]
+    }
+    ```
+
+- Searching books by both author and genre
+  ```gql
+  query AllBooks($author: String, $genre: String) {
+    allBooks(author: $author, genre: $genre) {
+      title
+      published
+      author {
+        id
+        name
+        born
+        bookCount
+      }
+      id
+      genres
+    }
+  }
+  ```
+
+  - Variables
+    ```gql
+    {
+      "author": "Author name",
+      "genre": "genre"
     }
     ```

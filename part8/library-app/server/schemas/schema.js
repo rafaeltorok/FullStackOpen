@@ -9,7 +9,7 @@ export const typeDefs = /* GraphQL */ `
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
     id: ID!
     genres: [String!]!
   }

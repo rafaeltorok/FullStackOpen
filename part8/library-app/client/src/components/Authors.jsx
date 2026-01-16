@@ -14,7 +14,8 @@ const Authors = ({ setError }) => {
   const [removeAuthor] = useMutation(REMOVE_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }],
     onError: (error) => setError(error.message),
-    onCompleted: (data) => setError(`${data.removeAuthor.name} was removed from the list`)
+    onCompleted: (data) =>
+      setError(`${data.removeAuthor.name} was removed from the list`),
   });
   const options = [];
 

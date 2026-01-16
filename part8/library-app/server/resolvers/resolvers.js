@@ -1,31 +1,37 @@
 import { GraphQLError } from "graphql";
-import Author from '../models/author.js';
-import Book from '../models/book.js';
-
+import Author from "../models/author.js";
+import Book from "../models/book.js";
+import User from "../models/user.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 export const resolvers = {
   Query: {
     authorCount: async () => Author.collection.countDocuments(),
     bookCount: () => Book.collection.countDocuments(),
     allAuthors: async (root, args) => {
-      return Author.find({})
+      return Author.find({});
     },
     allBooks: async (root, args) => {
-      const filter = {}
+      const filter = {};
 
       if (args.author) {
-        const author = await Author.findOne({ name: args.author })
+        const author = await Author.findOne({ name: args.author });
         if (!author) {
-          return []
+          return [];
         }
-        filter.author = author._id
+        filter.author = author._id;
       }
 
       if (args.genre) {
-        filter.genres = { $in: [args.genre] }
+        filter.genres = { $in: [args.genre] };
       }
 
-      return Book.find(filter).populate('author')
+      return Book.find(filter).populate("author");
+    },
+    me: (root, args, context) => {
+      console.log("CurrentUser in resolver:", context.currentUser);
+      return context.currentUser;
     },
   },
   Author: {
@@ -34,14 +40,23 @@ export const resolvers = {
     },
   },
   Mutation: {
-    addAuthor: async (root, args) => {
-      if (args.name.trim().length < 4) {
-        throw new GraphQLError("An author's name must have at least 4 characters", {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.name,
-          }
+    addAuthor: async (root, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("not authenticated", {
+          extensions: { code: "BAD_USER_INPUT" },
         });
+      }
+
+      if (args.name.trim().length < 4) {
+        throw new GraphQLError(
+          "An author's name must have at least 4 characters",
+          {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.name,
+            },
+          },
+        );
       }
 
       const authorExists = await Author.exists({ name: args.name });
@@ -62,22 +77,31 @@ export const resolvers = {
       } catch (error) {
         throw new GraphQLError(`Failed to add a new author: ${error.message}`, {
           extensions: {
-            code: 'BAD_USER_INPUT',
-            error
-          }
+            code: "BAD_USER_INPUT",
+            error,
+          },
         });
       }
 
       return author;
     },
-    addBook: async (root, args) => {
-      if (args.title.trim().length < 5) {
-        throw new GraphQLError("A book's title must have at least 5 characters", {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.title,
-          }
+    addBook: async (root, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("not authenticated", {
+          extensions: { code: "BAD_USER_INPUT" },
         });
+      }
+
+      if (args.title.trim().length < 5) {
+        throw new GraphQLError(
+          "A book's title must have at least 5 characters",
+          {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.title,
+            },
+          },
+        );
       }
 
       const bookExists = await Book.exists({ title: args.title });
@@ -91,6 +115,18 @@ export const resolvers = {
         });
       }
 
+      if (args.author.trim().length < 4) {
+        throw new GraphQLError(
+          "An author's name must have at least 4 characters",
+          {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.author,
+            },
+          },
+        );
+      }
+
       let author = await Author.findOne({ name: args.author });
 
       if (!author) {
@@ -98,33 +134,42 @@ export const resolvers = {
         await author.save();
       }
 
-      const book = new Book(
-        { title: args.title, published: args.published, author: author._id, genres: args.genres }
-      );
+      const book = new Book({
+        title: args.title,
+        published: args.published,
+        author: author._id,
+        genres: args.genres,
+      });
 
       try {
         await book.save();
       } catch (error) {
         throw new GraphQLError(`Failed to add a new book: ${error.message}`, {
           extensions: {
-            code: 'BAD_USER_INPUT',
+            code: "BAD_USER_INPUT",
             invalidArgs: args.author,
-            error
-          }
+            error,
+          },
         });
       }
 
-      return Book.findOne({ title: book.title }).populate('author');
+      return Book.findOne({ title: book.title }).populate("author");
     },
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, context) => {
       try {
+        if (!context.currentUser) {
+          throw new GraphQLError("not authenticated", {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+
         const updatedAuthor = await Author.findOneAndUpdate(
           { name: args.name },
           { born: args.setBornTo },
-          { 
+          {
             new: true,
-            runValidators: true 
-          }
+            runValidators: true,
+          },
         );
 
         if (!updatedAuthor) {
@@ -132,43 +177,100 @@ export const resolvers = {
         }
 
         return updatedAuthor;
-      } catch(error) {
-        throw new GraphQLError(`Failed to update the Author's birth year: ${error.message}`, {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.setBornTo,
-            error
-          }
-        });
+      } catch (error) {
+        throw new GraphQLError(
+          `Failed to update the Author's birth year: ${error.message}`,
+          {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.setBornTo,
+              error,
+            },
+          },
+        );
       }
     },
-    removeAuthor: async (root, args) => {
+    removeAuthor: async (root, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("not authenticated", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+
       const authorToRemove = await Author.findByIdAndDelete(args.id);
 
       if (!authorToRemove) {
-        throw new GraphQLError('Invalid or missing ID', {
+        throw new GraphQLError("Invalid or missing ID", {
           extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.id
-          }
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.id,
+          },
         });
       }
 
       return authorToRemove;
     },
-    removeBook: async (root, args) => {
+    removeBook: async (root, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("not authenticated", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+
       const bookToRemove = await Book.findByIdAndDelete(args.id);
 
       if (!bookToRemove) {
-        throw new GraphQLError('Invalid or missing ID', {
+        throw new GraphQLError("Invalid or missing ID", {
           extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.id
-          }
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.id,
+          },
         });
       }
 
       return bookToRemove;
+    },
+    createUser: async (root, args) => {
+      try {
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(args.password, saltRounds);
+        const user = new User({
+          username: args.username,
+          passwordHash: passwordHash,
+          favoriteGenre: args.favoriteGenre,
+        });
+        return user.save();
+      } catch (error) {
+        throw new GraphQLError(`Creating a new user failed: ${error.message}`, {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            error,
+          },
+        });
+      }
+    },
+    login: async (root, args) => {
+      const user = await User.findOne({ username: args.username });
+
+      const passwordCorrect =
+        user === null
+          ? false
+          : await bcrypt.compare(args.password, user.passwordHash);
+
+      if (!user || !passwordCorrect) {
+        throw new GraphQLError("Wrong credentials", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+          },
+        });
+      }
+
+      const userForToken = {
+        username: user.username,
+        id: user._id,
+      };
+
+      return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
     },
   },
 };

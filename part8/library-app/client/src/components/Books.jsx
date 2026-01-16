@@ -6,7 +6,8 @@ const Books = ({ setError }) => {
   const [removeBook] = useMutation(REMOVE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }],
     onError: (error) => setError(error.message),
-    onCompleted: (data) => setError(`${data.removeBook.title} was removed from the list`)
+    onCompleted: (data) =>
+      setError(`${data.removeBook.title} was removed from the list`),
   });
 
   const handleDelete = (id) => {
@@ -35,9 +36,9 @@ const Books = ({ setError }) => {
           {result.data.allBooks.map((b) => (
             <tr key={b.id}>
               <td>{b.title}</td>
-              <td>{b.author?.name ?? '(Removed author)'}</td>
+              <td>{b.author?.name ?? "(Removed author)"}</td>
               <td>{b.published}</td>
-              <td>{b.genres.join(', ')}</td>
+              <td>{b.genres.join(", ")}</td>
               <td>
                 <button onClick={() => handleDelete(b.id)}>Delete</button>
               </td>

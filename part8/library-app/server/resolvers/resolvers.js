@@ -35,6 +35,15 @@ export const resolvers = {
   },
   Mutation: {
     addAuthor: async (root, args) => {
+      if (args.name.trim().length < 4) {
+        throw new GraphQLError("An author's name must have at least 4 characters", {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.name,
+          }
+        });
+      }
+
       const authorExists = await Author.exists({ name: args.name });
 
       if (authorExists) {
@@ -45,7 +54,8 @@ export const resolvers = {
           },
         });
       }
-      const author = new Author({ ...args });
+
+      const author = new Author({ name: args.name, born: args.born });
 
       try {
         await author.save();
@@ -53,7 +63,6 @@ export const resolvers = {
         throw new GraphQLError(`Failed to add a new author: ${error.message}`, {
           extensions: {
             code: 'BAD_USER_INPUT',
-            invalidArgs: args.name,
             error
           }
         });
@@ -62,6 +71,15 @@ export const resolvers = {
       return author;
     },
     addBook: async (root, args) => {
+      if (args.title.trim().length < 5) {
+        throw new GraphQLError("A book's title must have at least 5 characters", {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+          }
+        });
+      }
+
       const bookExists = await Book.exists({ title: args.title });
 
       if (bookExists) {
@@ -123,6 +141,34 @@ export const resolvers = {
           }
         });
       }
+    },
+    removeAuthor: async (root, args) => {
+      const authorToRemove = await Author.findByIdAndDelete(args.id);
+
+      if (!authorToRemove) {
+        throw new GraphQLError('Invalid or missing ID', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.id
+          }
+        });
+      }
+
+      return authorToRemove;
+    },
+    removeBook: async (root, args) => {
+      const bookToRemove = await Book.findByIdAndDelete(args.id);
+
+      if (!bookToRemove) {
+        throw new GraphQLError('Invalid or missing ID', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.id
+          }
+        });
+      }
+
+      return bookToRemove;
     },
   },
 };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ALL_AUTHORS, EDIT_AUTHOR } from "../graphql/queries";
+import { ALL_AUTHORS, EDIT_AUTHOR, REMOVE_AUTHOR } from "../graphql/queries";
 import { useQuery, useMutation } from "@apollo/client/react";
 import Select from "react-select";
 
@@ -10,6 +10,11 @@ const Authors = ({ setError }) => {
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }],
     onError: (error) => setError(error.message),
+  });
+  const [removeAuthor] = useMutation(REMOVE_AUTHOR, {
+    refetchQueries: [{ query: ALL_AUTHORS }],
+    onError: (error) => setError(error.message),
+    onCompleted: (data) => setError(`${data.removeAuthor.name} was removed from the list`)
   });
   const options = [];
 
@@ -25,6 +30,10 @@ const Authors = ({ setError }) => {
     event.preventDefault();
     editAuthor({ variables: { name: authorName.value, setBornTo: born } });
     setBorn("");
+  };
+
+  const handleDelete = (id) => {
+    removeAuthor({ variables: { id: id } });
   };
 
   for (const author of result.data.allAuthors) {
@@ -46,6 +55,9 @@ const Authors = ({ setError }) => {
               <td>{a.name}</td>
               <td>{a.born}</td>
               <td>{a.bookCount}</td>
+              <td>
+                <button onClick={() => handleDelete(a.id)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>

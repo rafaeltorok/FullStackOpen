@@ -9,7 +9,7 @@ export const typeDefs = /* GraphQL */ `
   type Book {
     title: String!
     published: Int!
-    author: Author!
+    author: Author
     id: ID!
     genres: [String!]!
   }
@@ -25,6 +25,10 @@ export const typeDefs = /* GraphQL */ `
     ): Book
 
     editAuthor(name: String!, setBornTo: Int!): Author
+
+    removeAuthor(id: ID!): Author!
+
+    removeBook(id: ID!): Book!
   }
 
   type Query {

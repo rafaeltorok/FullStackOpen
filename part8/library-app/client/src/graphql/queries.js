@@ -60,4 +60,20 @@ const EDIT_AUTHOR = gql`
   }
 `;
 
-export { ALL_AUTHORS, ALL_BOOKS, ADD_BOOK, EDIT_AUTHOR };
+const REMOVE_AUTHOR = gql`
+  mutation removeAuthor($id: ID!) {
+    removeAuthor(id: $id) {
+      name
+    }
+  }
+`;
+
+const REMOVE_BOOK = gql`
+  mutation removeBook($id: ID!) {
+    removeBook(id: $id) {
+      title
+    }
+  }
+`;
+
+export { ALL_AUTHORS, ALL_BOOKS, ADD_BOOK, EDIT_AUTHOR, REMOVE_AUTHOR, REMOVE_BOOK };

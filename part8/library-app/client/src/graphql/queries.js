@@ -76,6 +76,22 @@ const REMOVE_BOOK = gql`
   }
 `;
 
+const LOGIN_USER = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      value
+    }
+  }
+`;
+
+const ME = gql`
+  query {
+    me {
+      username
+    }
+  }
+`;
+
 export {
   ALL_AUTHORS,
   ALL_BOOKS,
@@ -83,4 +99,6 @@ export {
   EDIT_AUTHOR,
   REMOVE_AUTHOR,
   REMOVE_BOOK,
+  LOGIN_USER,
+  ME,
 };

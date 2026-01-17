@@ -30,7 +30,6 @@ export const resolvers = {
       return Book.find(filter).populate("author");
     },
     me: (root, args, context) => {
-      console.log("CurrentUser in resolver:", context.currentUser);
       return context.currentUser;
     },
   },

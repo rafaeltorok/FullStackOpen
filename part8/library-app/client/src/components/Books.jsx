@@ -1,7 +1,7 @@
 import { ALL_BOOKS, REMOVE_BOOK } from "../graphql/queries";
 import { useQuery, useMutation } from "@apollo/client/react";
 
-const Books = ({ setError }) => {
+const Books = ({ setError, user }) => {
   const result = useQuery(ALL_BOOKS);
   const [removeBook] = useMutation(REMOVE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }],
@@ -39,9 +39,11 @@ const Books = ({ setError }) => {
               <td>{b.author?.name ?? "(Removed author)"}</td>
               <td>{b.published}</td>
               <td>{b.genres.join(", ")}</td>
-              <td>
-                <button onClick={() => handleDelete(b.id)}>Delete</button>
-              </td>
+              {user && (
+                <td>
+                  <button onClick={() => handleDelete(b.id)}>Delete</button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

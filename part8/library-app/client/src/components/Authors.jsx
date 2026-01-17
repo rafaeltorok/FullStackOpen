@@ -3,7 +3,7 @@ import { ALL_AUTHORS, EDIT_AUTHOR, REMOVE_AUTHOR } from "../graphql/queries";
 import { useQuery, useMutation } from "@apollo/client/react";
 import Select from "react-select";
 
-const Authors = ({ setError }) => {
+const Authors = ({ setError, user }) => {
   const [authorName, setAuthorName] = useState(null);
   const [born, setBorn] = useState("");
   const result = useQuery(ALL_AUTHORS);
@@ -56,9 +56,11 @@ const Authors = ({ setError }) => {
               <td>{a.name}</td>
               <td>{a.born}</td>
               <td>{a.bookCount}</td>
-              <td>
-                <button onClick={() => handleDelete(a.id)}>Delete</button>
-              </td>
+              {user && (
+                <td>
+                  <button onClick={() => handleDelete(a.id)}>Delete</button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -65,26 +65,29 @@ const Authors = ({ setError, user }) => {
           ))}
         </tbody>
       </table>
-
-      <h3>Set birthyear</h3>
-      <form onSubmit={changeBirthYear}>
+      {user &&
         <div>
-          <Select
-            defaultValue={authorName}
-            onChange={setAuthorName}
-            options={options}
-          />
+          <h3>Set birthyear</h3>
+          <form onSubmit={changeBirthYear}>
+            <div>
+              <Select
+                defaultValue={authorName}
+                onChange={setAuthorName}
+                options={options}
+              />
+            </div>
+            <div>
+              <label>born</label>
+              <input
+                type="number"
+                value={born}
+                onChange={(e) => setBorn(Number(e.target.value))}
+              ></input>
+            </div>
+            <button type="submit">update author</button>
+          </form>
         </div>
-        <div>
-          <label>born</label>
-          <input
-            type="number"
-            value={born}
-            onChange={(e) => setBorn(Number(e.target.value))}
-          ></input>
-        </div>
-        <button type="submit">update author</button>
-      </form>
+      }
     </div>
   );
 };

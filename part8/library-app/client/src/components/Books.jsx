@@ -11,7 +11,7 @@ const Books = ({ setError, user }) => {
     onCompleted: (data) =>
       setError(`${data.removeBook.title} was removed from the list`),
   });
-  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState(null);
   const options = [];
 
   const handleDelete = (id) => {
@@ -34,6 +34,10 @@ const Books = ({ setError, user }) => {
     }
   }
 
+  const booksDisplay = !selectedGenre ? 
+    result.data.allBooks : 
+    result.data.allBooks.filter((b) => b.genres.includes(selectedGenre.value));
+
   return (
     <div>
       <h2>books</h2>
@@ -45,7 +49,7 @@ const Books = ({ setError, user }) => {
             <th>published</th>
             <th>genres</th>
           </tr>
-          {result.data.allBooks.map((b) => (
+          {booksDisplay.map((b) => (
             <tr key={b.id}>
               <td>{b.title}</td>
               <td>{b.author?.name ?? "(Removed author)"}</td>
@@ -64,6 +68,7 @@ const Books = ({ setError, user }) => {
         <Select
           defaultValue={selectedGenre}
           onChange={setSelectedGenre}
+          isClearable={true}
           options={options}
         />
       </div>

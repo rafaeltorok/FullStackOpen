@@ -4,6 +4,7 @@ import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import Notify from "./components/Notify";
 import Login from "./components/Login";
+import Recommendations from "./components/Recommendations";
 import { LOGIN_USER, ME } from "./graphql/queries";
 import { useMutation, useQuery, useApolloClient } from "@apollo/client/react";
 import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
@@ -77,6 +78,11 @@ const App = () => {
           books
         </Link>
         {user && (
+          <Link style={padding} to={"/recommendations"}>
+            recommendations
+          </Link>
+        )}
+        {user && (
           <em>
             {loading ? "User" : data?.me?.username} logged in
             <button onClick={handleLogout}>Logout</button>
@@ -104,6 +110,10 @@ const App = () => {
         <Route
           path="/books"
           element={<Books setError={notify} user={user} />}
+        />
+        <Route
+          path="/recommendations"
+          element={<Recommendations user={data?.me} />}
         />
         <Route
           path="/login"

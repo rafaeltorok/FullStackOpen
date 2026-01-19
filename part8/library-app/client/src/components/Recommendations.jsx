@@ -1,8 +1,10 @@
 import { ALL_BOOKS } from "../graphql/queries";
 import { useQuery } from "@apollo/client/react";
 
-export default function Recommendations({ user }) {
-  const result = useQuery(ALL_BOOKS);
+export default function Recommendations({ favoriteGenre }) {
+  const result = useQuery(ALL_BOOKS, {
+    variables: { genre: favoriteGenre }
+  });
 
   if (result.loading) {
     return <div>Loading books...</div>;
@@ -12,12 +14,10 @@ export default function Recommendations({ user }) {
     return <div>Failed to get the books list</div>;
   }
 
-  const booksDisplay = result.data.allBooks.filter((b) => b.genres.includes(user?.favoriteGenre));
-
   return (
     <div>
       <h2>recommendations</h2>
-      <p>Books in your favorite genre: <strong>{user?.favoriteGenre}</strong></p>
+      <p>Books in your favorite genre: <strong>{favoriteGenre ?? "none"}</strong></p>
       <table>
         <tbody>
           <tr>
@@ -26,7 +26,7 @@ export default function Recommendations({ user }) {
             <th>published</th>
             <th>genres</th>
           </tr>
-          {booksDisplay.map((b) => (
+          {result.data.allBooks.map((b) => (
             <tr key={b.id}>
               <td>{b.title}</td>
               <td>{b.author?.name ?? "(Removed author)"}</td>

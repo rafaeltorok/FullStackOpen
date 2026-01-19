@@ -57,7 +57,9 @@ const App = () => {
     onError: (error) => notify(error.message),
   });
 
-  const { data, loading } = useQuery(ME);
+  const { data, loading } = useQuery(ME, {
+    skip: !user
+  });
 
   return (
     <div>
@@ -77,7 +79,7 @@ const App = () => {
         <Link style={padding} to={"/books"}>
           books
         </Link>
-        {user && (
+        {user && data?.me && (
           <Link style={padding} to={"/recommendations"}>
             recommendations
           </Link>
@@ -113,7 +115,15 @@ const App = () => {
         />
         <Route
           path="/recommendations"
-          element={<Recommendations user={data?.me} />}
+          element={
+            !user ? (
+              <Navigate replace to="/books" />
+            ) : loading ? (
+              <div>Loading recommendations...</div>
+            ) : (
+              <Recommendations favoriteGenre={data.me.favoriteGenre} />
+            )
+          }
         />
         <Route
           path="/login"

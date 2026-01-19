@@ -4,15 +4,18 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import Select from "react-select";
 
 const Books = ({ setError, user }) => {
-  const result = useQuery(ALL_BOOKS);
+  const genresList = useQuery(ALL_BOOKS);
+  const options = [];
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const result = useQuery(ALL_BOOKS, {
+    variables: { genre: selectedGenre?.value }
+  });
   const [removeBook] = useMutation(REMOVE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }],
     onError: (error) => setError(error.message),
     onCompleted: (data) =>
       setError(`${data.removeBook.title} was removed from the list`),
   });
-  const [selectedGenre, setSelectedGenre] = useState(null);
-  const options = [];
 
   const handleDelete = (id) => {
     removeBook({ variables: { id: id } });
@@ -26,17 +29,13 @@ const Books = ({ setError, user }) => {
     return <div>Failed to get the books list</div>;
   }
 
-  for (const book of result.data.allBooks) {
+  for (const book of genresList.data.allBooks) {
     for (const genre of book.genres) {
       if (!options.some(item => item.value === genre)) {
         options.push({ value: genre, label: genre });
       }
     }
   }
-
-  const booksDisplay = !selectedGenre ? 
-    result.data.allBooks : 
-    result.data.allBooks.filter((b) => b.genres.includes(selectedGenre.value));
 
   return (
     <div>
@@ -49,7 +48,7 @@ const Books = ({ setError, user }) => {
             <th>published</th>
             <th>genres</th>
           </tr>
-          {booksDisplay.map((b) => (
+          {result.data.allBooks.map((b) => (
             <tr key={b.id}>
               <td>{b.title}</td>
               <td>{b.author?.name ?? "(Removed author)"}</td>

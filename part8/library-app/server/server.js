@@ -1,9 +1,12 @@
 import { ApolloServer } from "@apollo/server";
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { expressMiddleware } from '@as-integrations/express5';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/use/ws';
+
 import cors from 'cors';
 import express from 'express';
-import { makeExecutableSchema } from '@graphql-tools/schema';
 import http from 'http';
 import jwt from "jsonwebtoken";
 
@@ -27,16 +30,34 @@ const getUserFromAuthHeader = async (auth) => {
 const startServer = async (port) => {
   const app = express();
   const httpServer = http.createServer(app);
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql'
+  });
+
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const serverCleanup = useServer({ schema }, wsServer);
 
   const server = new ApolloServer({
-    schema: makeExecutableSchema({ typeDefs, resolvers }),
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })]
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {             // Apollo calls this object during server start
+          return {                            // Another object is returned
+            async drainServer() {             // Apollo calls this during shutdown
+              await serverCleanup.dispose();  // Cleanup code
+            },
+          }
+        },
+      }
+    ]
   });
 
   await server.start();
 
   app.use(
-    '/',
+    '/graphql',
     cors(),
     express.json(),
     expressMiddleware(server, {
@@ -49,7 +70,7 @@ const startServer = async (port) => {
   );
 
   httpServer.listen(port, () => {
-    console.log(`Server is now running on http://localhost:${port}`);
+    console.log(`Server is now running on http://localhost:${port}/graphql`);
   });
 };
 

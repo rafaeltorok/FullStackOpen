@@ -1,9 +1,12 @@
-import { GraphQLError } from "graphql";
+import { GraphQLError, subscribe } from "graphql";
 import Author from "../models/author.js";
 import Book from "../models/book.js";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { PubSub } from "graphql-subscriptions";
+
+const pubsub = new PubSub();
 
 export const resolvers = {
   Query: {
@@ -82,6 +85,8 @@ export const resolvers = {
         });
       }
 
+      pubsub.publish('AUTHOR_ADDED', { authorAdded: author });
+
       return author;
     },
     addBook: async (root, args, context) => {
@@ -151,6 +156,8 @@ export const resolvers = {
           },
         });
       }
+
+      pubsub.publish('BOOK_ADDED', { bookAdded: book });
 
       return Book.findOne({ title: book.title }).populate("author");
     },
@@ -272,4 +279,12 @@ export const resolvers = {
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
     },
   },
+  Subscription: {
+    authorAdded: {
+      subscribe: () => pubsub.asyncIterableIterator('AUTHOR_ADDED')
+    },
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterableIterator('BOOK_ADDED')
+    }
+  }
 };

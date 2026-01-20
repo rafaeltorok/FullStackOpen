@@ -56,4 +56,9 @@ export const typeDefs = /* GraphQL */ `
     allBooks(author: String, genre: String): [Book!]!
     me: User
   }
+
+  type Subscription {
+    authorAdded: Author!
+    bookAdded: Book!
+  }
 `;

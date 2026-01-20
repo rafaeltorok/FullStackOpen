@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
@@ -11,18 +11,13 @@ import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(
+    window.localStorage.getItem("library-user-token")
+  );
 
   const client = useApolloClient();
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const getToken = async () => {
-      setUser(window.localStorage.getItem("library-user-token"));
-    };
-    getToken();
-  }, []);
 
   const handleLogin = (username, password) => {
     login({ variables: { username, password } });
@@ -113,12 +108,18 @@ const App = () => {
           path="/books"
           element={<Books setError={notify} user={user} />}
         />
-        {user &&
-          <Route
-            path="/recommendations"
-            element={<Recommendations favoriteGenre={data?.me.favoriteGenre} />}
-          />
-        }
+        <Route
+          path="/recommendations"
+          element={
+            !user ? (
+              <Navigate replace to="/books" />
+            ) : loading ? (
+              <div>Loading recommendations...</div>
+            ) : (
+              <Recommendations favoriteGenre={data.me.favoriteGenre} />
+            )
+          }
+        />
         <Route
           path="/login"
           element={<Login setError={notify} login={handleLogin} />}

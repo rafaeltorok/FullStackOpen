@@ -5,9 +5,28 @@ import NewBook from "./components/NewBook";
 import Notify from "./components/Notify";
 import Login from "./components/Login";
 import Recommendations from "./components/Recommendations";
-import { LOGIN_USER, ME } from "./graphql/queries";
-import { useMutation, useQuery, useApolloClient } from "@apollo/client/react";
-import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
+import { 
+  LOGIN_USER, 
+  ME, 
+  ALL_AUTHORS, 
+  ALL_BOOKS, 
+  AUTHOR_ADDED, 
+  BOOK_ADDED 
+} from "./graphql/queries";
+import { 
+  useMutation, 
+  useQuery, 
+  useApolloClient, 
+  useSubscription 
+} from "@apollo/client/react";
+import { 
+  Routes, 
+  Route, 
+  Link, 
+  Navigate, 
+  useNavigate 
+} from "react-router-dom";
+import { addAuthorToCache, addBookToCache } from "./utils/apolloCache";
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
@@ -18,6 +37,22 @@ const App = () => {
   const client = useApolloClient();
 
   const navigate = useNavigate();
+
+  useSubscription(AUTHOR_ADDED, {
+    onData: ({ data }) => {
+      const addedAuthor = data.data.authorAdded;
+      addAuthorToCache(client.cache, addedAuthor);
+      console.log(data);
+    }
+  });
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const addedBook = data.data.bookAdded;
+      addBookToCache(client.cache, addedBook);
+      console.log(data);
+    }
+  });
 
   const handleLogin = (username, password) => {
     login({ variables: { username, password } });

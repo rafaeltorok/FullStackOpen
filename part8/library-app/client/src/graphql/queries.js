@@ -100,6 +100,24 @@ const ME = gql`
   }
 `;
 
+const AUTHOR_ADDED = gql`
+  subscription {
+    authorAdded {
+      ...AuthorDetails
+    }
+  }
+  ${AUTHOR_DETAILS}
+`;
+
+const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      ...BookDetails
+    }
+  }
+  ${BOOK_DETAILS}
+`;
+
 export {
   ALL_AUTHORS,
   ALL_BOOKS,
@@ -109,4 +127,6 @@ export {
   REMOVE_BOOK,
   LOGIN_USER,
   ME,
+  AUTHOR_ADDED,
+  BOOK_ADDED
 };

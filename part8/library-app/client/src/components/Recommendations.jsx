@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client/react";
 
 export default function Recommendations({ favoriteGenre }) {
   const result = useQuery(ALL_BOOKS, {
-    variables: { genre: favoriteGenre }
+    variables: { genre: favoriteGenre },
   });
 
   if (result.loading) {
@@ -17,7 +17,9 @@ export default function Recommendations({ favoriteGenre }) {
   return (
     <div>
       <h2>recommendations</h2>
-      <p>Books in your favorite genre: <strong>{favoriteGenre ?? "none"}</strong></p>
+      <p>
+        Books in your favorite genre: <strong>{favoriteGenre ?? "none"}</strong>
+      </p>
       <table>
         <tbody>
           <tr>
@@ -38,4 +40,4 @@ export default function Recommendations({ favoriteGenre }) {
       </table>
     </div>
   );
-};
+}

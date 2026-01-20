@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ALL_BOOKS, REMOVE_BOOK } from "../graphql/queries";
+import { ALL_BOOKS, REMOVE_BOOK, ALL_AUTHORS } from "../graphql/queries";
 import { useQuery, useMutation } from "@apollo/client/react";
 import Select from "react-select";
 
@@ -8,10 +8,10 @@ const Books = ({ setError, user }) => {
   const options = [];
   const [selectedGenre, setSelectedGenre] = useState(null);
   const result = useQuery(ALL_BOOKS, {
-    variables: { genre: selectedGenre?.value }
+    variables: { genre: selectedGenre?.value },
   });
   const [removeBook] = useMutation(REMOVE_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }],
+    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
     onError: (error) => setError(error.message),
     onCompleted: (data) =>
       setError(`${data.removeBook.title} was removed from the list`),
@@ -31,7 +31,7 @@ const Books = ({ setError, user }) => {
 
   for (const book of genresList.data.allBooks) {
     for (const genre of book.genres) {
-      if (!options.some(item => item.value === genre)) {
+      if (!options.some((item) => item.value === genre)) {
         options.push({ value: genre, label: genre });
       }
     }

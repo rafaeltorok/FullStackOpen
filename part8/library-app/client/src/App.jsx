@@ -12,7 +12,7 @@ import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [user, setUser] = useState(
-    window.localStorage.getItem("library-user-token")
+    window.localStorage.getItem("library-user-token"),
   );
 
   const client = useApolloClient();
@@ -53,7 +53,7 @@ const App = () => {
   });
 
   const { data, loading } = useQuery(ME, {
-    skip: !user
+    skip: !user,
   });
 
   return (

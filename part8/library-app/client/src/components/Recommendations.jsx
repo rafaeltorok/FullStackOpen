@@ -7,11 +7,11 @@ export default function Recommendations({ favoriteGenre }) {
   });
 
   if (result.loading) {
-    return <div>Loading books...</div>;
+    return <div>Loading recommendations...</div>;
   }
 
   if (result.error) {
-    return <div>Failed to get the books list</div>;
+    return <div>Failed to get the recommendations list</div>;
   }
 
   return (

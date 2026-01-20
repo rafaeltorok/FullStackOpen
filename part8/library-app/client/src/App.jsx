@@ -113,18 +113,12 @@ const App = () => {
           path="/books"
           element={<Books setError={notify} user={user} />}
         />
-        <Route
-          path="/recommendations"
-          element={
-            !user ? (
-              <Navigate replace to="/books" />
-            ) : loading ? (
-              <div>Loading recommendations...</div>
-            ) : (
-              <Recommendations favoriteGenre={data.me.favoriteGenre} />
-            )
-          }
-        />
+        {user &&
+          <Route
+            path="/recommendations"
+            element={<Recommendations favoriteGenre={data?.me.favoriteGenre} />}
+          />
+        }
         <Route
           path="/login"
           element={<Login setError={notify} login={handleLogin} />}

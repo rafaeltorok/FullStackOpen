@@ -8,7 +8,7 @@ import {
 import { useQuery, useMutation } from "@apollo/client/react";
 import Select from "react-select";
 
-const Authors = ({ setError, user }) => {
+export default function Authors({ setError, user }) {
   const [authorName, setAuthorName] = useState(null);
   const [born, setBorn] = useState("");
   const result = useQuery(ALL_AUTHORS);
@@ -95,6 +95,4 @@ const Authors = ({ setError, user }) => {
       )}
     </div>
   );
-};
-
-export default Authors;
+}

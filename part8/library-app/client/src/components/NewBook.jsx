@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import { ADD_BOOK, ALL_BOOKS, ALL_AUTHORS } from "../graphql/queries";
 import { addBookToCache } from "../utils/apolloCache";
 
-const NewBook = ({ setError }) => {
+export default function NewBook({ setError }) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [published, setPublished] = useState("");
@@ -72,6 +72,4 @@ const NewBook = ({ setError }) => {
       </form>
     </div>
   );
-};
-
-export default NewBook;
+}

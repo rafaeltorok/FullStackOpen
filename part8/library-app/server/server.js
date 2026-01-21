@@ -1,13 +1,13 @@
 import { ApolloServer } from "@apollo/server";
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import { expressMiddleware } from '@as-integrations/express5';
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import { WebSocketServer } from 'ws';
-import { useServer } from 'graphql-ws/use/ws';
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { expressMiddleware } from "@as-integrations/express5";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/use/ws";
 
-import cors from 'cors';
-import express from 'express';
-import http from 'http';
+import cors from "cors";
+import express from "express";
+import http from "http";
 import jwt from "jsonwebtoken";
 
 import { typeDefs } from "./schemas/schema.js";
@@ -32,7 +32,7 @@ const startServer = async (port) => {
   const httpServer = http.createServer(app);
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/graphql'
+    path: "/graphql",
   });
 
   const schema = makeExecutableSchema({ typeDefs, resolvers });
@@ -43,21 +43,24 @@ const startServer = async (port) => {
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
-        async serverWillStart() {             // Apollo calls this object during server start
-          return {                            // Another object is returned
-            async drainServer() {             // Apollo calls this during shutdown
-              await serverCleanup.dispose();  // Cleanup code
+        async serverWillStart() {
+          // Apollo calls this object during server start
+          return {
+            // Another object is returned
+            async drainServer() {
+              // Apollo calls this during shutdown
+              await serverCleanup.dispose(); // Cleanup code
             },
-          }
+          };
         },
-      }
-    ]
+      },
+    ],
   });
 
   await server.start();
 
   app.use(
-    '/graphql',
+    "/graphql",
     cors(),
     express.json(),
     expressMiddleware(server, {
@@ -65,8 +68,8 @@ const startServer = async (port) => {
         const auth = req.headers.authorization;
         const currentUser = await getUserFromAuthHeader(auth);
         return { currentUser };
-      }
-    })
+      },
+    }),
   );
 
   httpServer.listen(port, () => {

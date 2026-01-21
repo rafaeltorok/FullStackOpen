@@ -58,7 +58,6 @@ export const typeDefs = /* GraphQL */ `
   }
 
   type Subscription {
-    authorAdded: Author!
     bookAdded: Book!
   }
 `;

@@ -298,3 +298,17 @@ mutation removedBook($removeBookId: ID!) {
   ```
   Authorization: Bearer <token>
   ```
+
+### Subscription for books
+```gql
+subscription Subscription {
+  bookAdded {
+    id
+    title
+    author {
+      name
+    }
+    published
+  }
+}
+```

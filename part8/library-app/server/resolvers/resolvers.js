@@ -13,7 +13,20 @@ export const resolvers = {
     authorCount: async () => Author.collection.countDocuments(),
     bookCount: () => Book.collection.countDocuments(),
     allAuthors: async (root, args) => {
-      return Author.find({});
+      const authors = await Author.find({});
+      const books = await Book.find({});
+
+      const bookCountByAuthor = {};
+
+      books.forEach((book) => {
+        const id = book.author.toString();
+        bookCountByAuthor[id] = (bookCountByAuthor[id] || 0) + 1;
+      });
+
+      return authors.map((author) => ({
+        ...author.toObject(),
+        bookCount: bookCountByAuthor[author._id.toString()] || 0,
+      }));
     },
     allBooks: async (root, args) => {
       const filter = {};
@@ -37,9 +50,7 @@ export const resolvers = {
     },
   },
   Author: {
-    bookCount: async (root, args) => {
-      return Book.countDocuments({ author: root._id });
-    },
+    id: (root) => root._id.toString(),
   },
   Mutation: {
     addAuthor: async (root, args, context) => {
@@ -84,8 +95,6 @@ export const resolvers = {
           },
         });
       }
-
-      pubsub.publish('AUTHOR_ADDED', { authorAdded: author });
 
       return author;
     },
@@ -157,7 +166,9 @@ export const resolvers = {
         });
       }
 
-      pubsub.publish('BOOK_ADDED', { bookAdded: book });
+      const populatedBook = await Book.findById(book._id).populate("author");
+
+      pubsub.publish("BOOK_ADDED", { bookAdded: populatedBook });
 
       return Book.findOne({ title: book.title }).populate("author");
     },
@@ -280,11 +291,8 @@ export const resolvers = {
     },
   },
   Subscription: {
-    authorAdded: {
-      subscribe: () => pubsub.asyncIterableIterator('AUTHOR_ADDED')
-    },
     bookAdded: {
-      subscribe: () => pubsub.asyncIterableIterator('BOOK_ADDED')
-    }
-  }
+      subscribe: () => pubsub.asyncIterableIterator("BOOK_ADDED"),
+    },
+  },
 };

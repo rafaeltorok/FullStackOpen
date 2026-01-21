@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { ALL_BOOKS, REMOVE_BOOK, ALL_AUTHORS } from "../graphql/queries";
-import { useQuery, useMutation } from "@apollo/client/react";
+import {
+  ALL_BOOKS,
+  REMOVE_BOOK,
+  ALL_AUTHORS,
+  BOOK_ADDED,
+} from "../graphql/queries";
+import { useQuery, useMutation, useSubscription } from "@apollo/client/react";
 import Select from "react-select";
+import { addBookToCache } from "../utils/apolloCache";
 
-const Books = ({ setError, user }) => {
+export default function Books({ setError, user }) {
   const genresList = useQuery(ALL_BOOKS);
   const options = [];
   const [selectedGenre, setSelectedGenre] = useState(null);
@@ -15,6 +21,14 @@ const Books = ({ setError, user }) => {
     onError: (error) => setError(error.message),
     onCompleted: (data) =>
       setError(`${data.removeBook.title} was removed from the list`),
+  });
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ client, data }) => {
+      const addedBook = data.data.bookAdded;
+      addBookToCache(client.cache, addedBook);
+      window.alert(`${addedBook.title} was added to the list`);
+    },
   });
 
   const handleDelete = (id) => {
@@ -73,6 +87,4 @@ const Books = ({ setError, user }) => {
       </div>
     </div>
   );
-};
-
-export default Books;
+}

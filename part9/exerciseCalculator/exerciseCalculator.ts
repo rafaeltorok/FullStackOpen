@@ -8,7 +8,7 @@ interface Results {
   average: number
 }
 
-function calculateExercises(target: number, dailyExerciseHours: number[]): Results {
+export default function calculateExercises(target: number, dailyExerciseHours: number[]): Results {
   let ratingDescription: string;
   let success: boolean;
   let rating: number;
@@ -22,9 +22,9 @@ function calculateExercises(target: number, dailyExerciseHours: number[]): Resul
     ratingDescription = 'you reached your target, well done!';
     success = true;
     rating = 3;
-  } else if (average <= target / 10) {
+  } else if (average <= target / 2) {
     // If the student only achieved less than 10% the target, give the lowest rating
-    ratingDescription = 'you need to dedicate more time for your exercises';
+    ratingDescription = 'bad';
     success = false;
     rating = 1;
   } else {
@@ -44,18 +44,3 @@ function calculateExercises(target: number, dailyExerciseHours: number[]): Resul
   };
   return results;
 }
-
-
-function main() {
-  const target: number = Number(process.argv[2]);
-  const dailyExerciseHours: number[] = process.argv.slice(3).map(h => Number(h));
-  if (!target || dailyExerciseHours.length < 1 || target < 0 ) {
-    throw new Error('Invalid input, please add the target number as the first parameter followed by each daily hours');
-  } 
-  if (dailyExerciseHours.some(h => isNaN(h) || h < 0)) {
-    throw new Error('Each daily hour must be represented by a positive number only');
-  }
-  console.log(calculateExercises(target, dailyExerciseHours));
-}
-
-main();

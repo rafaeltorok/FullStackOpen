@@ -9,8 +9,8 @@ interface BmiValues {
 }
 
 interface exercisesValues {
-  daily_exercises: (string | number)[];
-  target: string | number;
+  daily_exercises: number[];
+  target: number;
 }
 
 router.get('/hello', (_req, res) => {
@@ -54,18 +54,16 @@ router.post('/exercises', (req, res) => {
       throw new Error("parameters missing");
     }
 
-    const t: number = Number(target);
-    const eHours: number[] = daily_exercises.map(e => Number(e));
-
     if (
-      isNaN(t) ||
-      t < 0 ||
-      eHours.some(e => isNaN(e) || e < 0)
+      typeof target !== 'number' ||
+      target < 0 ||
+      Number.isNaN(target) ||
+      daily_exercises.some(e => typeof e !== 'number' || Number.isNaN(e) || e < 0)
     ) {
       throw new Error("malformatted parameters");
     }
 
-    const result = calculateExercises(t, eHours);
+    const result = calculateExercises(target, daily_exercises);
 
     return res.status(200).json(result);
   } catch (err: unknown) {

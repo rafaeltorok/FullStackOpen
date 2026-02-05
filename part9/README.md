@@ -4,6 +4,7 @@
 - [Express Server](#express-server)
 - [BMI Calculator](#bmi-calculator)
 - [Exercise Calculator](#exercise-calculator)
+- [Tests](#tests)
 
 
 ## Express Server
@@ -34,6 +35,28 @@ Or with HTTPie
 http GET 'localhost:3003/bmi?height=180&weight=72'
 ```
 
+#### Exercises Calculator app
+Make a POST request to http://localhost:3003/exercises with both the **daily_exercises** and **target** hours on the request body (Example)
+```json
+{
+  "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5],
+  "target": 2.5
+}
+```
+
+Should return an output (Example)
+```json
+{
+  "periodLength": 7,
+  "trainingDays": 4,
+  "success": false,
+  "rating": 1,
+  "ratingDescription": "bad",
+  "target": 2.5,
+  "average": 1.2142857142857142
+}
+```
+
 
 ## BMI Calculator
 The results were based on the [NHS UK⇗](https://www.nhs.uk/health-assessment-tools/calculate-your-body-mass-index/calculate-bmi-for-adults) rating system.
@@ -60,4 +83,17 @@ cd ./exerciseCalculator && npm install
 ### Usage
 ```bash
 npm run calculateExercises 2 1 0 2 4.5 0 3 1 0 4
+```
+
+
+## Tests
+Run all tests for both the `/bmi` and `/exercises` routes
+```bash
+npm run test
+```
+
+Run only a single test script
+```bash
+npm run test -- ./__tests__/bmi.test.ts
+npm run test -- ./__tests__/exercises.test.ts
 ```

@@ -1,0 +1,18 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const app = (0, express_1.default)();
+app.use(express_1.default.json());
+let pingCounter = 0;
+const PORT = 3001;
+app.get('/api/ping', (_req, res) => {
+    pingCounter++;
+    console.log(`Ping counter: ${pingCounter}`);
+    res.send(`Pong! Counter #${pingCounter}`);
+});
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

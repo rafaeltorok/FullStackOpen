@@ -1,9 +1,13 @@
 import express from 'express';
 import cors from 'cors';
+import diagnoseRouter from './routes/diagnosesRoutes';
+import patientRouter from './routes/patientsRoutes';
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use('/api', diagnoseRouter);
+app.use('/api', patientRouter);
 
 let pingCounter: number = 0;
 

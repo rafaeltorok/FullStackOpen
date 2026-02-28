@@ -1,3 +1,6 @@
+import { NewPatientSchema } from "./schemas/newPatient";
+import z from "zod";
+
 export type Diagnosis = {
   code: string;
   name: string;
@@ -10,16 +13,10 @@ export enum Gender {
   Other = 'other'
 };
 
+export type NewPatientEntry = z.infer<typeof NewPatientSchema>;
+
 export type Patient = {
   id: string;
-  name: string;
-  dateOfBirth: string;
-  ssn: string;
-  gender: Gender;
-  occupation: string;
-};
-
-export type NewPatientEntry = {
   name: string;
   dateOfBirth: string;
   ssn: string;

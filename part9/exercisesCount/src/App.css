@@ -4,3 +4,49 @@
   padding: 2rem;
   text-align: center;
 }
+
+h1 {
+  text-decoration: underline;
+}
+
+.part-info-table {
+  margin: 2rem auto;
+  border: 2px solid gray;
+  text-align: center;
+  width: 400px;
+  border-collapse: collapse;
+}
+
+.part-info-table th,
+.part-info-table td {
+  border: 2px solid gray;
+  padding: 0.5rem;
+  width: 50%;
+}
+
+.part-info-table th {
+  background-color: #303030;
+}
+
+.part-info-table td {
+  background-color: #121212;
+}
+
+.part-info-table thead th {
+  font-size: 1.5rem;
+  background-color: #505050;
+}
+
+@media only screen and (hover: none) and (pointer: coarse){
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .part-info-table {
+    max-width: 100%;
+  }
+
+  .part-info-table thead th {
+    font-size: 1.25rem;
+  }
+}

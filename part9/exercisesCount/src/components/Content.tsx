@@ -1,19 +1,21 @@
-type CourseParts = {
-  courseParts: Part[];
-};
+// Components
+import Part from "./Part";
 
-type Part = {
-  name: string;
-  exerciseCount: number
+// TypeScript types
+import type { CoursePart } from "../types";
+
+type CourseParts = {
+  courseParts: CoursePart[];
 };
 
 export default function Content(props: CourseParts) {
   return (
     <div>
-      {props.courseParts.map((part: Part) => (
-        <p>
-          {part.name} {part.exerciseCount}
-        </p>
+      {props.courseParts.map((part: CoursePart) => (
+        <Part
+          key={part.name}
+          part={part} 
+        />
       ))}
     </div>
   );

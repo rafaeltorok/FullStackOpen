@@ -5,9 +5,9 @@ type TotalExercises = {
 export default function Total(props: TotalExercises) {
   return (
     <div>
-      <p>
-        Number of exercises {props.totalExercises}
-      </p>
+      <h3>
+        Total number of exercises {props.totalExercises}
+      </h3>
     </div>
   );
 }

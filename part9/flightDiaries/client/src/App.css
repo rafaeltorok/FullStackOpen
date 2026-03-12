@@ -1,0 +1,77 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.main-page-title {
+  text-decoration: underline;
+}
+
+#add-entry-form {
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+#add-entry-form > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+#add-entry-form label {
+  width: 140px;
+  text-align: right;
+  margin-right: 10px;
+}
+
+#add-entry-form input,
+#add-entry-form select,
+#add-entry-form textarea {
+  flex: 1;
+}
+
+#add-entry-form button {
+  margin: 0 auto;
+}
+
+.diary-entry {
+  border: 2px solid gray;
+  border-collapse: collapse;
+  width: 400px;
+  margin: 2rem auto;
+}
+
+.diary-entry th,
+.diary-entry td {
+  border: 1px solid gray;
+  border-style: groove;
+  padding: 0.5rem 1rem;
+}
+
+.diary-entry th {
+  background-color: #303030;
+  width: 25%;
+}
+
+.diary-entry td {
+  background-color: #181818;
+  width: 75%;
+}
+
+.success-message,
+.error-message {
+  font-weight: bold;
+}
+
+.success-message {
+  color: #76b900;
+}
+
+.error-message {
+  color: red;
+}

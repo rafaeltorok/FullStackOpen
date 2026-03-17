@@ -3,11 +3,14 @@ import { Box, Table, Button, TableHead, Typography, TableCell, TableRow, TableBo
 import axios from 'axios';
 
 import { PatientFormValues, Patient } from "../../types";
-import AddPatientModal from "../AddPatientModal";
 
+import AddPatientModal from "../AddPatientModal";
 import HealthRatingBar from "../HealthRatingBar";
+import PatientInfo from "./PatientInfo";
 
 import patientService from "../../services/patients";
+
+import { Routes, Route, Link } from "react-router-dom";
 
 interface Props {
   patients : Patient[]
@@ -47,6 +50,10 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
     }
   };
 
+  function getPatient(searchId: string | undefined): Patient | undefined {
+    return patients.find(patient => patient.id === searchId);
+  }
+
   return (
     <div className="App">
       <Box>
@@ -66,7 +73,11 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
         <TableBody>
           {Object.values(patients).map((patient: Patient) => (
             <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
+              <TableCell>
+                <Link to={`/patients/${patient.id}`}>
+                  {patient.name}
+                </Link>
+              </TableCell>
               <TableCell>{patient.gender}</TableCell>
               <TableCell>{patient.occupation}</TableCell>
               <TableCell>
@@ -85,6 +96,10 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
       <Button variant="contained" onClick={() => openModal()}>
         Add New Patient
       </Button>
+
+      <Routes>
+        <Route path="/patients/:id" element={<PatientInfo getPatient={getPatient} />}/>
+      </Routes>
     </div>
   );
 };

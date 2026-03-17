@@ -1,6 +1,6 @@
 // Server dependencies
 import express from 'express';
-import patientsList from '../data/patients';
+import patientsData from '../data/patients';
 import { v4 as uuidv4 } from 'uuid';
 
 // Schemas
@@ -15,6 +15,11 @@ import type { NewPatientEntry, Patient, PatientInfo } from '../types';
 import newPatientParser from '../middleware/newPatientParser';
 
 const patientRouter = express.Router();
+
+const patientsList = patientsData.map(patient => ({ 
+  ...patient, 
+  entries: patient.entries ?? [] 
+}));
 
 // GET all patients
 patientRouter.get('/', (_req: Request, res: Response, next: NextFunction) => {
@@ -38,8 +43,7 @@ patientRouter.get('/:id', (req: Request, res: Response, next: NextFunction) => {
       res.status(404).json({ error: "Patient not found" }).end();
       return;
     }
-    const patientInfo: PatientInfo = filterSsn(patient);
-    res.status(200).json(patientInfo);
+    res.status(200).json(patient);
   } catch (err: unknown) {
     next(err);
   }
@@ -56,7 +60,8 @@ patientRouter.post(
     const patientData: NewPatientEntry = NewPatientSchema.parse(req.body);
     const newPatientEntry: Patient = {
       id: uuidv4(),
-      ...patientData
+      ...patientData,
+      entries: []
     };
     patientsList.push(newPatientEntry);
     const patientInfo: PatientInfo = filterSsn(newPatientEntry);

@@ -2,6 +2,7 @@
 import express from 'express';
 import patientsData from '../data/patients';
 import { v4 as uuidv4 } from 'uuid';
+import newPatientParser from '../middleware/newPatientParser';
 
 // Schemas
 import { NewPatientSchema } from '../schemas/newPatient';
@@ -11,8 +12,8 @@ import filterSsn from '../utils/filterSsn';
 
 // TypeScript types
 import type { NextFunction, Request, Response } from 'express';
-import type { NewPatientEntry, Patient, PatientInfo } from '../types/types';
-import newPatientParser from '../middleware/newPatientParser';
+import type { Patient, PatientInfo } from '../../../shared/types';
+import type { NewPatientEntry } from '../schemas/newPatient';
 
 const patientRouter = express.Router();
 

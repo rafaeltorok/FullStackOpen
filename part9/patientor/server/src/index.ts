@@ -4,7 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 // Express routes
-import diagnoseRouter from './routes/diagnosesRoutes';
+import diagnosesRouter from './routes/diagnosesRoutes';
 import patientRouter from './routes/patientsRoutes';
 
 // Middleware
@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
-app.use('/api/diagnoses', diagnoseRouter);
+app.use('/api/diagnoses', diagnosesRouter);
 app.use('/api/patients', patientRouter);
 app.get('/api/ping', (_req: Request, res: Response) => {
   res.status(200).send('pong');

@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
 import diagnosesData from '../data/diagnoses';
-import { Diagnosis } from '../types/types';
+import { Diagnosis } from '../../../shared/types';
 
-const diagnoseRouter = express.Router();
+const diagnosesRouter = express.Router();
 
-diagnoseRouter.get('/diagnoses', (_req: Request, res: Response) => {
+diagnosesRouter.get('/', (_req: Request, res: Response) => {
   try {
     if (diagnosesData.length < 1) {
       return res.status(404).json({ error: "No diagnosis data available" });
@@ -18,7 +18,7 @@ diagnoseRouter.get('/diagnoses', (_req: Request, res: Response) => {
   }
 });
 
-diagnoseRouter.get('/diagnoses/:id', (req: Request, res: Response) => {
+diagnosesRouter.get('/:id', (req: Request, res: Response) => {
   try {
     const diagnose: Diagnosis | undefined = diagnosesData.find(d => d.code === req.params.id);
     if (!diagnose) {
@@ -33,4 +33,4 @@ diagnoseRouter.get('/diagnoses/:id', (req: Request, res: Response) => {
   }
 });
 
-export default diagnoseRouter;
+export default diagnosesRouter;

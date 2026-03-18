@@ -1,6 +1,3 @@
-import { NewPatientSchema } from "../schemas/newPatient";
-import z from "zod";
-
 export interface Diagnosis {
   code: string;
   name: string;
@@ -12,8 +9,6 @@ export enum Gender {
   Female = 'female',
   Other = 'other'
 };
-
-export type NewPatientEntry = z.infer<typeof NewPatientSchema>;
 
 export interface Patient {
   id: string;
@@ -49,7 +44,7 @@ export interface OccupationalHealthcareEntry extends BaseEntry {
 
 export interface HospitalEntry extends BaseEntry {
   type: 'Hospital';
-  discharge: {
+  discharge?: {
     date: string,
     criteria: string
   };
@@ -68,3 +63,5 @@ export interface HealthCheckEntry extends BaseEntry {
 }
 
 export type Entry = OccupationalHealthcareEntry | HospitalEntry | HealthCheckEntry;
+
+export type PatientFormValues = Omit<Patient, "id" | "entries">;

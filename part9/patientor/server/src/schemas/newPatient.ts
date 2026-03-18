@@ -1,4 +1,4 @@
-import { Gender } from "../types/types";
+import { Gender } from "../../../shared/types";
 import z from "zod";
 
 export const NewPatientSchema = z.object({
@@ -8,3 +8,5 @@ export const NewPatientSchema = z.object({
   gender: z.enum(Gender),
   occupation: z.string(),
 });
+
+export type NewPatientEntry = z.infer<typeof NewPatientSchema>;

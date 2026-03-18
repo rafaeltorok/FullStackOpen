@@ -6,11 +6,10 @@ import { PatientFormValues, Patient } from "../../types";
 
 import AddPatientModal from "../AddPatientModal";
 import HealthRatingBar from "../HealthRatingBar";
-import PatientInfo from "./PatientInfo";
 
 import patientService from "../../services/patients";
 
-import { Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface Props {
   patients : Patient[]
@@ -49,10 +48,6 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
       }
     }
   };
-
-  function getPatient(searchId: string | undefined): Patient | undefined {
-    return patients.find(patient => patient.id === searchId);
-  }
 
   return (
     <div className="App">
@@ -96,10 +91,6 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
       <Button variant="contained" onClick={() => openModal()}>
         Add New Patient
       </Button>
-
-      <Routes>
-        <Route path="/patients/:id" element={<PatientInfo getPatient={getPatient} />}/>
-      </Routes>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Patient, PatientInfo } from "../types";
+import { Patient, PatientInfo } from "../types/types";
 
 export default function filterSsn(patient: Patient): PatientInfo {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

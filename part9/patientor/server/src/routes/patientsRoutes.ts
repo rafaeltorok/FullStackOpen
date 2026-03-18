@@ -11,7 +11,7 @@ import filterSsn from '../utils/filterSsn';
 
 // TypeScript types
 import type { NextFunction, Request, Response } from 'express';
-import type { NewPatientEntry, Patient, PatientInfo } from '../types';
+import type { NewPatientEntry, Patient, PatientInfo } from '../types/types';
 import newPatientParser from '../middleware/newPatientParser';
 
 const patientRouter = express.Router();

@@ -3,6 +3,7 @@ import express from 'express';
 import patientsData from '../data/patients';
 import { v4 as uuidv4 } from 'uuid';
 import newPatientParser from '../middleware/newPatientParser';
+import newEntryParser from '../middleware/newEntryParser';
 
 // Schemas
 import { NewPatientSchema } from '../schemas/newPatient';
@@ -14,6 +15,9 @@ import filterSsn from '../utils/filterSsn';
 import type { NextFunction, Request, Response } from 'express';
 import type { Patient, PatientInfo } from '../../../shared/types';
 import type { NewPatientEntry } from '../schemas/newPatient';
+import type { NewOccupationalHealthcareEntry } from '../schemas/newOccupationalEntry';
+import type { NewHospitalEntry } from '../schemas/newHospitalEntry';
+import type { NewHealthCheckEntry } from '../schemas/newHealthCheckEntry';
 
 const patientRouter = express.Router();
 
@@ -63,6 +67,28 @@ patientRouter.post(
       id: uuidv4(),
       ...patientData,
       entries: []
+    };
+    patientsList.push(newPatientEntry);
+    const patientInfo: PatientInfo = filterSsn(newPatientEntry);
+    res.status(201).json(patientInfo);
+  } catch (err: unknown) {
+    next(err);
+  }
+});
+
+// POST a new entry
+patientRouter.post(
+  '/:id/entries', newEntryParser, (
+    req: Request<unknown, unknown, unknown>, 
+    res: Response<PatientInfo>, 
+    next: NextFunction
+  ) => {
+  try {
+
+    const patientData: NewPatientEntry = NewPatientSchema.parse(req.body);
+    const newPatientEntry: Patient = {
+      id: uuidv4(),
+      ...patientData,
     };
     patientsList.push(newPatientEntry);
     const patientInfo: PatientInfo = filterSsn(newPatientEntry);

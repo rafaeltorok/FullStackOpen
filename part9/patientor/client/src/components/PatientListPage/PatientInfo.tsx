@@ -3,21 +3,25 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import services from "../../services/patients";
 
-// Material UI icons
+// Material UI elements
+import { Button } from '@mui/material';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import TransgenderIcon from '@mui/icons-material/Transgender';
 
 // Components
 import EntryDetails from "./EntryDetails";
+import AddEntryForm from "./AddEntryForm";
 
 // TypeScript types
-import type { Patient } from "../../../../shared/types";
+import type { Entry, Patient } from "../../../../shared/types";
 
 export default function PatientInfo() {
   const { id } = useParams();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showAddEntryForm, setShowAddEntryForm] = useState<boolean>(false);
+  const [addEntryText, setAddEntryText] = useState<string>("Add new entry");
 
   useEffect(() => {
     async function fetchPatient() {
@@ -47,6 +51,19 @@ export default function PatientInfo() {
     return <TransgenderIcon />;
   }
 
+  function toggleAddForm() {
+    setShowAddEntryForm((prev) => !prev);
+    setAddEntryText(showAddEntryForm ? "Cancel" : "Add new entry");
+  }
+
+  function createNewEntry(newEntry: Entry): void {
+    if (patient) {
+      setPatient({ ...patient, entries: patient.entries.concat(newEntry) });
+      
+      setShowAddEntryForm(false);
+    }
+  }
+
   if (loading) return <h3>Loading patient information...</h3>;
 
   if (!patient) return <h3>Patient not found</h3>;
@@ -63,6 +80,14 @@ export default function PatientInfo() {
         ))) :
         (<p>No entries available</p>)
       }
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={toggleAddForm}
+      >
+        {addEntryText}
+      </Button>
+      {showAddEntryForm && <AddEntryForm createNewEntry={createNewEntry} />}
     </div>
   );
 }

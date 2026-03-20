@@ -1,18 +1,19 @@
 // Base dependencies
 import { useState } from 'react';
-import { v4 as uuidv4 } from "uuid";
 
 // Material UI
 import { InputLabel, MenuItem, Select } from '@mui/material';
 
 // Components
-import HealthCheckEntry from './addEntry/healthCheckEntry';
+import HealthCheckEntry from './addEntry/HealthCheckEntry';
+import HospitalEntry from './addEntry/HospitalEntry';
+import OccupationalHealthcareEntry from './addEntry/OccupationalEntry';
 
 // TypeScript types
-import type { Entry, newEntry } from "../../../../shared/types";
+import type { EntryFormValues } from "../../../../shared/types";
 
 interface AddEntryProps {
-  createNewEntry: (entry: Entry) => void;
+  createNewEntry: (entry: EntryFormValues) => void;
 }
 
 export default function AddEntryForm(props: AddEntryProps) {
@@ -21,15 +22,10 @@ export default function AddEntryForm(props: AddEntryProps) {
 
   function handleSelection(selection: string) {
     setEntryType(selection);
-    switch (entryType) {
-      case "HealthCheck":
-        return <HealthCheckEntry handleNewEntry={handleNewEntry} />;
-    }
   }
 
-  function handleNewEntry(entry: newEntry): void {
-    const newId = uuidv4();
-    props.createNewEntry({ ...entry, id: newId });
+  function handleNewEntry(entry: EntryFormValues): void {
+    props.createNewEntry(entry);
   }
 
   return (
@@ -52,9 +48,9 @@ export default function AddEntryForm(props: AddEntryProps) {
         )}
         </Select>
       </form>
-      {entryType === "Hospital" && <></>}
+      {entryType === "Hospital" && <HospitalEntry handleNewEntry={handleNewEntry} />}
       {entryType === "HealthCheck" && <HealthCheckEntry handleNewEntry={handleNewEntry} />}
-      {entryType === "OccupationalHealthcare" && <></>}
+      {entryType === "OccupationalHealthcare" && <OccupationalHealthcareEntry handleNewEntry={handleNewEntry} />}
     </div>
   );
 }

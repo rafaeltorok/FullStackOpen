@@ -26,14 +26,17 @@ export default function HealthCheck(props: HealthCheckProps) {
       <p>{props.entry.date} <LocalHospitalIcon /></p>
       <p>{props.entry.description}</p>
       <p>{HealthRating()}</p>
-      <ul>
-        {props.entry.diagnosisCodes && (
-          props.entry.diagnosisCodes.map(code => (
-            <DiagnosesCode key={code} code={code} />
-          ))
-        )}
-      </ul>
-      <p>diagnose by {props.entry.specialist}</p>
+      {props.entry.diagnosisCodes &&
+        <div>
+          <h3>Diagnosis codes:</h3>
+          <ul>
+            {props.entry.diagnosisCodes.map(code => (
+              <DiagnosesCode key={code} code={code} />
+            ))}
+          </ul>
+        </div>
+      }
+      <em>diagnose by {props.entry.specialist}</em>
     </div>
   );
 }

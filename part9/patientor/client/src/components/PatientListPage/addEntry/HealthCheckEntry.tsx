@@ -1,19 +1,18 @@
 import {  TextField, InputLabel, MenuItem, Select, Grid, Button } from '@mui/material';
 import { useState } from 'react';
 
-import type { newEntry } from "../../../../../shared/types";
+import type { EntryFormValues, HealthCheckFormValues } from "../../../../../shared/types";
 
 interface HealthCheckEntryProps {
-  handleNewEntry: (entry: newEntry) => void;
+  handleNewEntry: (entry: EntryFormValues) => void;
 }
 
 export default function HealthCheckEntry(props: HealthCheckEntryProps) {
-  const [entryDetails, setEntryDetails] = useState({
+  const [entryDetails, setEntryDetails] = useState<HealthCheckFormValues>({
     type: "HealthCheck",
     description: "",
     date: "",
     specialist: "",
-    diagnosisCodes: [],
     healthCheckRating: 0
   });
   const [codesList, setCodesList] = useState<string[]>([]);
@@ -37,20 +36,23 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
       return;
     }
 
+    let newEntry: HealthCheckFormValues = { ...entryDetails };
+          
+    // Appends the list of diagnoses
     if (codesList.length > 0) {
-      setEntryDetails({ ...entryDetails, diagnosisCodes: codesList });
+      newEntry = ({ ...newEntry, diagnosisCodes: codesList });
     }
 
-    props.handleNewEntry(entryDetails);
+    props.handleNewEntry(newEntry);
 
     setEntryDetails({
       type: "HealthCheck",
       description: "",
       date: "",
       specialist: "",
-      diagnosisCodes: [],
       healthCheckRating: 0
     });
+    setCodesList([]);
   }
 
   function handleCode() {
@@ -90,7 +92,7 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           label="Diagnosis code"
           value={codeInput}
           className='diagnoses-field'
-          onChange={({ target }) => setCodeInput(target.value)}
+          onChange={({ target }) => setCodeInput(target.value.toUpperCase())}
         />
         <Button 
           onClick={handleCode}
@@ -125,9 +127,6 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
         <Grid>
           <Grid item>
             <Button
-              style={{
-                float: "right",
-              }}
               type="submit"
               variant="contained"
             >

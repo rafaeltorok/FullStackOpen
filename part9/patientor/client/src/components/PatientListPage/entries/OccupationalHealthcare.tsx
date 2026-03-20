@@ -11,14 +11,26 @@ export default function OccupationalHealthcare(props: OccupationalHealthcareProp
     <div className="patient-entry">
       <p>{props.entry.date} <WorkIcon /> {props.entry.employerName}</p>
       <p>{props.entry.description}</p>
-      <ul>
-        {props.entry.diagnosisCodes && (
-          props.entry.diagnosisCodes.map(code => (
-            <DiagnosesCode key={code} code={code} />
-          ))
-        )}
-      </ul>
-      <p>diagnose by {props.entry.specialist}</p>
+      {props.entry.diagnosisCodes &&
+        <div>
+          <h3>Diagnosis codes:</h3>
+          <ul>
+            {props.entry.diagnosisCodes.map(code => (
+              <DiagnosesCode key={code} code={code} />
+            ))}
+          </ul>
+        </div>
+      }
+      {props.entry.sickLeave && 
+        <div>
+          <h3>Sick leave:</h3>
+          <ul>
+            <li>Start date: {props.entry.sickLeave.startDate}</li>
+            <li>End date: {props.entry.sickLeave.endDate}</li>
+          </ul>
+        </div>
+      }
+      <em>diagnose by {props.entry.specialist}</em>
     </div>
   );
 }

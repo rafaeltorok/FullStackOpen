@@ -1,9 +1,14 @@
+import { Entry, EntryFormValues } from "../../../shared/types";
 import { NewHealthCheckSchema } from "../schemas/newHealthCheckEntry";
 import { NewHospitalSchema } from "../schemas/newHospitalEntry";
 import { NewOccupationalHealthcareSchema } from "../schemas/newOccupationalEntry";
 import type { Request, Response, NextFunction } from "express";
 
-export default function newEntryParser(req: Request, _res: Response, next: NextFunction) {
+export default function newEntryParser(
+  req: Request<{ id: string }, Entry, EntryFormValues>,
+  _res: Response, 
+  next: NextFunction
+) {
   function exhaustiveMatchingGuard(_never: never) {
     throw new Error('Invalid operation type');
   }

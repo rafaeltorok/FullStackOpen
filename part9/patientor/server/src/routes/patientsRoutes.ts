@@ -13,11 +13,8 @@ import filterSsn from '../utils/filterSsn';
 
 // TypeScript types
 import type { NextFunction, Request, Response } from 'express';
-import type { Patient, PatientInfo } from '../../../shared/types';
+import type { Patient, PatientInfo, Entry } from '../../../shared/types';
 import type { NewPatientEntry } from '../schemas/newPatient';
-import type { NewOccupationalHealthcareEntry } from '../schemas/newOccupationalEntry';
-import type { NewHospitalEntry } from '../schemas/newHospitalEntry';
-import type { NewHealthCheckEntry } from '../schemas/newHealthCheckEntry';
 
 const patientRouter = express.Router();
 
@@ -50,7 +47,7 @@ patientRouter.get('/:id', (req: Request, res: Response, next: NextFunction) => {
     }
     res.status(200).json(patient);
   } catch (err: unknown) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -72,29 +69,33 @@ patientRouter.post(
     const patientInfo: PatientInfo = filterSsn(newPatientEntry);
     res.status(201).json(patientInfo);
   } catch (err: unknown) {
-    next(err);
+    return next(err);
   }
 });
 
 // POST a new entry
 patientRouter.post(
   '/:id/entries', newEntryParser, (
-    req: Request<unknown, unknown, unknown>, 
-    res: Response<PatientInfo>, 
+    req: Request<{ id: string }, unknown, Entry>,
+    res: Response<Entry>,
     next: NextFunction
   ) => {
   try {
-
-    const patientData: NewPatientEntry = NewPatientSchema.parse(req.body);
-    const newPatientEntry: Patient = {
+    const entryData = req.body;
+    
+    const patient: Patient | undefined = patientsList.find((patient) => patient.id === req.params.id);
+    
+    if (!patient) return res.status(404).end();
+    
+    const newEntry: Entry = {
+      ...entryData,
       id: uuidv4(),
-      ...patientData,
     };
-    patientsList.push(newPatientEntry);
-    const patientInfo: PatientInfo = filterSsn(newPatientEntry);
-    res.status(201).json(patientInfo);
+    
+    patient.entries = [...patient.entries, newEntry];
+    return res.status(201).json(newEntry);
   } catch (err: unknown) {
-    next(err);
+    return next(err);
   }
 });
 

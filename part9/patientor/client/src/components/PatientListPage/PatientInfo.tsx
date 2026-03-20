@@ -1,7 +1,8 @@
 // Base dependencies
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import services from "../../services/patients";
+import patientService from "../../services/patients";
+import entryService from "../../services/entries";
 
 // Material UI elements
 import { Button } from '@mui/material';
@@ -14,7 +15,7 @@ import EntryDetails from "./EntryDetails";
 import AddEntryForm from "./AddEntryForm";
 
 // TypeScript types
-import type { Entry, Patient } from "../../../../shared/types";
+import type { Patient, EntryFormValues } from "../../../../shared/types";
 
 export default function PatientInfo() {
   const { id } = useParams();
@@ -27,7 +28,7 @@ export default function PatientInfo() {
     async function fetchPatient() {
       try {
         if (!id) return;
-        const patientFound = await services.getById(id);
+        const patientFound = await patientService.getById(id);
         setPatient(patientFound);
         setLoading(false);
       } catch (err: unknown) {
@@ -56,10 +57,10 @@ export default function PatientInfo() {
     setAddEntryText(showAddEntryForm ? "Cancel" : "Add new entry");
   }
 
-  function createNewEntry(newEntry: Entry): void {
+  async function createNewEntry(newEntry: EntryFormValues): Promise<void> {
     if (patient) {
-      setPatient({ ...patient, entries: patient.entries.concat(newEntry) });
-      
+      const response = await entryService.create(newEntry, patient.id);
+      if (response) setPatient({ ...patient, entries: patient.entries.concat(response) });
       setShowAddEntryForm(false);
     }
   }
@@ -74,12 +75,7 @@ export default function PatientInfo() {
       <p>ssn: <strong>{patient.ssn}</strong></p>
       <p>occupation: <strong>{patient.occupation}</strong></p>
       <h3>Entries:</h3>
-      {patient.entries.length > 0 ? 
-        (patient.entries.map(entry => (
-          <EntryDetails key={entry.id} entry={entry} />
-        ))) :
-        (<p>No entries available</p>)
-      }
+      
       <Button 
         variant="contained" 
         color="primary" 
@@ -88,6 +84,13 @@ export default function PatientInfo() {
         {addEntryText}
       </Button>
       {showAddEntryForm && <AddEntryForm createNewEntry={createNewEntry} />}
+
+      {patient.entries.length > 0 ? 
+        (patient.entries.map(entry => (
+          <EntryDetails key={entry.id} entry={entry} />
+        ))) :
+        (<p>No entries available</p>)
+      }
     </div>
   );
 }

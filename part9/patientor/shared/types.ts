@@ -22,13 +22,10 @@ export interface Patient {
 
 export type NonSensitivePatient = Omit<Patient, 'ssn' | 'entries'>;
 
-export type PatientInfo = Omit<Patient, "ssn">;
-
 export interface BaseEntry {
   id: string;
   description: string;
   date: string;
-  type: string;
   specialist: string;
   diagnosisCodes?: Array<Diagnosis['code']>;
 }
@@ -44,7 +41,7 @@ export interface OccupationalHealthcareEntry extends BaseEntry {
 
 export interface HospitalEntry extends BaseEntry {
   type: 'Hospital';
-  discharge?: {
+  discharge: {
     date: string,
     criteria: string
   };

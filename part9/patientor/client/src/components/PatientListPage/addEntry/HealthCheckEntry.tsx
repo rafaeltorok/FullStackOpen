@@ -8,12 +8,13 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // TypeScript types
-import type { EntryFormValues, HealthCheckFormValues } from "../../../../../shared/types";
+import type { EntryFormValues, HealthCheckFormValues, Diagnosis } from "../../../../../shared/types";
 import type { Dayjs } from 'dayjs';
 
 interface HealthCheckEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
   notifyError: (message: string) => void;
+  diagnosesList: Diagnosis[];
 }
 
 export default function HealthCheckEntry(props: HealthCheckEntryProps) {
@@ -34,7 +35,7 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
 
   // Diagnoses codes states
   const [codesList, setCodesList] = useState<string[]>([]);
-  const [codeInput, setCodeInput] = useState<string>("");
+  const [selectedCode, setSelectedCode] = useState<string>("");
 
   const [date, setDate] = useState<Dayjs | null>(null);
 
@@ -74,10 +75,10 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
   }
 
   function handleCode() {
-    if (codeInput.trim() !== "") {
-      setCodesList(prev => [...prev, codeInput]);
-      setCodeInput("");
+    if (selectedCode && !codesList.includes(selectedCode)) {
+      setCodesList(prev => [...prev, selectedCode]);
     }
+    setSelectedCode("");
   }
 
   return (
@@ -106,12 +107,21 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           onChange={({ target }) => setEntryDetails({ ...entryDetails, specialist: target.value })}
         />
 
-        <TextField
-          label="Diagnosis code"
-          value={codeInput}
-          className='diagnoses-field'
-          onChange={({ target }) => setCodeInput(target.value.toUpperCase())}
-        />
+        <InputLabel style={{ marginTop: 20 }}>Diagnosis code</InputLabel>
+        <Select
+          fullWidth
+          value={selectedCode}
+          onChange={({ target }) => setSelectedCode(target.value)}
+        >
+          {props.diagnosesList.map(diagnosis => 
+            <MenuItem
+              key={diagnosis.code}
+              value={diagnosis.code}
+            >
+              {diagnosis.code}: {diagnosis.name}
+            </MenuItem>
+          )}
+        </Select>
         <Button 
           onClick={handleCode}
           type='button'
@@ -132,14 +142,14 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           value={entryDetails.healthCheckRating}
           onChange={({ target }) => setEntryDetails({ ...entryDetails, healthCheckRating: Number(target.value) })}
         >
-        {Object.entries(ratingValues).map(([key, value]) => 
-          <MenuItem
-            key={key}
-            value={value}
-          >
-            {key}
-          </MenuItem>
-        )}
+          {Object.entries(ratingValues).map(([key, value]) => 
+            <MenuItem
+              key={key}
+              value={value}
+            >
+              {key}
+            </MenuItem>
+          )}
         </Select>
 
         <Grid>

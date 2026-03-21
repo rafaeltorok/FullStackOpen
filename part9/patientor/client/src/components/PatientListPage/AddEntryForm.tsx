@@ -1,5 +1,6 @@
 // Base dependencies
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import diagnoseService from "../../services/diagnoses";
 
 // Material UI
 import { InputLabel, MenuItem, Select } from '@mui/material';
@@ -10,7 +11,7 @@ import HospitalEntry from './addEntry/HospitalEntry';
 import OccupationalHealthcareEntry from './addEntry/OccupationalEntry';
 
 // TypeScript types
-import type { EntryFormValues } from "../../../../shared/types";
+import type { EntryFormValues, Diagnosis } from "../../../../shared/types";
 
 interface AddEntryProps {
   createNewEntry: (entry: EntryFormValues) => void;
@@ -20,6 +21,20 @@ interface AddEntryProps {
 export default function AddEntryForm(props: AddEntryProps) {
   const [entryType, setEntryType] = useState<string>("Hospital");
   const types = ["OccupationalHealthcare", "Hospital", "HealthCheck"];
+  const [diagnosesList, setDiagnosesList] = useState<Diagnosis[]>([]);
+
+  useEffect(() => {
+    async function getDiagnoses() {
+      try {
+        const response = await diagnoseService.getAll();
+        if (response) setDiagnosesList(response);
+      } catch(err: unknown) {
+        if (err instanceof Error) console.error("Failed to get list of diagnoses:", err.message);
+        else console.error(String(err));
+      }
+    }
+    getDiagnoses();
+  });
 
   function handleSelection(selection: string) {
     setEntryType(selection);
@@ -49,9 +64,27 @@ export default function AddEntryForm(props: AddEntryProps) {
         )}
         </Select>
       </form>
-      {entryType === "Hospital" && <HospitalEntry handleNewEntry={handleNewEntry} notifyError={props.notifyError} />}
-      {entryType === "HealthCheck" && <HealthCheckEntry handleNewEntry={handleNewEntry} notifyError={props.notifyError} />}
-      {entryType === "OccupationalHealthcare" && <OccupationalHealthcareEntry handleNewEntry={handleNewEntry} notifyError={props.notifyError} />}
+      {entryType === "Hospital" && 
+        <HospitalEntry 
+          handleNewEntry={handleNewEntry} 
+          notifyError={props.notifyError} 
+          diagnosesList={diagnosesList}
+        />
+      }
+      {entryType === "HealthCheck" && 
+        <HealthCheckEntry 
+          handleNewEntry={handleNewEntry} 
+          notifyError={props.notifyError} 
+          diagnosesList={diagnosesList}
+        />
+      }
+      {entryType === "OccupationalHealthcare" && 
+        <OccupationalHealthcareEntry 
+          handleNewEntry={handleNewEntry} 
+          notifyError={props.notifyError} 
+          diagnosesList={diagnosesList}
+        />
+      }
     </div>
   );
 }

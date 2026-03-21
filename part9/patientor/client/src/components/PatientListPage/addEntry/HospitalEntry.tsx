@@ -73,7 +73,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
 
   function handleCode() {
     if (codeInput.trim() !== "") {
-      setCodesList([ ...codesList, codeInput ]);
+      setCodesList(prev => [...prev, codeInput]);
       setCodeInput("");
     }
   }

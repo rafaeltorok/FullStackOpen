@@ -65,7 +65,7 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
 
   function handleCode() {
     if (codeInput.trim() !== "") {
-      setCodesList([ ...codesList, codeInput ]);
+      setCodesList(prev => [...prev, codeInput]);
       setCodeInput("");
     }
   }

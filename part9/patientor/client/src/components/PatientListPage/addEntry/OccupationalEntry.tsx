@@ -75,7 +75,7 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
 
   function handleCode() {
     if (codeInput.trim() !== "") {
-      setCodesList([ ...codesList, codeInput ]);
+      setCodesList(prev => [...prev, codeInput]);
       setCodeInput("");
     }
   }

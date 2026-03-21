@@ -3,9 +3,13 @@ import { useState } from 'react';
 
 // Material UI
 import { TextField, InputLabel, MenuItem, Select, Grid, Button } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // TypeScript types
 import type { EntryFormValues, HealthCheckFormValues } from "../../../../../shared/types";
+import type { Dayjs } from 'dayjs';
 
 interface HealthCheckEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
@@ -32,12 +36,14 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
   const [codesList, setCodesList] = useState<string[]>([]);
   const [codeInput, setCodeInput] = useState<string>("");
 
+  const [date, setDate] = useState<Dayjs | null>(null);
+
   function handleInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (
       entryDetails.description.trim() === "" ||
-      entryDetails.date.trim() === "" ||
+      !date ||
       entryDetails.specialist.trim() === ""
     ) {
       props.notifyError("Missing required field(s): Description, Date or Specialist");
@@ -51,6 +57,9 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
       newEntry = ({ ...newEntry, diagnosisCodes: codesList });
     }
 
+    // Adds the properly formatted date field
+    newEntry = ({ ...newEntry, date: date.format("YYYY-MM-DD") });
+
     props.handleNewEntry(newEntry);
 
     setEntryDetails({
@@ -61,6 +70,7 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
       healthCheckRating: 0
     });
     setCodesList([]);
+    setDate(null);
   }
 
   function handleCode() {
@@ -82,13 +92,13 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           value={entryDetails.description}
           onChange={({ target }) => setEntryDetails({ ...entryDetails, description: target.value })}
         />
-        <TextField
-          label="Date"
-          placeholder="YYYY-MM-DD"
-          fullWidth
-          value={entryDetails.date}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, date: target.value })}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker 
+            label="Date" 
+            value={date}
+            onChange={(newValue) => setDate(newValue)}
+          />
+        </LocalizationProvider>
         <TextField
           label="Specialist"
           fullWidth

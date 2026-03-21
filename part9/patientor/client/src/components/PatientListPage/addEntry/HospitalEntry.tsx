@@ -3,13 +3,22 @@ import { useState } from 'react';
 
 // Material UI
 import { TextField, InputLabel, Grid, Button } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // TypeScript types
 import type { EntryFormValues, HospitalFormValues } from "../../../../../shared/types";
+import { Dayjs } from 'dayjs';
 
 interface HospitalEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
   notifyError: (message: string) => void;
+}
+
+interface Discharge {
+  date: Dayjs | null;
+  criteria: string;
 }
 
 export default function HospitalEntry(props: HospitalEntryProps) {
@@ -20,8 +29,8 @@ export default function HospitalEntry(props: HospitalEntryProps) {
     date: "",
     specialist: ""
   });
-  const [dischargeInfo, setDischargeInfo] = useState({
-    date: "",
+  const [dischargeInfo, setDischargeInfo] = useState<Discharge>({
+    date: null,
     criteria: ""
   });
 
@@ -29,12 +38,14 @@ export default function HospitalEntry(props: HospitalEntryProps) {
   const [codesList, setCodesList] = useState<string[]>([]);
   const [codeInput, setCodeInput] = useState<string>("");
 
+  const [date, setDate] = useState<Dayjs | null>(null);
+
   function handleInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (
       entryDetails.description.trim() === "" ||
-      entryDetails.date.trim() === "" ||
+      !date ||
       entryDetails.specialist.trim() === ""
     ) {
       props.notifyError("Missing required field(s): Description, Date or Specialist");
@@ -44,11 +55,17 @@ export default function HospitalEntry(props: HospitalEntryProps) {
     let newEntry: HospitalFormValues = { ...entryDetails };
 
     // Validates the discharge field
-    if (dischargeInfo.date.trim() && dischargeInfo.criteria.trim()) {
-      newEntry = ({ ...newEntry, discharge: dischargeInfo });
+    if (dischargeInfo.date && dischargeInfo.criteria.trim()) {
+      newEntry = ({ 
+        ...newEntry, 
+        discharge: { 
+          date: dischargeInfo.date.format("YYYY-MM-DD"), 
+          criteria: dischargeInfo.criteria 
+        }
+      });
     } else if (
-      ( !dischargeInfo.date.trim() && dischargeInfo.criteria.trim() ) ||
-      ( dischargeInfo.date.trim() && !dischargeInfo.criteria.trim() )
+      ( !dischargeInfo.date && dischargeInfo.criteria.trim() ) ||
+      ( dischargeInfo.date && !dischargeInfo.criteria.trim() )
     ) {
       props.notifyError("Missing one of the discharge fields");
       return;
@@ -59,6 +76,9 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       newEntry = ({ ...newEntry, diagnosisCodes: codesList });
     }
 
+    // Adds the properly formatted date field
+    newEntry = ({ ...newEntry, date: date.format("YYYY-MM-DD") });
+
     props.handleNewEntry(newEntry);
 
     setEntryDetails({
@@ -68,7 +88,8 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       specialist: ""
     });
     setCodesList([]);
-    setDischargeInfo({ date: "", criteria: "" });
+    setDischargeInfo({ date: null, criteria: "" });
+    setDate(null);
   }
 
   function handleCode() {
@@ -90,13 +111,13 @@ export default function HospitalEntry(props: HospitalEntryProps) {
           value={entryDetails.description}
           onChange={({ target }) => setEntryDetails({ ...entryDetails, description: target.value })}
         />
-        <TextField
-          label="Date"
-          placeholder="YYYY-MM-DD"
-          fullWidth
-          value={entryDetails.date}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, date: target.value })}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker 
+            label="Date" 
+            value={date}
+            onChange={(newValue) => setDate(newValue)}
+          />
+        </LocalizationProvider>
         <TextField
           label="Specialist"
           fullWidth
@@ -124,13 +145,13 @@ export default function HospitalEntry(props: HospitalEntryProps) {
         <p>{codesList.join(", ")}</p>
 
         <InputLabel style={{ marginTop: 20 }}>Discharge</InputLabel>
-        <TextField
-          label="Date"
-          value={dischargeInfo.date}
-          onChange={({ target }) => setDischargeInfo({
-              ...dischargeInfo, date: target.value
-            })}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker 
+            label="Date" 
+            value={dischargeInfo.date}
+            onChange={(newValue) => setDischargeInfo({ ...dischargeInfo, date: newValue })}
+          />
+        </LocalizationProvider>
         <TextField
           label="Criteria"
           value={dischargeInfo.criteria}

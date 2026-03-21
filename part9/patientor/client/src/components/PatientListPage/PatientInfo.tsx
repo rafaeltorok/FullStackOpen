@@ -88,7 +88,7 @@ export default function PatientInfo() {
       <h2>{patient.name} {getGenderIcon()}</h2>
       <p>ssn: <strong>{patient.ssn}</strong></p>
       <p>occupation: <strong>{patient.occupation}</strong></p>
-      <h3>Entries:</h3>
+      <h3>Entries{patient.entries.length > 0 && <span> ({patient.entries.length} total)</span>}:</h3>
       
       <Button 
         variant="contained" 

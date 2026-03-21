@@ -2,14 +2,23 @@
 import { useState } from 'react';
 
 // Material UI
-import {  TextField, InputLabel, Grid, Button } from '@mui/material';
+import { TextField, InputLabel, Grid, Button } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // TypeScript types
 import type { EntryFormValues, OccupationalHealthcareFormValues } from "../../../../../shared/types";
+import type { Dayjs } from "dayjs";
 
 interface OccupationalHealthcareEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
   notifyError: (message: string) => void;
+}
+
+interface SickLeave {
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
 }
 
 export default function OccupationalHealthcareEntry(props: OccupationalHealthcareEntryProps) {
@@ -21,21 +30,23 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
     specialist: "",
     employerName: ""
   });
-  const [sickLeaveInfo, setSickLeaveInfo] = useState({
-    startDate: "",
-    endDate: ""
+  const [sickLeaveInfo, setSickLeaveInfo] = useState<SickLeave>({
+    startDate: null,
+    endDate: null
   });
 
   // Diagnoses codes states
   const [codesList, setCodesList] = useState<string[]>([]);
   const [codeInput, setCodeInput] = useState<string>("");
 
+  const [date, setDate] = useState<Dayjs | null>(null);
+
   function handleInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (
       entryDetails.description.trim() === "" ||
-      entryDetails.date.trim() === "" ||
+      !date ||
       entryDetails.specialist.trim() === ""
     ) {
       props.notifyError("Missing required field(s): Description, Date or Specialist");
@@ -45,11 +56,17 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
     let newEntry: OccupationalHealthcareFormValues = { ...entryDetails };
 
     // Validates the sickLeave field
-    if (sickLeaveInfo.startDate.trim() && sickLeaveInfo.endDate.trim()) {
-      newEntry = ({ ...newEntry, sickLeave: sickLeaveInfo });
+    if (sickLeaveInfo.startDate && sickLeaveInfo.endDate) {
+      newEntry = ({ 
+        ...newEntry, 
+        sickLeave: {
+          startDate: sickLeaveInfo.startDate.format("YYYY-MM-DD"),
+          endDate: sickLeaveInfo.endDate.format("YYYY-MM-DD")
+        }
+      });
     } else if (
-      ( !sickLeaveInfo.startDate.trim() && sickLeaveInfo.endDate.trim() ) ||
-      ( sickLeaveInfo.startDate.trim() && !sickLeaveInfo.endDate.trim() )
+      ( !sickLeaveInfo.startDate && sickLeaveInfo.endDate ) ||
+      ( sickLeaveInfo.startDate && !sickLeaveInfo.endDate )
     ) {
       props.notifyError("Missing one of the sick leave dates");
       return;
@@ -59,6 +76,9 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
     if (codesList.length > 0) {
       newEntry = ({ ...newEntry, diagnosisCodes: codesList });
     }
+
+    // Adds the properly formatted date field
+    newEntry = ({ ...newEntry, date: date.format("YYYY-MM-DD") });
 
     props.handleNewEntry(newEntry);
 
@@ -70,7 +90,8 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
       employerName: ""
     });
     setCodesList([]);
-    setSickLeaveInfo({ startDate: "", endDate: "" });
+    setSickLeaveInfo({ startDate: null, endDate: null });
+    setDate(null);
   }
 
   function handleCode() {
@@ -92,13 +113,13 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
           value={entryDetails.description}
           onChange={({ target }) => setEntryDetails({ ...entryDetails, description: target.value })}
         />
-        <TextField
-          label="Date"
-          placeholder="YYYY-MM-DD"
-          fullWidth
-          value={entryDetails.date}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, date: target.value })}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker 
+            label="Date" 
+            value={date}
+            onChange={(newValue) => setDate(newValue)}
+          />
+        </LocalizationProvider>
         <TextField
           label="Specialist"
           fullWidth
@@ -132,20 +153,20 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
         <p>{codesList.join(", ")}</p>
 
         <InputLabel style={{ marginTop: 20 }}>Sick leave</InputLabel>
-        <TextField
-          label="Start date"
-          value={sickLeaveInfo.startDate}
-          onChange={({ target }) => setSickLeaveInfo({
-              ...sickLeaveInfo, startDate: target.value
-            })}
-        />
-        <TextField
-          label="End date"
-          value={sickLeaveInfo.endDate}
-          onChange={({ target }) => setSickLeaveInfo({
-              ...sickLeaveInfo, endDate: target.value
-            })}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker 
+            label="Start date" 
+            value={sickLeaveInfo.startDate}
+            onChange={(newValue) => setSickLeaveInfo({ ...sickLeaveInfo, startDate: newValue })}
+          />
+        </LocalizationProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker 
+            label="End date" 
+            value={sickLeaveInfo.endDate}
+            onChange={(newValue) => setSickLeaveInfo({ ...sickLeaveInfo, endDate: newValue })}
+          />
+        </LocalizationProvider>
 
         <Grid>
           <Grid item>

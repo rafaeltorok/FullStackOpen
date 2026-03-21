@@ -70,6 +70,7 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
       employerName: ""
     });
     setCodesList([]);
+    setSickLeaveInfo({ startDate: "", endDate: "" });
   }
 
   function handleCode() {

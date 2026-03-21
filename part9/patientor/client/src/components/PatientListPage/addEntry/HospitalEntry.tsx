@@ -68,6 +68,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       specialist: ""
     });
     setCodesList([]);
+    setDischargeInfo({ date: "", criteria: "" });
   }
 
   function handleCode() {

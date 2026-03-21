@@ -1,15 +1,26 @@
 // Dependencies
-import { useState } from 'react';
+import { useState } from "react";
 
 // Material UI
-import { TextField, InputLabel, MenuItem, Select, Grid, Button } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import {
+  TextField,
+  InputLabel,
+  MenuItem,
+  Select,
+  Grid,
+  Button,
+} from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // TypeScript types
-import type { EntryFormValues, HealthCheckFormValues, Diagnosis } from "../../../../../shared/types";
-import type { Dayjs } from 'dayjs';
+import type {
+  EntryFormValues,
+  HealthCheckFormValues,
+  Diagnosis,
+} from "../../../../../shared/types";
+import type { Dayjs } from "dayjs";
 
 interface HealthCheckEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
@@ -24,13 +35,13 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
     description: "",
     date: "",
     specialist: "",
-    healthCheckRating: 0
+    healthCheckRating: 0,
   });
-  const ratingValues = { 
-    "Healthy": 0,
-    "LowRisk": 1,
-    "HighRisk": 2,
-    "CriticalRisk": 3
+  const ratingValues = {
+    Healthy: 0,
+    LowRisk: 1,
+    HighRisk: 2,
+    CriticalRisk: 3,
   };
 
   // Diagnoses codes states
@@ -47,19 +58,21 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
       !date ||
       entryDetails.specialist.trim() === ""
     ) {
-      props.notifyError("Missing required field(s): Description, Date or Specialist");
+      props.notifyError(
+        "Missing required field(s): Description, Date or Specialist",
+      );
       return;
     }
 
     let newEntry: HealthCheckFormValues = { ...entryDetails };
-          
+
     // Appends the list of diagnoses
     if (codesList.length > 0) {
-      newEntry = ({ ...newEntry, diagnosisCodes: codesList });
+      newEntry = { ...newEntry, diagnosisCodes: codesList };
     }
 
     // Adds the properly formatted date field
-    newEntry = ({ ...newEntry, date: date.format("YYYY-MM-DD") });
+    newEntry = { ...newEntry, date: date.format("YYYY-MM-DD") };
 
     props.handleNewEntry(newEntry);
 
@@ -68,7 +81,7 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
       description: "",
       date: "",
       specialist: "",
-      healthCheckRating: 0
+      healthCheckRating: 0,
     });
     setCodesList([]);
     setDate(null);
@@ -76,26 +89,25 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
 
   function handleCode() {
     if (selectedCode && !codesList.includes(selectedCode)) {
-      setCodesList(prev => [...prev, selectedCode]);
+      setCodesList((prev) => [...prev, selectedCode]);
     }
     setSelectedCode("");
   }
 
   return (
     <div>
-      <form 
-        onSubmit={handleInput}
-        className='add-entry-form'
-      >
+      <form onSubmit={handleInput} className="add-entry-form">
         <TextField
           label="Description"
-          fullWidth 
+          fullWidth
           value={entryDetails.description}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, description: target.value })}
+          onChange={({ target }) =>
+            setEntryDetails({ ...entryDetails, description: target.value })
+          }
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker 
-            label="Date" 
+          <DatePicker
+            label="Date"
             value={date}
             onChange={(newValue) => setDate(newValue)}
           />
@@ -104,7 +116,9 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           label="Specialist"
           fullWidth
           value={entryDetails.specialist}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, specialist: target.value })}
+          onChange={({ target }) =>
+            setEntryDetails({ ...entryDetails, specialist: target.value })
+          }
         />
 
         <InputLabel style={{ marginTop: 20 }}>Diagnosis code</InputLabel>
@@ -113,20 +127,17 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           value={selectedCode}
           onChange={({ target }) => setSelectedCode(target.value)}
         >
-          {props.diagnosesList.map(diagnosis => 
-            <MenuItem
-              key={diagnosis.code}
-              value={diagnosis.code}
-            >
+          {props.diagnosesList.map((diagnosis) => (
+            <MenuItem key={diagnosis.code} value={diagnosis.code}>
               {diagnosis.code}: {diagnosis.name}
             </MenuItem>
-          )}
+          ))}
         </Select>
-        <Button 
+        <Button
           onClick={handleCode}
-          type='button'
+          type="button"
           style={{
-            float: "right"
+            float: "right",
           }}
           variant="contained"
         >
@@ -140,24 +151,23 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           label="Health Rating"
           fullWidth
           value={entryDetails.healthCheckRating}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, healthCheckRating: Number(target.value) })}
+          onChange={({ target }) =>
+            setEntryDetails({
+              ...entryDetails,
+              healthCheckRating: Number(target.value),
+            })
+          }
         >
-          {Object.entries(ratingValues).map(([key, value]) => 
-            <MenuItem
-              key={key}
-              value={value}
-            >
+          {Object.entries(ratingValues).map(([key, value]) => (
+            <MenuItem key={key} value={value}>
               {key}
             </MenuItem>
-          )}
+          ))}
         </Select>
 
         <Grid>
           <Grid item>
-            <Button
-              type="submit"
-              variant="contained"
-            >
+            <Button type="submit" variant="contained">
               Add
             </Button>
           </Grid>

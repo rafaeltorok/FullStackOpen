@@ -30,6 +30,8 @@ export default function DiagnosesCode(props: DiagnosesCodeProps) {
   if (!diagnose) return;
 
   return (
-    <li>{diagnose.code} {diagnose.name}</li>
+    <li>
+      {diagnose.code} {diagnose.name}
+    </li>
   );
 }

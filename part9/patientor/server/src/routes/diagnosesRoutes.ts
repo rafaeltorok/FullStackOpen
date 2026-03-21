@@ -1,18 +1,17 @@
 // Route dependencies
-import express, { NextFunction, Request, Response } from 'express';
-import diagnosesList from '../data/diagnoses';
+import express, { NextFunction, Request, Response } from "express";
+import diagnosesList from "../data/diagnoses";
 
 // Schemas
-import { NewDiagnoseSchema } from '../schemas/newDiagnose';
+import { NewDiagnoseSchema } from "../schemas/newDiagnose";
 
 // TypeScript types
-import type { Diagnosis } from '../../../shared/types';
-import newDiagnoseParser from '../middleware/newDiagnoseParser';
-
+import type { Diagnosis } from "../../../shared/types";
+import newDiagnoseParser from "../middleware/newDiagnoseParser";
 
 const diagnosesRouter = express.Router();
 
-diagnosesRouter.get('/', (_req: Request, res: Response) => {
+diagnosesRouter.get("/", (_req: Request, res: Response) => {
   try {
     if (diagnosesList.length < 1) {
       return res.status(404).json({ error: "No diagnosis data available" });
@@ -26,9 +25,11 @@ diagnosesRouter.get('/', (_req: Request, res: Response) => {
   }
 });
 
-diagnosesRouter.get('/:id', (req: Request, res: Response) => {
+diagnosesRouter.get("/:id", (req: Request, res: Response) => {
   try {
-    const diagnose: Diagnosis | undefined = diagnosesList.find(d => d.code === req.params.id);
+    const diagnose: Diagnosis | undefined = diagnosesList.find(
+      (d) => d.code === req.params.id,
+    );
     if (!diagnose) {
       return res.status(404).json({ error: "Diagnosis not found" });
     }
@@ -42,18 +43,21 @@ diagnosesRouter.get('/:id', (req: Request, res: Response) => {
 });
 
 diagnosesRouter.post(
-  '/', newDiagnoseParser, (
-    req: Request<unknown, unknown, Diagnosis>, 
-    res: Response, 
-    next: NextFunction
+  "/",
+  newDiagnoseParser,
+  (
+    req: Request<unknown, unknown, Diagnosis>,
+    res: Response,
+    next: NextFunction,
   ) => {
-  try {
-    const diagnoseData: Diagnosis = NewDiagnoseSchema.parse(req.body);
-    diagnosesList.push(diagnoseData);
-    res.status(201).json(diagnoseData);
-  } catch (err: unknown) {
-    return next(err);
-  }
-});
+    try {
+      const diagnoseData: Diagnosis = NewDiagnoseSchema.parse(req.body);
+      diagnosesList.push(diagnoseData);
+      res.status(201).json(diagnoseData);
+    } catch (err: unknown) {
+      return next(err);
+    }
+  },
+);
 
 export default diagnosesRouter;

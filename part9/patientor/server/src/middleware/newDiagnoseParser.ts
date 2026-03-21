@@ -1,7 +1,11 @@
 import { NewDiagnoseSchema } from "../schemas/newDiagnose";
 import type { Request, Response, NextFunction } from "express";
 
-export default function newDiagnoseParser(req: Request, _res: Response, next: NextFunction) { 
+export default function newDiagnoseParser(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) {
   try {
     const result = NewDiagnoseSchema.parse(req.body);
     req.body = result;
@@ -9,4 +13,4 @@ export default function newDiagnoseParser(req: Request, _res: Response, next: Ne
   } catch (error: unknown) {
     next(error);
   }
-};
+}

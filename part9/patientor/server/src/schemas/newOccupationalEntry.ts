@@ -7,10 +7,14 @@ export const NewOccupationalHealthcareSchema = z.object({
   specialist: z.string(),
   diagnosisCodes: z.array(z.string()).optional(),
   employerName: z.string(),
-  sickLeave: z.object({
-    startDate: z.iso.date(),
-    endDate: z.iso.date()
-  }).optional()
+  sickLeave: z
+    .object({
+      startDate: z.iso.date(),
+      endDate: z.iso.date(),
+    })
+    .optional(),
 });
 
-export type NewOccupationalHealthcareEntry = z.infer<typeof NewOccupationalHealthcareSchema>;
+export type NewOccupationalHealthcareEntry = z.infer<
+  typeof NewOccupationalHealthcareSchema
+>;

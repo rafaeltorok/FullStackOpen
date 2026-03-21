@@ -1,15 +1,26 @@
 // Dependencies
-import { useState } from 'react';
+import { useState } from "react";
 
 // Material UI
-import { TextField, InputLabel, Grid, Button, Select, MenuItem } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import {
+  TextField,
+  InputLabel,
+  Grid,
+  Button,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // TypeScript types
-import type { EntryFormValues, HospitalFormValues, Diagnosis } from "../../../../../shared/types";
-import { Dayjs } from 'dayjs';
+import type {
+  EntryFormValues,
+  HospitalFormValues,
+  Diagnosis,
+} from "../../../../../shared/types";
+import { Dayjs } from "dayjs";
 
 interface HospitalEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
@@ -28,11 +39,11 @@ export default function HospitalEntry(props: HospitalEntryProps) {
     type: "Hospital",
     description: "",
     date: "",
-    specialist: ""
+    specialist: "",
   });
   const [dischargeInfo, setDischargeInfo] = useState<Discharge>({
     date: null,
-    criteria: ""
+    criteria: "",
   });
 
   // Diagnoses codes states
@@ -49,7 +60,9 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       !date ||
       entryDetails.specialist.trim() === ""
     ) {
-      props.notifyError("Missing required field(s): Description, Date or Specialist");
+      props.notifyError(
+        "Missing required field(s): Description, Date or Specialist",
+      );
       return;
     }
 
@@ -57,28 +70,28 @@ export default function HospitalEntry(props: HospitalEntryProps) {
 
     // Validates the discharge field
     if (dischargeInfo.date && dischargeInfo.criteria.trim()) {
-      newEntry = ({ 
-        ...newEntry, 
-        discharge: { 
-          date: dischargeInfo.date.format("YYYY-MM-DD"), 
-          criteria: dischargeInfo.criteria 
-        }
-      });
+      newEntry = {
+        ...newEntry,
+        discharge: {
+          date: dischargeInfo.date.format("YYYY-MM-DD"),
+          criteria: dischargeInfo.criteria,
+        },
+      };
     } else if (
-      ( !dischargeInfo.date && dischargeInfo.criteria.trim() ) ||
-      ( dischargeInfo.date && !dischargeInfo.criteria.trim() )
+      (!dischargeInfo.date && dischargeInfo.criteria.trim()) ||
+      (dischargeInfo.date && !dischargeInfo.criteria.trim())
     ) {
       props.notifyError("Missing one of the discharge fields");
       return;
     }
-      
+
     // Appends the list of diagnoses
     if (codesList.length > 0) {
-      newEntry = ({ ...newEntry, diagnosisCodes: codesList });
+      newEntry = { ...newEntry, diagnosisCodes: codesList };
     }
 
     // Adds the properly formatted date field
-    newEntry = ({ ...newEntry, date: date.format("YYYY-MM-DD") });
+    newEntry = { ...newEntry, date: date.format("YYYY-MM-DD") };
 
     props.handleNewEntry(newEntry);
 
@@ -86,7 +99,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       type: "Hospital",
       description: "",
       date: "",
-      specialist: ""
+      specialist: "",
     });
     setCodesList([]);
     setDischargeInfo({ date: null, criteria: "" });
@@ -95,26 +108,25 @@ export default function HospitalEntry(props: HospitalEntryProps) {
 
   function handleCode() {
     if (selectedCode && !codesList.includes(selectedCode)) {
-      setCodesList(prev => [...prev, selectedCode]);
+      setCodesList((prev) => [...prev, selectedCode]);
     }
     setSelectedCode("");
   }
 
   return (
     <div>
-      <form 
-        onSubmit={handleInput}
-        className='add-entry-form'
-      >
+      <form onSubmit={handleInput} className="add-entry-form">
         <TextField
           label="Description"
-          fullWidth 
+          fullWidth
           value={entryDetails.description}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, description: target.value })}
+          onChange={({ target }) =>
+            setEntryDetails({ ...entryDetails, description: target.value })
+          }
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker 
-            label="Date" 
+          <DatePicker
+            label="Date"
             value={date}
             onChange={(newValue) => setDate(newValue)}
           />
@@ -123,7 +135,9 @@ export default function HospitalEntry(props: HospitalEntryProps) {
           label="Specialist"
           fullWidth
           value={entryDetails.specialist}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, specialist: target.value })}
+          onChange={({ target }) =>
+            setEntryDetails({ ...entryDetails, specialist: target.value })
+          }
         />
 
         <InputLabel style={{ marginTop: 20 }}>Diagnosis code</InputLabel>
@@ -132,20 +146,17 @@ export default function HospitalEntry(props: HospitalEntryProps) {
           value={selectedCode}
           onChange={({ target }) => setSelectedCode(target.value)}
         >
-          {props.diagnosesList.map(diagnosis => 
-            <MenuItem
-              key={diagnosis.code}
-              value={diagnosis.code}
-            >
+          {props.diagnosesList.map((diagnosis) => (
+            <MenuItem key={diagnosis.code} value={diagnosis.code}>
               {diagnosis.code}: {diagnosis.name}
             </MenuItem>
-          )}
+          ))}
         </Select>
-        <Button 
+        <Button
           onClick={handleCode}
-          type='button'
+          type="button"
           style={{
-            float: "right"
+            float: "right",
           }}
           variant="contained"
         >
@@ -156,26 +167,28 @@ export default function HospitalEntry(props: HospitalEntryProps) {
 
         <InputLabel style={{ marginTop: 20 }}>Discharge</InputLabel>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker 
-            label="Date" 
+          <DatePicker
+            label="Date"
             value={dischargeInfo.date}
-            onChange={(newValue) => setDischargeInfo({ ...dischargeInfo, date: newValue })}
+            onChange={(newValue) =>
+              setDischargeInfo({ ...dischargeInfo, date: newValue })
+            }
           />
         </LocalizationProvider>
         <TextField
           label="Criteria"
           value={dischargeInfo.criteria}
-          onChange={({ target }) => setDischargeInfo({
-              ...dischargeInfo, criteria: target.value
-            })}
+          onChange={({ target }) =>
+            setDischargeInfo({
+              ...dischargeInfo,
+              criteria: target.value,
+            })
+          }
         />
 
         <Grid>
           <Grid item>
-            <Button
-              type="submit"
-              variant="contained"
-            >
+            <Button type="submit" variant="contained">
               Add
             </Button>
           </Grid>

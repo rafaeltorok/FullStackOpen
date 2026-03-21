@@ -6,11 +6,11 @@ import type { Request, Response, NextFunction } from "express";
 
 export default function newEntryParser(
   req: Request<{ id: string }, Entry, EntryFormValues>,
-  _res: Response, 
-  next: NextFunction
+  _res: Response,
+  next: NextFunction,
 ) {
   function exhaustiveMatchingGuard(_never: never) {
-    throw new Error('Invalid operation type');
+    throw new Error("Invalid operation type");
   }
 
   try {
@@ -30,4 +30,4 @@ export default function newEntryParser(
   } catch (error: unknown) {
     next(error);
   }
-};
+}

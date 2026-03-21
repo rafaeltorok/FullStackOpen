@@ -6,7 +6,10 @@ interface Notification {
 }
 
 export default function useNotification() {
-  const [notification, setNotification] = useState<Notification>({ message: "", type: null });
+  const [notification, setNotification] = useState<Notification>({
+    message: "",
+    type: null,
+  });
 
   function notifySuccess(message: string) {
     setNotification({ message: message, type: "success" });
@@ -25,6 +28,6 @@ export default function useNotification() {
   return {
     notification,
     notifySuccess,
-    notifyError
+    notifyError,
   };
 }

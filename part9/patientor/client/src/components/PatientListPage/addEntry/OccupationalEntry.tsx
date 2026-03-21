@@ -1,14 +1,25 @@
 // Dependencies
-import { useState } from 'react';
+import { useState } from "react";
 
 // Material UI
-import { TextField, InputLabel, Grid, Button, Select, MenuItem } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import {
+  TextField,
+  InputLabel,
+  Grid,
+  Button,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // TypeScript types
-import type { EntryFormValues, OccupationalHealthcareFormValues, Diagnosis } from "../../../../../shared/types";
+import type {
+  EntryFormValues,
+  OccupationalHealthcareFormValues,
+  Diagnosis,
+} from "../../../../../shared/types";
 import type { Dayjs } from "dayjs";
 
 interface OccupationalHealthcareEntryProps {
@@ -22,18 +33,21 @@ interface SickLeave {
   endDate: Dayjs | null;
 }
 
-export default function OccupationalHealthcareEntry(props: OccupationalHealthcareEntryProps) {
+export default function OccupationalHealthcareEntry(
+  props: OccupationalHealthcareEntryProps,
+) {
   // Occupational Healthcare related states
-  const [entryDetails, setEntryDetails] = useState<OccupationalHealthcareFormValues>({
-    type: "OccupationalHealthcare",
-    description: "",
-    date: "",
-    specialist: "",
-    employerName: ""
-  });
+  const [entryDetails, setEntryDetails] =
+    useState<OccupationalHealthcareFormValues>({
+      type: "OccupationalHealthcare",
+      description: "",
+      date: "",
+      specialist: "",
+      employerName: "",
+    });
   const [sickLeaveInfo, setSickLeaveInfo] = useState<SickLeave>({
     startDate: null,
-    endDate: null
+    endDate: null,
   });
 
   // Diagnoses codes states
@@ -50,7 +64,9 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
       !date ||
       entryDetails.specialist.trim() === ""
     ) {
-      props.notifyError("Missing required field(s): Description, Date or Specialist");
+      props.notifyError(
+        "Missing required field(s): Description, Date or Specialist",
+      );
       return;
     }
 
@@ -58,28 +74,28 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
 
     // Validates the sickLeave field
     if (sickLeaveInfo.startDate && sickLeaveInfo.endDate) {
-      newEntry = ({ 
-        ...newEntry, 
+      newEntry = {
+        ...newEntry,
         sickLeave: {
           startDate: sickLeaveInfo.startDate.format("YYYY-MM-DD"),
-          endDate: sickLeaveInfo.endDate.format("YYYY-MM-DD")
-        }
-      });
+          endDate: sickLeaveInfo.endDate.format("YYYY-MM-DD"),
+        },
+      };
     } else if (
-      ( !sickLeaveInfo.startDate && sickLeaveInfo.endDate ) ||
-      ( sickLeaveInfo.startDate && !sickLeaveInfo.endDate )
+      (!sickLeaveInfo.startDate && sickLeaveInfo.endDate) ||
+      (sickLeaveInfo.startDate && !sickLeaveInfo.endDate)
     ) {
       props.notifyError("Missing one of the sick leave dates");
       return;
     }
-      
+
     // Appends the list of diagnoses
     if (codesList.length > 0) {
-      newEntry = ({ ...newEntry, diagnosisCodes: codesList });
+      newEntry = { ...newEntry, diagnosisCodes: codesList };
     }
 
     // Adds the properly formatted date field
-    newEntry = ({ ...newEntry, date: date.format("YYYY-MM-DD") });
+    newEntry = { ...newEntry, date: date.format("YYYY-MM-DD") };
 
     props.handleNewEntry(newEntry);
 
@@ -88,7 +104,7 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
       description: "",
       date: "",
       specialist: "",
-      employerName: ""
+      employerName: "",
     });
     setCodesList([]);
     setSickLeaveInfo({ startDate: null, endDate: null });
@@ -97,26 +113,25 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
 
   function handleCode() {
     if (selectedCode && !codesList.includes(selectedCode)) {
-      setCodesList(prev => [...prev, selectedCode]);
+      setCodesList((prev) => [...prev, selectedCode]);
     }
     setSelectedCode("");
   }
 
   return (
     <div>
-      <form 
-        onSubmit={handleInput}
-        className='add-entry-form'
-      >
+      <form onSubmit={handleInput} className="add-entry-form">
         <TextField
           label="Description"
-          fullWidth 
+          fullWidth
           value={entryDetails.description}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, description: target.value })}
+          onChange={({ target }) =>
+            setEntryDetails({ ...entryDetails, description: target.value })
+          }
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker 
-            label="Date" 
+          <DatePicker
+            label="Date"
             value={date}
             onChange={(newValue) => setDate(newValue)}
           />
@@ -125,13 +140,17 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
           label="Specialist"
           fullWidth
           value={entryDetails.specialist}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, specialist: target.value })}
+          onChange={({ target }) =>
+            setEntryDetails({ ...entryDetails, specialist: target.value })
+          }
         />
         <TextField
           label="Employer name"
           fullWidth
           value={entryDetails.employerName}
-          onChange={({ target }) => setEntryDetails({ ...entryDetails, employerName: target.value })}
+          onChange={({ target }) =>
+            setEntryDetails({ ...entryDetails, employerName: target.value })
+          }
         />
 
         <InputLabel style={{ marginTop: 20 }}>Diagnosis code</InputLabel>
@@ -140,20 +159,17 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
           value={selectedCode}
           onChange={({ target }) => setSelectedCode(target.value)}
         >
-          {props.diagnosesList.map(diagnosis => 
-            <MenuItem
-              key={diagnosis.code}
-              value={diagnosis.code}
-            >
+          {props.diagnosesList.map((diagnosis) => (
+            <MenuItem key={diagnosis.code} value={diagnosis.code}>
               {diagnosis.code}: {diagnosis.name}
             </MenuItem>
-          )}
+          ))}
         </Select>
-        <Button 
+        <Button
           onClick={handleCode}
-          type='button'
+          type="button"
           style={{
-            float: "right"
+            float: "right",
           }}
           variant="contained"
         >
@@ -164,26 +180,27 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
 
         <InputLabel style={{ marginTop: 20 }}>Sick leave</InputLabel>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker 
-            label="Start date" 
+          <DatePicker
+            label="Start date"
             value={sickLeaveInfo.startDate}
-            onChange={(newValue) => setSickLeaveInfo({ ...sickLeaveInfo, startDate: newValue })}
+            onChange={(newValue) =>
+              setSickLeaveInfo({ ...sickLeaveInfo, startDate: newValue })
+            }
           />
         </LocalizationProvider>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker 
-            label="End date" 
+          <DatePicker
+            label="End date"
             value={sickLeaveInfo.endDate}
-            onChange={(newValue) => setSickLeaveInfo({ ...sickLeaveInfo, endDate: newValue })}
+            onChange={(newValue) =>
+              setSickLeaveInfo({ ...sickLeaveInfo, endDate: newValue })
+            }
           />
         </LocalizationProvider>
 
         <Grid>
           <Grid item>
-            <Button
-              type="submit"
-              variant="contained"
-            >
+            <Button type="submit" variant="contained">
               Add
             </Button>
           </Grid>

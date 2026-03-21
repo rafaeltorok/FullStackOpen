@@ -6,10 +6,12 @@ export const NewHospitalSchema = z.object({
   type: z.literal("Hospital"),
   specialist: z.string(),
   diagnosisCodes: z.array(z.string()).optional(),
-  discharge: z.object({
-    date: z.iso.date(),
-    criteria: z.string()
-  }).optional()
+  discharge: z
+    .object({
+      date: z.iso.date(),
+      criteria: z.string(),
+    })
+    .optional(),
 });
 
 export type NewHospitalEntry = z.infer<typeof NewHospitalSchema>;

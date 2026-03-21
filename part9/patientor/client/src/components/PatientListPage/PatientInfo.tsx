@@ -54,7 +54,7 @@ export default function PatientInfo() {
 
   function toggleAddForm() {
     setShowAddEntryForm((prev) => !prev);
-    setAddEntryText(showAddEntryForm ? "Cancel" : "Add new entry");
+    setAddEntryText(showAddEntryForm ? "Add new entry" : "Cancel");
   }
 
   async function createNewEntry(newEntry: EntryFormValues): Promise<void> {

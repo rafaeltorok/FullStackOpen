@@ -1,4 +1,4 @@
-// Server dependencies
+// Route dependencies
 import express from "express";
 import patientsData from "../data/patients";
 import { v4 as uuidv4 } from "uuid";
@@ -7,15 +7,12 @@ import { v4 as uuidv4 } from "uuid";
 import newPatientParser from "../middleware/newPatientParser";
 import newEntryParser from "../middleware/newEntryParser";
 
-// Schemas
-import { NewPatientSchema } from "../schemas/newPatient";
-
 // Utils
-import filterSsn from "../utils/filterSsn";
+import filterSensitiveInfo from "../utils/filterSensitiveInfo";
 
 // TypeScript types
 import type { NextFunction, Request, Response } from "express";
-import type { Patient, PatientInfo, Entry } from "../../../shared/types";
+import type { Patient, Entry, NonSensitivePatient, NewEntry } from "../../../shared/types";
 import type { NewPatientEntry } from "../schemas/newPatient";
 
 const patientRouter = express.Router();
@@ -32,8 +29,8 @@ patientRouter.get("/", (_req: Request, res: Response, next: NextFunction) => {
       res.status(404).json({ error: "No patient data available" }).end();
       return;
     }
-    const allPatientsInfo: PatientInfo[] = patientsList.map((p) =>
-      filterSsn(p),
+    const allPatientsInfo: NonSensitivePatient[] = patientsList.map((p) =>
+      filterSensitiveInfo(p),
     );
     res.status(200).json(allPatientsInfo);
   } catch (err: unknown) {
@@ -63,18 +60,17 @@ patientRouter.post(
   newPatientParser,
   (
     req: Request<unknown, unknown, NewPatientEntry>,
-    res: Response<PatientInfo>,
+    res: Response<NonSensitivePatient>,
     next: NextFunction,
   ) => {
     try {
-      const patientData: NewPatientEntry = NewPatientSchema.parse(req.body);
       const newPatientEntry: Patient = {
         id: uuidv4(),
-        ...patientData,
+        ...req.body,
         entries: [],
       };
       patientsList.push(newPatientEntry);
-      const patientInfo: PatientInfo = filterSsn(newPatientEntry);
+      const patientInfo: NonSensitivePatient = filterSensitiveInfo(newPatientEntry);
       res.status(201).json(patientInfo);
     } catch (err: unknown) {
       return next(err);
@@ -87,12 +83,12 @@ patientRouter.post(
   "/:id/entries",
   newEntryParser,
   (
-    req: Request<{ id: string }, unknown, Entry>,
+    req: Request<{ id: string }, unknown, NewEntry>,
     res: Response<Entry>,
     next: NextFunction,
   ) => {
     try {
-      const entryData = req.body;
+      const entryData: NewEntry = req.body;
 
       const patient: Patient | undefined = patientsList.find(
         (patient) => patient.id === req.params.id,
@@ -101,8 +97,8 @@ patientRouter.post(
       if (!patient) return res.status(404).end();
 
       const newEntry: Entry = {
-        ...entryData,
         id: uuidv4(),
+        ...entryData,
       };
 
       patient.entries = [...patient.entries, newEntry];

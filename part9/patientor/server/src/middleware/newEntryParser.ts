@@ -1,11 +1,11 @@
-import { Entry, EntryFormValues } from "../../../shared/types";
+import { NewEntry } from "../../../shared/types";
 import { NewHealthCheckSchema } from "../schemas/newHealthCheckEntry";
 import { NewHospitalSchema } from "../schemas/newHospitalEntry";
 import { NewOccupationalHealthcareSchema } from "../schemas/newOccupationalEntry";
 import type { Request, Response, NextFunction } from "express";
 
 export default function newEntryParser(
-  req: Request<{ id: string }, Entry, EntryFormValues>,
+  req: Request<{ id: string }, unknown, NewEntry>,
   _res: Response,
   next: NextFunction,
 ) {
@@ -25,7 +25,7 @@ export default function newEntryParser(
         req.body = NewOccupationalHealthcareSchema.parse(req.body);
         return next();
       default:
-        return exhaustiveMatchingGuard(req.body.type);
+        return exhaustiveMatchingGuard(req.body);
     }
   } catch (error: unknown) {
     next(error);

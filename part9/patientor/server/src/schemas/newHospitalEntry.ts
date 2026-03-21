@@ -10,8 +10,7 @@ export const NewHospitalSchema = z.object({
     .object({
       date: z.iso.date(),
       criteria: z.string(),
-    })
-    .optional(),
+    }),
 });
 
 export type NewHospitalEntry = z.infer<typeof NewHospitalSchema>;

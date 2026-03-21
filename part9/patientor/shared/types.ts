@@ -61,9 +61,12 @@ export interface HealthCheckEntry extends BaseEntry {
 
 export type Entry = OccupationalHealthcareEntry | HospitalEntry | HealthCheckEntry;
 
-export type PatientFormValues = Omit<Patient, "id" | "entries">;
+export type NewEntry =
+  | Omit<HospitalEntry, "id">
+  | Omit<OccupationalHealthcareEntry, "id">
+  | Omit<HealthCheckEntry, "id">;
 
-export type EntryFormValues = Omit<Entry, "id">;
+export type PatientFormValues = Omit<Patient, "id" | "entries">;
 
 export type HealthCheckFormValues = Omit<HealthCheckEntry, "id">;
 export type HospitalFormValues = Omit<HospitalEntry, "id">;

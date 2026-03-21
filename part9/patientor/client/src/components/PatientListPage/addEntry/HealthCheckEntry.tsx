@@ -1,13 +1,19 @@
-import {  TextField, InputLabel, MenuItem, Select, Grid, Button } from '@mui/material';
+// Dependencies
 import { useState } from 'react';
 
+// Material UI
+import { TextField, InputLabel, MenuItem, Select, Grid, Button } from '@mui/material';
+
+// TypeScript types
 import type { EntryFormValues, HealthCheckFormValues } from "../../../../../shared/types";
 
 interface HealthCheckEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
+  notifyError: (message: string) => void;
 }
 
 export default function HealthCheckEntry(props: HealthCheckEntryProps) {
+  // Health Check related states
   const [entryDetails, setEntryDetails] = useState<HealthCheckFormValues>({
     type: "HealthCheck",
     description: "",
@@ -15,14 +21,16 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
     specialist: "",
     healthCheckRating: 0
   });
-  const [codesList, setCodesList] = useState<string[]>([]);
-  const [codeInput, setCodeInput] = useState<string>("");
   const ratingValues = { 
     "Healthy": 0,
     "LowRisk": 1,
     "HighRisk": 2,
     "CriticalRisk": 3
   };
+
+  // Diagnoses codes states
+  const [codesList, setCodesList] = useState<string[]>([]);
+  const [codeInput, setCodeInput] = useState<string>("");
 
   function handleInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,7 +40,7 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
       entryDetails.date.trim() === "" ||
       entryDetails.specialist.trim() === ""
     ) {
-      alert("Missing required field(s): Description, Date or Specialist");
+      props.notifyError("Missing required field(s): Description, Date or Specialist");
       return;
     }
 

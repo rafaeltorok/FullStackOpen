@@ -14,6 +14,7 @@ import type { EntryFormValues } from "../../../../shared/types";
 
 interface AddEntryProps {
   createNewEntry: (entry: EntryFormValues) => void;
+  notifyError: (message: string) => void;
 }
 
 export default function AddEntryForm(props: AddEntryProps) {
@@ -48,9 +49,9 @@ export default function AddEntryForm(props: AddEntryProps) {
         )}
         </Select>
       </form>
-      {entryType === "Hospital" && <HospitalEntry handleNewEntry={handleNewEntry} />}
-      {entryType === "HealthCheck" && <HealthCheckEntry handleNewEntry={handleNewEntry} />}
-      {entryType === "OccupationalHealthcare" && <OccupationalHealthcareEntry handleNewEntry={handleNewEntry} />}
+      {entryType === "Hospital" && <HospitalEntry handleNewEntry={handleNewEntry} notifyError={props.notifyError} />}
+      {entryType === "HealthCheck" && <HealthCheckEntry handleNewEntry={handleNewEntry} notifyError={props.notifyError} />}
+      {entryType === "OccupationalHealthcare" && <OccupationalHealthcareEntry handleNewEntry={handleNewEntry} notifyError={props.notifyError} />}
     </div>
   );
 }

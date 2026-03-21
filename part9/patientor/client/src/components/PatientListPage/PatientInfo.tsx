@@ -3,12 +3,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import patientService from "../../services/patients";
 import entryService from "../../services/entries";
+import useNotification from "../../hooks/useNotification";
 
 // Material UI elements
 import { Button } from '@mui/material';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import TransgenderIcon from '@mui/icons-material/Transgender';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 
 // Components
 import EntryDetails from "./EntryDetails";
@@ -21,6 +24,9 @@ export default function PatientInfo() {
   const { id } = useParams();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const { notification, notifySuccess, notifyError } = useNotification();
+
+  // Add entry form states
   const [showAddEntryForm, setShowAddEntryForm] = useState<boolean>(false);
   const [addEntryText, setAddEntryText] = useState<string>("Add new entry");
 
@@ -53,15 +59,23 @@ export default function PatientInfo() {
   }
 
   function toggleAddForm() {
-    setShowAddEntryForm((prev) => !prev);
-    setAddEntryText(showAddEntryForm ? "Add new entry" : "Cancel");
+    setShowAddEntryForm(prev => {
+      setAddEntryText(prev ? "Add new entry" : "Cancel");
+      return !prev;
+    });
   }
 
   async function createNewEntry(newEntry: EntryFormValues): Promise<void> {
-    if (patient) {
-      const response = await entryService.create(newEntry, patient.id);
-      if (response) setPatient({ ...patient, entries: patient.entries.concat(response) });
-      setShowAddEntryForm(false);
+    try {
+      if (patient) {
+        const response = await entryService.create(newEntry, patient.id);
+        if (response) setPatient({ ...patient, entries: patient.entries.concat(response) });
+        toggleAddForm();
+      }
+      notifySuccess("Entry was added successfully!");
+    } catch (err: unknown) {
+      if (err instanceof Error) notifyError(err.message);
+      else notifyError(String(err));
     }
   }
 
@@ -83,7 +97,14 @@ export default function PatientInfo() {
       >
         {addEntryText}
       </Button>
-      {showAddEntryForm && <AddEntryForm createNewEntry={createNewEntry} />}
+
+      {(notification.type && notification.message) &&
+        <Stack sx={{ width: '100%' }} spacing={2}>
+          <Alert severity={notification.type}>{notification.message}</Alert>
+        </Stack>
+      }
+
+      {showAddEntryForm && <AddEntryForm notifyError={notifyError} createNewEntry={createNewEntry} />}
 
       {patient.entries.length > 0 ? 
         (patient.entries.map(entry => (

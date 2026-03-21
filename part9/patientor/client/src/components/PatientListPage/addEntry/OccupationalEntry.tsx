@@ -1,13 +1,19 @@
-import {  TextField, InputLabel, Grid, Button } from '@mui/material';
+// Dependencies
 import { useState } from 'react';
 
+// Material UI
+import {  TextField, InputLabel, Grid, Button } from '@mui/material';
+
+// TypeScript types
 import type { EntryFormValues, OccupationalHealthcareFormValues } from "../../../../../shared/types";
 
 interface OccupationalHealthcareEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
+  notifyError: (message: string) => void;
 }
 
 export default function OccupationalHealthcareEntry(props: OccupationalHealthcareEntryProps) {
+  // Occupational Healthcare related states
   const [entryDetails, setEntryDetails] = useState<OccupationalHealthcareFormValues>({
     type: "OccupationalHealthcare",
     description: "",
@@ -15,12 +21,14 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
     specialist: "",
     employerName: ""
   });
-  const [codesList, setCodesList] = useState<string[]>([]);
-  const [codeInput, setCodeInput] = useState<string>("");
   const [sickLeaveInfo, setSickLeaveInfo] = useState({
     startDate: "",
     endDate: ""
   });
+
+  // Diagnoses codes states
+  const [codesList, setCodesList] = useState<string[]>([]);
+  const [codeInput, setCodeInput] = useState<string>("");
 
   function handleInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,7 +38,7 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
       entryDetails.date.trim() === "" ||
       entryDetails.specialist.trim() === ""
     ) {
-      alert("Missing required field(s): Description, Date or Specialist");
+      props.notifyError("Missing required field(s): Description, Date or Specialist");
       return;
     }
 
@@ -43,7 +51,7 @@ export default function OccupationalHealthcareEntry(props: OccupationalHealthcar
       ( !sickLeaveInfo.startDate.trim() && sickLeaveInfo.endDate.trim() ) ||
       ( sickLeaveInfo.startDate.trim() && !sickLeaveInfo.endDate.trim() )
     ) {
-      alert("Missing one of the sick leave dates");
+      props.notifyError("Missing one of the sick leave dates");
       return;
     }
       

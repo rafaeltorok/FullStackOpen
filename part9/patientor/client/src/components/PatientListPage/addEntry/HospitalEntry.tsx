@@ -1,25 +1,33 @@
-import {  TextField, InputLabel, Grid, Button } from '@mui/material';
+// Dependencies
 import { useState } from 'react';
 
+// Material UI
+import { TextField, InputLabel, Grid, Button } from '@mui/material';
+
+// TypeScript types
 import type { EntryFormValues, HospitalFormValues } from "../../../../../shared/types";
 
 interface HospitalEntryProps {
   handleNewEntry: (entry: EntryFormValues) => void;
+  notifyError: (message: string) => void;
 }
 
 export default function HospitalEntry(props: HospitalEntryProps) {
+  // Hospital related states
   const [entryDetails, setEntryDetails] = useState<HospitalFormValues>({
     type: "Hospital",
     description: "",
     date: "",
     specialist: ""
   });
-  const [codesList, setCodesList] = useState<string[]>([]);
-  const [codeInput, setCodeInput] = useState<string>("");
   const [dischargeInfo, setDischargeInfo] = useState({
     date: "",
     criteria: ""
   });
+
+  // Diagnoses codes states
+  const [codesList, setCodesList] = useState<string[]>([]);
+  const [codeInput, setCodeInput] = useState<string>("");
 
   function handleInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,7 +37,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       entryDetails.date.trim() === "" ||
       entryDetails.specialist.trim() === ""
     ) {
-      alert("Missing required field(s): Description, Date or Specialist");
+      props.notifyError("Missing required field(s): Description, Date or Specialist");
       return;
     }
 
@@ -42,7 +50,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       ( !dischargeInfo.date.trim() && dischargeInfo.criteria.trim() ) ||
       ( dischargeInfo.date.trim() && !dischargeInfo.criteria.trim() )
     ) {
-      alert("Missing one of the discharge fields");
+      props.notifyError("Missing one of the discharge fields");
       return;
     }
       

@@ -2,6 +2,8 @@
 import express from 'express';
 import patientsData from '../data/patients';
 import { v4 as uuidv4 } from 'uuid';
+
+// Middleware
 import newPatientParser from '../middleware/newPatientParser';
 import newEntryParser from '../middleware/newEntryParser';
 

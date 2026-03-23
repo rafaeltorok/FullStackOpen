@@ -1,7 +1,12 @@
+// Components
+import Diagnoses from "./Diagnoses";
+
+// Material UI
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+
+// TypeScript types
 import type { HealthCheckEntry } from "../../../../../shared/types";
-import DiagnosesCode from "./DiagnosesCode";
 
 interface HealthCheckProps {
   entry: HealthCheckEntry;
@@ -29,14 +34,7 @@ export default function HealthCheck(props: HealthCheckProps) {
       <p>{props.entry.description}</p>
       <p>{HealthRating()}</p>
       {props.entry.diagnosisCodes && (
-        <div>
-          <h3>Diagnosis codes:</h3>
-          <ul>
-            {props.entry.diagnosisCodes.map((code) => (
-              <DiagnosesCode key={code} code={code} />
-            ))}
-          </ul>
-        </div>
+        <Diagnoses codes={props.entry.diagnosisCodes} />
       )}
       <em>diagnose by {props.entry.specialist}</em>
     </div>

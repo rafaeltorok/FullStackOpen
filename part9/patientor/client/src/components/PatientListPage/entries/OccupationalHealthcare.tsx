@@ -1,6 +1,11 @@
+// Components
+import Diagnoses from "./Diagnoses";
+
+// Material UI
 import WorkIcon from "@mui/icons-material/Work";
+
+// TypeScript types
 import type { OccupationalHealthcareEntry } from "../../../../../shared/types";
-import DiagnosesCode from "./DiagnosesCode";
 
 interface OccupationalHealthcareProps {
   entry: OccupationalHealthcareEntry;
@@ -16,14 +21,7 @@ export default function OccupationalHealthcare(
       </p>
       <p>{props.entry.description}</p>
       {props.entry.diagnosisCodes && (
-        <div>
-          <h3>Diagnosis codes:</h3>
-          <ul>
-            {props.entry.diagnosisCodes.map((code) => (
-              <DiagnosesCode key={code} code={code} />
-            ))}
-          </ul>
-        </div>
+        <Diagnoses codes={props.entry.diagnosisCodes} />
       )}
       {props.entry.sickLeave && (
         <div>

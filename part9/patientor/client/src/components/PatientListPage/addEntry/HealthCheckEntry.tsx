@@ -16,14 +16,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // TypeScript types
 import type {
-  EntryFormValues,
+  NewEntry,
   HealthCheckFormValues,
   Diagnosis,
 } from "../../../../../shared/types";
 import type { Dayjs } from "dayjs";
 
 interface HealthCheckEntryProps {
-  handleNewEntry: (entry: EntryFormValues) => void;
+  handleNewEntry: (entry: NewEntry) => void;
   notifyError: (message: string) => void;
   diagnosesList: Diagnosis[];
 }

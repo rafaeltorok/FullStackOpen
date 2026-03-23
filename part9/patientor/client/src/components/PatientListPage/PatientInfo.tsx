@@ -18,7 +18,7 @@ import EntryDetails from "./EntryDetails";
 import AddEntryForm from "./AddEntryForm";
 
 // TypeScript types
-import type { Patient, EntryFormValues } from "../../../../shared/types";
+import type { Patient, NewEntry } from "../../../../shared/types";
 
 export default function PatientInfo() {
   const { id } = useParams();
@@ -30,6 +30,7 @@ export default function PatientInfo() {
   const [showAddEntryForm, setShowAddEntryForm] = useState<boolean>(false);
   const [addEntryText, setAddEntryText] = useState<string>("Add new entry");
 
+  // Fetch patient data by the ID
   useEffect(() => {
     async function fetchPatient() {
       try {
@@ -65,7 +66,7 @@ export default function PatientInfo() {
     });
   }
 
-  async function createNewEntry(newEntry: EntryFormValues): Promise<void> {
+  async function createNewEntry(newEntry: NewEntry): Promise<void> {
     try {
       if (patient) {
         const response = await entryService.create(newEntry, patient.id);

@@ -1,6 +1,11 @@
+// Components
+import Diagnoses from "./Diagnoses";
+
+// Material UI
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+
+// TypeScript types
 import type { HospitalEntry } from "../../../../../shared/types";
-import DiagnosesCode from "./DiagnosesCode";
 
 interface HospitalProps {
   entry: HospitalEntry;
@@ -14,14 +19,7 @@ export default function Hospital(props: HospitalProps) {
       </p>
       <p>{props.entry.description}</p>
       {props.entry.diagnosisCodes && (
-        <div>
-          <h3>Diagnosis codes:</h3>
-          <ul>
-            {props.entry.diagnosisCodes.map((code) => (
-              <DiagnosesCode key={code} code={code} />
-            ))}
-          </ul>
-        </div>
+        <Diagnoses codes={props.entry.diagnosisCodes} />
       )}
       {props.entry.discharge && (
         <div>

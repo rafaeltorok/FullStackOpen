@@ -16,21 +16,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // TypeScript types
 import type {
-  EntryFormValues,
+  NewEntry,
   HospitalFormValues,
   Diagnosis,
 } from "../../../../../shared/types";
 import { Dayjs } from "dayjs";
 
 interface HospitalEntryProps {
-  handleNewEntry: (entry: EntryFormValues) => void;
+  handleNewEntry: (entry: NewEntry) => void;
   notifyError: (message: string) => void;
   diagnosesList: Diagnosis[];
-}
-
-interface Discharge {
-  date: Dayjs | null;
-  criteria: string;
 }
 
 export default function HospitalEntry(props: HospitalEntryProps) {
@@ -40,11 +35,12 @@ export default function HospitalEntry(props: HospitalEntryProps) {
     description: "",
     date: "",
     specialist: "",
+    discharge: {
+      date: "",
+      criteria: ""
+    }
   });
-  const [dischargeInfo, setDischargeInfo] = useState<Discharge>({
-    date: null,
-    criteria: "",
-  });
+  const [dischargeDate, setDischargeDate] = useState<Dayjs | null>(null);
 
   // Diagnoses codes states
   const [codesList, setCodesList] = useState<string[]>([]);
@@ -69,19 +65,17 @@ export default function HospitalEntry(props: HospitalEntryProps) {
     let newEntry: HospitalFormValues = { ...entryDetails };
 
     // Validates the discharge field
-    if (dischargeInfo.date && dischargeInfo.criteria.trim()) {
-      newEntry = {
-        ...newEntry,
-        discharge: {
-          date: dischargeInfo.date.format("YYYY-MM-DD"),
-          criteria: dischargeInfo.criteria,
-        },
-      };
+    if (dischargeDate && entryDetails.discharge.criteria.trim()) {
+      // Appends the discharge info
+      newEntry = { ...newEntry, discharge: { ...entryDetails.discharge, date: dischargeDate.format("YYYY-MM-DD" )}};
     } else if (
-      (!dischargeInfo.date && dischargeInfo.criteria.trim()) ||
-      (dischargeInfo.date && !dischargeInfo.criteria.trim())
+      (!dischargeDate && entryDetails.discharge.criteria.trim()) ||
+      (dischargeDate && !entryDetails.discharge.criteria.trim())
     ) {
       props.notifyError("Missing one of the discharge fields");
+      return;
+    } else {
+      props.notifyError("The discharge field is required");
       return;
     }
 
@@ -100,9 +94,13 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       description: "",
       date: "",
       specialist: "",
+      discharge: {
+        date: "",
+        criteria: ""
+      }
     });
     setCodesList([]);
-    setDischargeInfo({ date: null, criteria: "" });
+    setDischargeDate(null);
     setDate(null);
   }
 
@@ -169,19 +167,22 @@ export default function HospitalEntry(props: HospitalEntryProps) {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             label="Date"
-            value={dischargeInfo.date}
+            value={dischargeDate}
             onChange={(newValue) =>
-              setDischargeInfo({ ...dischargeInfo, date: newValue })
+              setDischargeDate(newValue)
             }
           />
         </LocalizationProvider>
         <TextField
           label="Criteria"
-          value={dischargeInfo.criteria}
+          value={entryDetails.discharge.criteria}
           onChange={({ target }) =>
-            setDischargeInfo({
-              ...dischargeInfo,
-              criteria: target.value,
+            setEntryDetails({
+              ...entryDetails,
+              discharge: {
+                ...entryDetails.discharge,
+                criteria: target.value,
+              }
             })
           }
         />

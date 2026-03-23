@@ -1,7 +1,9 @@
+// Components
 import OccupationalHealthcare from "./entries/OccupationalHealthcare";
 import HealthCheck from "./entries/HealthCheck";
 import Hospital from "./entries/Hospital";
 
+// TypeScript types
 import type { Entry } from "../../../../shared/types";
 
 interface EntryDetailsProps {

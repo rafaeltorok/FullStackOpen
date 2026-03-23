@@ -8,8 +8,8 @@ export default function errorMiddleware(
   next: NextFunction,
 ) {
   if (error instanceof z.ZodError) {
-    res.status(400).send({ error: error.issues });
+    return res.status(400).json({ error: error.issues });
   } else {
-    next(error);
+    return next(error);
   }
 }

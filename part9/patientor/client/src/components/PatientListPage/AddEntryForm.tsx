@@ -11,16 +11,18 @@ import HospitalEntry from "./addEntry/HospitalEntry";
 import OccupationalHealthcareEntry from "./addEntry/OccupationalEntry";
 
 // TypeScript types
-import type { EntryFormValues, Diagnosis } from "../../../../shared/types";
+import type { NewEntry, Diagnosis } from "../../../../shared/types";
 
 interface AddEntryProps {
-  createNewEntry: (entry: EntryFormValues) => void;
+  createNewEntry: (entry: NewEntry) => void;
   notifyError: (message: string) => void;
 }
 
+type EntryType = "Hospital" | "HealthCheck" | "OccupationalHealthcare";
+
 export default function AddEntryForm(props: AddEntryProps) {
-  const [entryType, setEntryType] = useState<string>("Hospital");
-  const types = ["OccupationalHealthcare", "Hospital", "HealthCheck"];
+  const [entryType, setEntryType] = useState<EntryType>("Hospital");
+  const types: EntryType[] = ["OccupationalHealthcare", "Hospital", "HealthCheck"];
   const [diagnosesList, setDiagnosesList] = useState<Diagnosis[]>([]);
 
   useEffect(() => {
@@ -35,14 +37,10 @@ export default function AddEntryForm(props: AddEntryProps) {
       }
     }
     getDiagnoses();
-  });
+  }, []);
 
-  function handleSelection(selection: string) {
+  function handleSelection(selection: EntryType) {
     setEntryType(selection);
-  }
-
-  function handleNewEntry(entry: EntryFormValues): void {
-    props.createNewEntry(entry);
   }
 
   return (
@@ -50,10 +48,11 @@ export default function AddEntryForm(props: AddEntryProps) {
       <form className="add-entry-form">
         <InputLabel style={{ marginTop: 20 }}>Entry type</InputLabel>
         <Select
-          label="Type"
+          labelId="entry-type-label"
+          label="Entry type"
           fullWidth
           value={entryType}
-          onChange={(e) => handleSelection(e.target.value)}
+          onChange={(e) => handleSelection(e.target.value as EntryType)}
         >
           {types.map((option) => (
             <MenuItem key={option} value={option}>
@@ -64,21 +63,21 @@ export default function AddEntryForm(props: AddEntryProps) {
       </form>
       {entryType === "Hospital" && (
         <HospitalEntry
-          handleNewEntry={handleNewEntry}
+          handleNewEntry={props.createNewEntry}
           notifyError={props.notifyError}
           diagnosesList={diagnosesList}
         />
       )}
       {entryType === "HealthCheck" && (
         <HealthCheckEntry
-          handleNewEntry={handleNewEntry}
+          handleNewEntry={props.createNewEntry}
           notifyError={props.notifyError}
           diagnosesList={diagnosesList}
         />
       )}
       {entryType === "OccupationalHealthcare" && (
         <OccupationalHealthcareEntry
-          handleNewEntry={handleNewEntry}
+          handleNewEntry={props.createNewEntry}
           notifyError={props.notifyError}
           diagnosesList={diagnosesList}
         />

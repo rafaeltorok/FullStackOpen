@@ -25,10 +25,6 @@ const patientsList = patientsData.map((patient) => ({
 // GET all patients
 patientRouter.get("/", (_req: Request, res: Response, next: NextFunction) => {
   try {
-    if (patientsList.length < 1) {
-      res.status(404).json({ error: "No patient data available" }).end();
-      return;
-    }
     const allPatientsInfo: NonSensitivePatient[] = patientsList.map((p) =>
       filterSensitiveInfo(p),
     );

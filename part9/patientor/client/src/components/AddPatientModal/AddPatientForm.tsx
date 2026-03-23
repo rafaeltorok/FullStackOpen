@@ -1,5 +1,7 @@
+// Component dependencies
 import { useState, SyntheticEvent } from "react";
 
+// Material UI
 import {
   TextField,
   InputLabel,
@@ -9,8 +11,13 @@ import {
   Button,
   SelectChangeEvent,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
+// TypeScript types
 import { PatientFormValues, Gender } from "../../../../shared/types";
+import { Dayjs } from "dayjs";
 
 interface Props {
   onCancel: () => void;
@@ -28,11 +35,14 @@ const genderOptions: GenderOption[] = Object.values(Gender).map((v) => ({
 }));
 
 const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
-  const [name, setName] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [ssn, setSsn] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [gender, setGender] = useState(Gender.Other);
+  const [patientData, setPatientData] = useState<PatientFormValues>({
+    name: "",
+    occupation: "",
+    ssn: "",
+    dateOfBirth: "",
+    gender: Gender.Other
+  });
+  const [date, setDate] = useState<Dayjs | null>(null);
 
   const onGenderChange = (event: SelectChangeEvent<string>) => {
     event.preventDefault();
@@ -40,20 +50,18 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
       const value = event.target.value;
       const gender = Object.values(Gender).find((g) => g.toString() === value);
       if (gender) {
-        setGender(gender);
+        setPatientData({ ...patientData, gender: gender });
       }
     }
   };
 
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault();
-    onSubmit({
-      name,
-      occupation,
-      ssn,
-      dateOfBirth,
-      gender,
-    });
+    
+    // Formats the date of birth
+    if (date) setPatientData({ ...patientData, dateOfBirth: date.format("YYYY-MM-DD") });
+
+    onSubmit(patientData);
   };
 
   return (
@@ -62,34 +70,34 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
         <TextField
           label="Name"
           fullWidth
-          value={name}
-          onChange={({ target }) => setName(target.value)}
+          value={patientData.name}
+          onChange={({ target }) => setPatientData({ ...patientData, name: target.value })}
         />
         <TextField
           label="Social security number"
           fullWidth
-          value={ssn}
-          onChange={({ target }) => setSsn(target.value)}
+          value={patientData.ssn}
+          onChange={({ target }) => setPatientData({ ...patientData, ssn: target.value })}
         />
-        <TextField
-          label="Date of birth"
-          placeholder="YYYY-MM-DD"
-          fullWidth
-          value={dateOfBirth}
-          onChange={({ target }) => setDateOfBirth(target.value)}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Date of birth"
+            value={date}
+            onChange={(newValue) => setDate(newValue)}
+          />
+        </LocalizationProvider>
         <TextField
           label="Occupation"
           fullWidth
-          value={occupation}
-          onChange={({ target }) => setOccupation(target.value)}
+          value={patientData.occupation}
+          onChange={({ target }) => setPatientData({ ...patientData, occupation: target.value })}
         />
 
         <InputLabel style={{ marginTop: 20 }}>Gender</InputLabel>
         <Select
           label="Gender"
           fullWidth
-          value={gender}
+          value={patientData.gender}
           onChange={onGenderChange}
         >
           {genderOptions.map((option) => (

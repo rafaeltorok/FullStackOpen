@@ -63,6 +63,7 @@ export default function AddEntryForm(props: AddEntryProps) {
       </form>
       {entryType === "Hospital" && (
         <HospitalEntry
+          key={entryType}
           handleNewEntry={props.createNewEntry}
           notifyError={props.notifyError}
           diagnosesList={diagnosesList}
@@ -70,6 +71,7 @@ export default function AddEntryForm(props: AddEntryProps) {
       )}
       {entryType === "HealthCheck" && (
         <HealthCheckEntry
+          key={entryType}
           handleNewEntry={props.createNewEntry}
           notifyError={props.notifyError}
           diagnosesList={diagnosesList}
@@ -77,6 +79,7 @@ export default function AddEntryForm(props: AddEntryProps) {
       )}
       {entryType === "OccupationalHealthcare" && (
         <OccupationalHealthcareEntry
+          key={entryType}
           handleNewEntry={props.createNewEntry}
           notifyError={props.notifyError}
           diagnosesList={diagnosesList}

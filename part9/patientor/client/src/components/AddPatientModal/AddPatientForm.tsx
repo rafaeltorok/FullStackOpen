@@ -59,9 +59,12 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
     event.preventDefault();
     
     // Formats the date of birth
-    if (date) setPatientData({ ...patientData, dateOfBirth: date.format("YYYY-MM-DD") });
+    const newPatient: PatientFormValues = {
+      ...patientData,
+      dateOfBirth: date ? date.format("YYYY-MM-DD") : ""
+    };
 
-    onSubmit(patientData);
+    onSubmit(newPatient);
   };
 
   return (

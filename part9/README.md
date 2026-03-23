@@ -2,9 +2,11 @@
 
 ## Table of Contents
 - [Express Server](#express-server)
+  - [Running the tests](#running-the-tests)
 - [BMI Calculator](#bmi-calculator)
 - [Exercise Calculator](#exercise-calculator)
-- [Tests](#tests)
+- [Exercises Count](#exercises-count)
+- [Flight Diaries](#flight-diaries)
 
 
 ## Express Server
@@ -57,6 +59,18 @@ Should return an output (Example)
 }
 ```
 
+### Running the tests
+Run all tests for both the `/bmi` and `/exercises` routes
+```bash
+npm run test
+```
+
+Run only a single test script
+```bash
+npm run test -- ./__tests__/bmi.test.ts
+npm run test -- ./__tests__/exercises.test.ts
+```
+
 
 ## BMI Calculator
 The results were based on the [NHS UK⇗](https://www.nhs.uk/health-assessment-tools/calculate-your-body-mass-index/calculate-bmi-for-adults) rating system.
@@ -86,14 +100,61 @@ npm run calculateExercises 2 1 0 2 4.5 0 3 1 0 4
 ```
 
 
-## Tests
-Run all tests for both the `/bmi` and `/exercises` routes
+## Exercises Count
+This app has no separate backend, all logic has been implemented directly on the React frontend.
+
+Install dependencies
 ```bash
-npm run test
+cd ./exercisesCount && npm install
 ```
 
-Run only a single test script
+Start the app
 ```bash
-npm run test -- ./__tests__/bmi.test.ts
-npm run test -- ./__tests__/exercises.test.ts
+npm run dev
 ```
+
+Access the app on http://localhost:5173
+
+
+## Flight Diaries
+**This app has no database integration, so new diaries entries will only remain stored at runtime.**
+
+Start the backend server
+```bash
+cd ./flightDiaries/server && npm install && npm run dev
+```
+
+Start the React frontend
+```bash
+cd ./flightDiaries/client && npm install && npm run dev
+```
+
+Access the Web UI on http://localhost:5173
+
+### CRUD operations
+- GET all diaries
+  ```bash
+  curl -X GET http://localhost:3000/api/diaries
+  ```
+
+- GET a single diary by its id
+  ```bash
+  curl -X GET http://localhost:3000/api/diaries/:id
+  ```
+
+- GET the non-sensitive entries (filters out the comment)
+  ```bash
+  curl -X GET http://localhost:3000/api/diaries/nonsensitive
+  ```
+
+- POST a new entry
+  ```bash
+  curl -X POST http://localhost:3000/api/diaries \
+    -H "Content-Type: application/json" \
+    -d '{
+      "date": "2025-12-31",
+      "weather": "sunny",
+      "visibility": "good",
+      "comment": "Last flight of the year, to celebrate the new years eve"
+    }'
+  ```

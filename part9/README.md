@@ -7,6 +7,7 @@
 - [Exercise Calculator](#exercise-calculator)
 - [Exercises Count](#exercises-count)
 - [Flight Diaries](#flight-diaries)
+- [Patientor](#patientor)
 
 
 ## Express Server
@@ -158,3 +159,7 @@ Access the Web UI on http://localhost:5173
       "comment": "Last flight of the year, to celebrate the new years eve"
     }'
   ```
+
+
+## Patientor
+[Read full documentation⬈](./patientor/README.md)

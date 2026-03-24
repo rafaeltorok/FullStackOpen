@@ -1,9 +1,11 @@
 # Patientor
+Web app available on [Render⬈](https://patientorapp.onrender.com)
 
 ## Table of Contents
 - [Usage](#usage)
 - [CRUD operations](#crud-operations)
 - [Docker](#docker)
+- [Tests](#tests)
 
 
 ## Usage
@@ -133,3 +135,11 @@ cd ./patientor && docker compose up -d
   ```
 
 - Access the Web UI on http://localhost:3001
+
+
+## Tests
+### Integration tests
+Run the backend server tests with
+```bash
+cd ./patientor/server && npm install && npm run test
+```

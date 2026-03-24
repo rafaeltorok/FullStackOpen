@@ -1,6 +1,6 @@
 // Route dependencies
 import express, { NextFunction, Request, Response } from "express";
-import diagnosesList from "../data/diagnoses";
+import diagnosesService from "../services/diagnosesService";
 
 // Schemas
 import { NewDiagnoseSchema } from "../schemas/newDiagnose";
@@ -13,9 +13,7 @@ const diagnosesRouter = express.Router();
 
 diagnosesRouter.get("/", (_req: Request, res: Response) => {
   try {
-    if (diagnosesList.length < 1) {
-      return res.status(404).json({ error: "No diagnosis data available" });
-    }
+    const diagnosesList = diagnosesService.getDiagnoses();
     return res.status(200).json(diagnosesList);
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -27,9 +25,7 @@ diagnosesRouter.get("/", (_req: Request, res: Response) => {
 
 diagnosesRouter.get("/:id", (req: Request, res: Response) => {
   try {
-    const diagnose: Diagnosis | undefined = diagnosesList.find(
-      (d) => d.code === req.params.id,
-    );
+    const diagnose: Diagnosis | undefined = diagnosesService.findDiagnosis(String(req.params.id));
     if (!diagnose) {
       return res.status(404).json({ error: "Diagnosis not found" });
     }
@@ -51,9 +47,9 @@ diagnosesRouter.post(
     next: NextFunction,
   ) => {
     try {
-      const diagnoseData: Diagnosis = NewDiagnoseSchema.parse(req.body);
-      diagnosesList.push(diagnoseData);
-      res.status(201).json(diagnoseData);
+      const data: Diagnosis = NewDiagnoseSchema.parse(req.body);
+      const diagnosis: Diagnosis = diagnosesService.addDiagnose(data);
+      res.status(201).json(diagnosis);
     } catch (err: unknown) {
       return next(err);
     }

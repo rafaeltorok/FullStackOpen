@@ -114,6 +114,13 @@
 
 
 ## Docker
+**Disclaimer: This project utilizes a shared directory for TypeScript definitions. Consequently, the Docker build context must be set to the root project folder for the containers to compile successfully.**
+
+### Composer (Recommended)
+```bash
+cd ./patientor && docker compose up -d
+```
+
 ### Backend production build
 - Navigate to the root folder of the Patientor project and build the Docker image
   ```bash

@@ -326,4 +326,38 @@ describe("POST route", () => {
 
     assert.strictEqual(patientsService.getPatients().length, initialPatientListLength);
   });
+
+  test("A new patient added has no entries", async() => {
+    const patientData: PatientFormValues = {
+      name: "Anonymous",
+      ssn: "010101-01",
+      dateOfBirth: "1980-01-01",
+      gender: Gender.Other,
+      occupation: "None"
+    };
+
+    // Creates a new patient on the server
+    const postResponse = await api
+      .post("/api/patients")
+      .send(patientData)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const newPatient: Patient = postResponse.body as Patient;
+
+    // Fetches the full info of the newly created patient from the server
+    const findResponse = await api
+      .get(`/api/patients/${newPatient.id}`)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const patientInfo = findResponse.body as Patient;
+
+    // Checks if the entries field is empty
+    assert.strictEqual("entries" in patientInfo, true);
+    assert.strictEqual(patientInfo.entries.length, 0);
+
+    // Checks if the total number of patients has changed
+    assert.strictEqual(patientsService.getPatients().length, initialPatientListLength + 1);
+  });
 });

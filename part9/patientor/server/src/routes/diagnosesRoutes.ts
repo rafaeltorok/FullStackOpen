@@ -3,11 +3,11 @@ import express, { NextFunction, Request, Response } from "express";
 import diagnosesService from "../services/diagnosesService";
 
 // Schemas
-import { NewDiagnoseSchema } from "../schemas/newDiagnose";
+import { NewDiagnosisEntry } from "../schemas/newDiagnosis";
 
 // TypeScript types
 import type { Diagnosis } from "../../../shared/types";
-import newDiagnoseParser from "../middleware/newDiagnoseParser";
+import newDiagnoseParser from "../middleware/newDiagnosisParser";
 
 const diagnosesRouter = express.Router();
 
@@ -42,13 +42,12 @@ diagnosesRouter.post(
   "/",
   newDiagnoseParser,
   (
-    req: Request<unknown, unknown, Diagnosis>,
+    req: Request<unknown, unknown, NewDiagnosisEntry>,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const data: Diagnosis = NewDiagnoseSchema.parse(req.body);
-      const diagnosis: Diagnosis = diagnosesService.addDiagnose(data);
+      const diagnosis: Diagnosis = diagnosesService.addDiagnose(req.body);
       res.status(201).json(diagnosis);
     } catch (err: unknown) {
       return next(err);

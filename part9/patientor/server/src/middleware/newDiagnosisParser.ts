@@ -1,4 +1,4 @@
-import { NewDiagnoseSchema } from "../schemas/newDiagnose";
+import { NewDiagnosisSchema } from "../schemas/newDiagnosis";
 import type { Request, Response, NextFunction } from "express";
 
 export default function newDiagnoseParser(
@@ -7,7 +7,7 @@ export default function newDiagnoseParser(
   next: NextFunction,
 ) {
   try {
-    const result = NewDiagnoseSchema.parse(req.body);
+    const result = NewDiagnosisSchema.parse(req.body);
     req.body = result;
     next();
   } catch (error: unknown) {

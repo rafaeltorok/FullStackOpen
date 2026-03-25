@@ -77,6 +77,16 @@ describe("GET route", () => {
     assert.strictEqual("code" in diagnosisInfo, true);
     assert.strictEqual("name" in diagnosisInfo, true);
   });
+
+  test("A non-existing code returns a proper error response", async() => {
+    // Get an specific diagnosis by its code
+    const response = await api
+      .get(`/api/diagnoses/A00.0`)
+      .expect(404)
+      .expect("Content-Type", /application\/json/);
+
+    assert.deepStrictEqual(response.body, { error: "Diagnosis not found" });
+  });
 });
 
 describe("POST route", () => {

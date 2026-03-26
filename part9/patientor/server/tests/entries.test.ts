@@ -695,9 +695,9 @@ describe("POST route", () => {
     const initialEntriesLength = patientInfo.entries.length;
 
     // Adds all entries to the patient
-    await addEntry(patientInfo.id, 500, /text\/html/, hospitalEntry);
-    await addEntry(patientInfo.id, 500, /text\/html/, healthCheckEntry);
-    await addEntry(patientInfo.id, 500, /text\/html/, occupationalEntry);
+    await addEntry(patientInfo.id, 400, /application\/json/, hospitalEntry);
+    await addEntry(patientInfo.id, 400, /application\/json/, healthCheckEntry);
+    await addEntry(patientInfo.id, 400, /application\/json/, occupationalEntry);
     
     // Fetches the patient data again to make sure its entries field hasn't changed
     patientInfo = await getPatient(2);
@@ -1001,7 +1001,7 @@ describe("POST route", () => {
     const initialEntriesLength = patientInfo.entries.length;
 
     // Adds all entries to the patient
-    await addEntry(patientInfo.id, 500, /text\/html/, newEntry);
+    await addEntry(patientInfo.id, 400, /application\/json/, newEntry);
 
     // Fetches the patient data again to make sure its entries field hasn't changed
     patientInfo = await getPatient(2);

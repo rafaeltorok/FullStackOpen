@@ -19,9 +19,13 @@ function getApp() {
   app.use(express.json());
   app.use(cors());
   app.use(express.static("dist"));
-  app.use(
-    morgan(":method :url :status :res[content-length] - :response-time ms"),
-  );
+  
+  if (process.env.NODE_ENV !== "test") {
+    app.use(
+      morgan(":method :url :status :res[content-length] - :response-time ms"),
+    );
+  }
+
   app.use("/api/diagnoses", diagnosesRouter);
   app.use("/api/patients", patientRouter);
   app.get("/api/ping", (_req: Request, res: Response) => {

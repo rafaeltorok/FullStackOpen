@@ -139,7 +139,24 @@ cd ./patientor && docker compose up -d
 
 ## Tests
 ### Integration tests
-Run the backend server tests with
-```bash
-cd ./patientor/server && npm install && npm run test
-```
+Backend only tests, focused on the three main routes of the Express server: `/api/patients`, `/api/diagnoses` and `/api/patients/:id/entries`.
+
+- Running all tests
+  ```bash
+  cd ./patientor/server && npm run test
+  ```
+
+- Patients route
+  ```bash
+  cd ./patientor/server && npm run test -- --test ./tests/patient.test.ts
+  ```
+
+- Diagnoses route
+  ```bash
+  cd ./patientor/server && npm run test -- --test ./tests/diagnosis.test.ts
+  ```
+
+- Entries route
+  ```bash
+  cd ./patientor/server && npm run test -- --test ./tests/entries.test.ts
+  ```

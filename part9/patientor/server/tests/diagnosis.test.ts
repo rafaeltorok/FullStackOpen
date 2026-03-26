@@ -12,26 +12,24 @@ import getApp from "../src/app";
 import diagnosesService from "../src/services/diagnosesService";
 
 // TypeScript types
-import type { 
-  Diagnosis,
-} from "../../shared/types";
+import type { Diagnosis } from "../../shared/types";
 
 // app + api setup
 const app = getApp();
 const api = supertest(app);
 
 // Stores the initial number of diagnoses
-const initialDiagnosesListLength: number = diagnosesService.getDiagnoses().length;
+const initialDiagnosesListLength: number =
+  diagnosesService.getDiagnoses().length;
 
 // Tests
 // Resets the database
 beforeEach(async () => {
-  await api
-    .post("/api/testing/reset");
+  await api.post("/api/testing/reset");
 });
 
 describe("Testing the Express server", () => {
-  test("The HTTP server works", async() => {
+  test("The HTTP server works", async () => {
     await api
       .get("/api/ping")
       .expect("Content-Type", /text\/html/)
@@ -48,13 +46,12 @@ describe("GET route", () => {
   });
 
   test("All diagnoses are returned", async () => {
-    const response = await api
-      .get("/api/diagnoses");
+    const response = await api.get("/api/diagnoses");
     const diagnosesList = response.body as Diagnosis[];
     assert.strictEqual(diagnosesList.length, initialDiagnosesListLength);
   });
 
-  test("An individual diagnosis is correctly returned", async() => {
+  test("An individual diagnosis is correctly returned", async () => {
     // Get the list with all available diagnoses
     const getAllResponse = await api
       .get("/api/diagnoses")
@@ -78,7 +75,7 @@ describe("GET route", () => {
     assert.strictEqual("name" in diagnosisInfo, true);
   });
 
-  test("A non-existing code returns a proper error response", async() => {
+  test("A non-existing code returns a proper error response", async () => {
     // Get an specific diagnosis by its code
     const response = await api
       .get(`/api/diagnoses/A00.0`)
@@ -90,11 +87,11 @@ describe("GET route", () => {
 });
 
 describe("POST route", () => {
-  test("A new diagnose can be added", async() => {
+  test("A new diagnose can be added", async () => {
     const diagnosisData: Diagnosis = {
       code: "R51.9",
       name: "Unspecified Headache",
-      latin: "Latin name"
+      latin: "Latin name",
     };
 
     // Creates a new diagnosis on the server
@@ -112,13 +109,16 @@ describe("POST route", () => {
     assert.strictEqual(newDiagnosis.latin, diagnosisData.latin);
 
     // Checks if the total number of diagnoses has changed
-    assert.strictEqual(diagnosesService.getDiagnoses().length, initialDiagnosesListLength + 1);
+    assert.strictEqual(
+      diagnosesService.getDiagnoses().length,
+      initialDiagnosesListLength + 1,
+    );
   });
 
-  test("The latin field is optional", async() => {
+  test("The latin field is optional", async () => {
     const diagnosisData: Diagnosis = {
       code: "R51.9",
-      name: "Unspecified Headache"
+      name: "Unspecified Headache",
     };
 
     // Creates a new diagnosis on the server
@@ -136,13 +136,16 @@ describe("POST route", () => {
     assert.strictEqual("latin" in newDiagnosis, false);
 
     // Checks if the total number of diagnoses has changed
-    assert.strictEqual(diagnosesService.getDiagnoses().length, initialDiagnosesListLength + 1);
+    assert.strictEqual(
+      diagnosesService.getDiagnoses().length,
+      initialDiagnosesListLength + 1,
+    );
   });
 
-  test("Empty required fields", async() => {
+  test("Empty required fields", async () => {
     const diagnosisData = {
       code: "",
-      name: ""
+      name: "",
     };
 
     // Creates a new diagnosis on the server
@@ -153,10 +156,13 @@ describe("POST route", () => {
       .expect("Content-Type", /application\/json/);
 
     // Checks if the total number of diagnoses has changed
-    assert.strictEqual(diagnosesService.getDiagnoses().length, initialDiagnosesListLength);
+    assert.strictEqual(
+      diagnosesService.getDiagnoses().length,
+      initialDiagnosesListLength,
+    );
   });
 
-  test("Sending an empty request body", async() => {
+  test("Sending an empty request body", async () => {
     const diagnosisData = {};
 
     // Creates a new diagnosis on the server
@@ -167,12 +173,15 @@ describe("POST route", () => {
       .expect("Content-Type", /application\/json/);
 
     // Checks if the total number of diagnoses has changed
-    assert.strictEqual(diagnosesService.getDiagnoses().length, initialDiagnosesListLength);
+    assert.strictEqual(
+      diagnosesService.getDiagnoses().length,
+      initialDiagnosesListLength,
+    );
   });
 
-  test("Missing required fields", async() => {
+  test("Missing required fields", async () => {
     const noCode = {
-      name: "Unspecified Headaches"
+      name: "Unspecified Headaches",
     };
 
     await api
@@ -182,10 +191,13 @@ describe("POST route", () => {
       .expect("Content-Type", /application\/json/);
 
     // Checks if the total number of diagnoses has changed
-    assert.strictEqual(diagnosesService.getDiagnoses().length, initialDiagnosesListLength);
+    assert.strictEqual(
+      diagnosesService.getDiagnoses().length,
+      initialDiagnosesListLength,
+    );
 
     const noName = {
-      code: "R51.9"
+      code: "R51.9",
     };
 
     await api
@@ -194,6 +206,9 @@ describe("POST route", () => {
       .expect(400)
       .expect("Content-Type", /application\/json/);
 
-    assert.strictEqual(diagnosesService.getDiagnoses().length, initialDiagnosesListLength);
+    assert.strictEqual(
+      diagnosesService.getDiagnoses().length,
+      initialDiagnosesListLength,
+    );
   });
 });

@@ -37,8 +37,8 @@ export default function HospitalEntry(props: HospitalEntryProps) {
     specialist: "",
     discharge: {
       date: "",
-      criteria: ""
-    }
+      criteria: "",
+    },
   });
   const [dischargeDate, setDischargeDate] = useState<Dayjs | null>(null);
 
@@ -67,7 +67,13 @@ export default function HospitalEntry(props: HospitalEntryProps) {
     // Validates the discharge field
     if (dischargeDate && entryDetails.discharge.criteria.trim()) {
       // Appends the discharge info
-      newEntry = { ...newEntry, discharge: { ...entryDetails.discharge, date: dischargeDate.format("YYYY-MM-DD" )}};
+      newEntry = {
+        ...newEntry,
+        discharge: {
+          ...entryDetails.discharge,
+          date: dischargeDate.format("YYYY-MM-DD"),
+        },
+      };
     } else if (
       (!dischargeDate && entryDetails.discharge.criteria.trim()) ||
       (dischargeDate && !entryDetails.discharge.criteria.trim())
@@ -96,8 +102,8 @@ export default function HospitalEntry(props: HospitalEntryProps) {
       specialist: "",
       discharge: {
         date: "",
-        criteria: ""
-      }
+        criteria: "",
+      },
     });
     setCodesList([]);
     setDischargeDate(null);
@@ -168,9 +174,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
           <DatePicker
             label="Date"
             value={dischargeDate}
-            onChange={(newValue) =>
-              setDischargeDate(newValue)
-            }
+            onChange={(newValue) => setDischargeDate(newValue)}
           />
         </LocalizationProvider>
         <TextField
@@ -182,7 +186,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
               discharge: {
                 ...entryDetails.discharge,
                 criteria: target.value,
-              }
+              },
             })
           }
         />

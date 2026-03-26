@@ -40,7 +40,7 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
     occupation: "",
     ssn: "",
     dateOfBirth: "",
-    gender: Gender.Other
+    gender: Gender.Other,
   });
   const [date, setDate] = useState<Dayjs | null>(null);
 
@@ -57,11 +57,11 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
 
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault();
-    
+
     // Formats the date of birth
     const newPatient: PatientFormValues = {
       ...patientData,
-      dateOfBirth: date ? date.format("YYYY-MM-DD") : ""
+      dateOfBirth: date ? date.format("YYYY-MM-DD") : "",
     };
 
     onSubmit(newPatient);
@@ -74,13 +74,17 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
           label="Name"
           fullWidth
           value={patientData.name}
-          onChange={({ target }) => setPatientData({ ...patientData, name: target.value })}
+          onChange={({ target }) =>
+            setPatientData({ ...patientData, name: target.value })
+          }
         />
         <TextField
           label="Social security number"
           fullWidth
           value={patientData.ssn}
-          onChange={({ target }) => setPatientData({ ...patientData, ssn: target.value })}
+          onChange={({ target }) =>
+            setPatientData({ ...patientData, ssn: target.value })
+          }
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
@@ -93,7 +97,9 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
           label="Occupation"
           fullWidth
           value={patientData.occupation}
-          onChange={({ target }) => setPatientData({ ...patientData, occupation: target.value })}
+          onChange={({ target }) =>
+            setPatientData({ ...patientData, occupation: target.value })
+          }
         />
 
         <InputLabel style={{ marginTop: 20 }}>Gender</InputLabel>

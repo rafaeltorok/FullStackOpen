@@ -25,8 +25,8 @@ export default function Diagnoses(props: DiagnosesCodeProps) {
     fetchAll();
   }, []);
 
-  const filteredCodes = diagnosesList.filter(diagnosis =>
-    props.codes.includes(diagnosis.code)
+  const filteredCodes = diagnosesList.filter((diagnosis) =>
+    props.codes.includes(diagnosis.code),
   );
 
   if (filteredCodes.length === 0) return null;

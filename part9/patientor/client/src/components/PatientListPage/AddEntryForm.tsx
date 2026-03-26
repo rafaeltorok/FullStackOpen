@@ -22,7 +22,11 @@ type EntryType = "Hospital" | "HealthCheck" | "OccupationalHealthcare";
 
 export default function AddEntryForm(props: AddEntryProps) {
   const [entryType, setEntryType] = useState<EntryType>("Hospital");
-  const types: EntryType[] = ["OccupationalHealthcare", "Hospital", "HealthCheck"];
+  const types: EntryType[] = [
+    "OccupationalHealthcare",
+    "Hospital",
+    "HealthCheck",
+  ];
   const [diagnosesList, setDiagnosesList] = useState<Diagnosis[]>([]);
 
   useEffect(() => {

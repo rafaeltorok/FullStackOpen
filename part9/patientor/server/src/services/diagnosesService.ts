@@ -35,5 +35,5 @@ export default {
   getDiagnoses,
   findDiagnosis,
   addDiagnose,
-  resetDiagnoses
+  resetDiagnoses,
 };

@@ -19,7 +19,7 @@ function getApp() {
   app.use(express.json());
   app.use(cors());
   app.use(express.static("dist"));
-  
+
   if (process.env.NODE_ENV !== "test") {
     app.use(
       morgan(":method :url :status :res[content-length] - :response-time ms"),

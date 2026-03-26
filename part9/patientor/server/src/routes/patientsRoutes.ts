@@ -8,7 +8,12 @@ import newEntryParser from "../middleware/newEntryParser";
 
 // TypeScript types
 import type { NextFunction, Request, Response } from "express";
-import type { Patient, Entry, NonSensitivePatient, NewEntry } from "../../../shared/types";
+import type {
+  Patient,
+  Entry,
+  NonSensitivePatient,
+  NewEntry,
+} from "../../../shared/types";
 import type { NewPatientEntry } from "../schemas/newPatient";
 
 const patientRouter = express.Router();
@@ -16,7 +21,8 @@ const patientRouter = express.Router();
 // GET all patients
 patientRouter.get("/", (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const allPatientsInfo: NonSensitivePatient[] = patientsService.getPatients();
+    const allPatientsInfo: NonSensitivePatient[] =
+      patientsService.getPatients();
     res.status(200).json(allPatientsInfo);
   } catch (err: unknown) {
     next(err);
@@ -26,7 +32,9 @@ patientRouter.get("/", (_req: Request, res: Response, next: NextFunction) => {
 // GET a patient by the id
 patientRouter.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const patient: Patient | undefined = patientsService.findPatient(String(req.params.id));
+    const patient: Patient | undefined = patientsService.findPatient(
+      String(req.params.id),
+    );
     if (!patient) {
       res.status(404).json({ error: "Patient not found" }).end();
       return;
@@ -47,7 +55,9 @@ patientRouter.post(
     next: NextFunction,
   ) => {
     try {
-      const newPatientEntry: NonSensitivePatient = patientsService.addPatient(req.body);
+      const newPatientEntry: NonSensitivePatient = patientsService.addPatient(
+        req.body,
+      );
       res.status(201).json(newPatientEntry);
     } catch (err: unknown) {
       return next(err);
@@ -66,11 +76,16 @@ patientRouter.post(
   ) => {
     try {
       const entryData: NewEntry = req.body;
-      const patient: Patient | undefined = patientsService.findPatient(String(req.params.id));
+      const patient: Patient | undefined = patientsService.findPatient(
+        String(req.params.id),
+      );
 
       if (!patient) return res.status(404).end();
 
-      const newEntry: Entry = patientsService.addEntryToPatient(patient, entryData);
+      const newEntry: Entry = patientsService.addEntryToPatient(
+        patient,
+        entryData,
+      );
       return res.status(201).json(newEntry);
     } catch (err: unknown) {
       return next(err);

@@ -6,12 +6,12 @@ import { v4 as uuidv4 } from "uuid";
 import patientsData from "../data/patients";
 
 // TypeScript types
-import type { 
-  Patient, 
-  NonSensitivePatient, 
-  PatientFormValues, 
-  Entry, 
-  NewEntry
+import type {
+  Patient,
+  NonSensitivePatient,
+  PatientFormValues,
+  Entry,
+  NewEntry,
 } from "../../../shared/types";
 
 // Patients data services
@@ -33,9 +33,7 @@ function getPatients(): NonSensitivePatient[] {
 }
 
 function findPatient(id: string): Patient | undefined {
-  const patient: Patient | undefined = patientsList.find(
-    (p) => p.id === id,
-  );
+  const patient: Patient | undefined = patientsList.find((p) => p.id === id);
   return patient;
 }
 
@@ -57,9 +55,9 @@ function resetPatients(): void {
 // Entries data services
 function addEntryToPatient(patient: Patient, entryData: NewEntry): Entry {
   const newEntry: Entry = {
-        id: uuidv4(),
-        ...entryData,
-      };
+    id: uuidv4(),
+    ...entryData,
+  };
   patient.entries = [...patient.entries, newEntry];
   return newEntry;
 }
@@ -69,5 +67,5 @@ export default {
   findPatient,
   addPatient,
   resetPatients,
-  addEntryToPatient
+  addEntryToPatient,
 };

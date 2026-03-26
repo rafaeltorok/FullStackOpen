@@ -1,5 +1,5 @@
 // Zod dependencies
-import z from 'zod';
+import z from "zod";
 
 // Entry schemas
 import { NewHospitalSchema } from "../schemas/newHospitalEntry";
@@ -19,7 +19,7 @@ export default function newEntryParser(
     const NewEntrySchema = z.discriminatedUnion("type", [
       NewHospitalSchema,
       NewHealthCheckSchema,
-      NewOccupationalHealthcareSchema
+      NewOccupationalHealthcareSchema,
     ]);
 
     req.body = NewEntrySchema.parse(req.body);

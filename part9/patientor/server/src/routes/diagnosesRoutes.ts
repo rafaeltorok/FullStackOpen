@@ -25,7 +25,9 @@ diagnosesRouter.get("/", (_req: Request, res: Response) => {
 
 diagnosesRouter.get("/:id", (req: Request, res: Response) => {
   try {
-    const diagnose: Diagnosis | undefined = diagnosesService.findDiagnosis(String(req.params.id));
+    const diagnose: Diagnosis | undefined = diagnosesService.findDiagnosis(
+      String(req.params.id),
+    );
     if (!diagnose) {
       return res.status(404).json({ error: "Diagnosis not found" });
     }

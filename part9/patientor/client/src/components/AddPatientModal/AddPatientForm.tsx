@@ -90,6 +90,7 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
           <DatePicker
             label="Date of birth"
             value={date}
+            format="YYYY/MM/DD"
             onChange={(newValue) => setDate(newValue)}
           />
         </LocalizationProvider>

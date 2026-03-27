@@ -43,15 +43,16 @@ const PatientListPage = ({ patients, setPatients }: Props) => {
       setModalOpen(false);
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
-        if (e?.response?.data && typeof e?.response?.data === "string") {
-          const message = e.response.data.replace(
-            "Something went wrong. Error: ",
-            "",
-          );
-          console.error(message);
-          setError(message);
-        } else {
-          setError("Unrecognized axios error");
+        if (e?.response?.data) {
+          const data = e.response.data;
+
+          if (typeof data === 'string') {
+            setError(data.replace("Something went wrong. Error: ", "",));
+          } else if (typeof data === "object" && Array.isArray(data.error) && data.error.length > 0) {
+            setError(data.error.map((e: { message: string }) => e.message).join(", "));
+          } else {
+            setError("Unrecognized axios error");
+          }
         }
       } else {
         console.error("Unknown error", e);

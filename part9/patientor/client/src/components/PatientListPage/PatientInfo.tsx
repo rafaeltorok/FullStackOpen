@@ -1,12 +1,13 @@
-// Base dependencies
+// Component dependencies
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import patientService from "../../services/patients";
-import entryService from "../../services/entries";
+import { useParams, Link } from "react-router-dom";
 import useNotification from "../../hooks/useNotification";
 
+// Services
+import patientService from "../../services/patients";
+import entryService from "../../services/entries";
+
 // Material UI elements
-import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";

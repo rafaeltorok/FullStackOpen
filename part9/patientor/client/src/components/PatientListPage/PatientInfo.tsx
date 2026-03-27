@@ -6,6 +6,7 @@ import entryService from "../../services/entries";
 import useNotification from "../../hooks/useNotification";
 
 // Material UI elements
+import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
@@ -87,6 +88,9 @@ export default function PatientInfo() {
 
   return (
     <div>
+      <Button component={Link} to="/" variant="contained" color="primary">
+        Home
+      </Button>
       <h2>
         {patient.name} {getGenderIcon()}
       </h2>

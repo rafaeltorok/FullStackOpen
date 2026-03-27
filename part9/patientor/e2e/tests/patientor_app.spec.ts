@@ -8,6 +8,9 @@ const clientUrl = "http://localhost:5173";
 // Helper functions
 import { addPatient } from "./helpers/addPatient";
 
+// TypeScript types
+import { HealthCheckRating, type NonSensitivePatient } from '../../shared/types';
+
 // E2E tests
 test.beforeEach(async ({ page }) => {
   // Resets the database to the original state before each test
@@ -53,7 +56,10 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("should add a new patient when clicking on the Add button", async ({ page }) => {
+    // wait for the expected initial data to be present first
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
@@ -80,6 +86,7 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("the cancel button should not add a new patient", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
 
     await page.getByRole('button', { name: "Add New Patient" }).click();
@@ -110,7 +117,9 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("missing the name field", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+
     const patientData = {
       ssn: "01-010101",
       dateOfBirth: {
@@ -123,7 +132,7 @@ test.describe("Testing the add new patient form", () => {
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toContainText("Patient name is required");
+    await expect(page.getByRole("alert")).toHaveText("Patient name is required");
 
     await page.getByRole('button', { name: 'Cancel' }).click();
 
@@ -138,7 +147,9 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("missing the ssn field", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+
     const patientData = {
       name: "John Johns",
       dateOfBirth: {
@@ -151,7 +162,7 @@ test.describe("Testing the add new patient form", () => {
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toContainText("Patient SSN is required");
+    await expect(page.getByRole("alert")).toHaveText("Patient SSN is required");
 
     await page.getByRole('button', { name: 'Cancel' }).click();
 
@@ -166,7 +177,9 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("missing the date of birth field", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
@@ -175,7 +188,7 @@ test.describe("Testing the add new patient form", () => {
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toContainText("Invalid ISO date");
+    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
     await page.getByRole('button', { name: 'Cancel' }).click();
 
@@ -190,7 +203,9 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("missing the year on the date of birth field", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
@@ -203,7 +218,7 @@ test.describe("Testing the add new patient form", () => {
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toContainText("Invalid ISO date");
+    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
     await page.getByRole('button', { name: 'Cancel' }).click();
 
@@ -218,7 +233,9 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("missing the month on the date of birth field", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
@@ -231,7 +248,7 @@ test.describe("Testing the add new patient form", () => {
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toContainText("Invalid ISO date");
+    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
     await page.getByRole('button', { name: 'Cancel' }).click();
 
@@ -246,7 +263,9 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("missing the day on the date of birth field", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
@@ -259,7 +278,7 @@ test.describe("Testing the add new patient form", () => {
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toContainText("Invalid ISO date");
+    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
     await page.getByRole('button', { name: 'Cancel' }).click();
 
@@ -274,7 +293,9 @@ test.describe("Testing the add new patient form", () => {
   });
 
   test("missing the occupation field", async ({ page }) => {
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
     const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
@@ -287,7 +308,7 @@ test.describe("Testing the add new patient form", () => {
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toContainText("Patient occupation is required");
+    await expect(page.getByRole("alert")).toHaveText("Patient occupation is required");
 
     await page.getByRole('button', { name: 'Cancel' }).click();
 
@@ -299,5 +320,143 @@ test.describe("Testing the add new patient form", () => {
       .getByRole('row')
       .filter({ has: page.getByRole('link', { name: 'John Johns' }) }))
       .toHaveCount(0);
+  });
+});
+
+test.describe("Patient full info page", () => {
+  test.beforeEach(async ({ page, request }) => {
+    await page.request.post(`${serverUrl}/api/testing/reset`);
+
+    const postResponse = await request.post(`${serverUrl}/api/patients`, {
+      data: {
+        name: 'John Johns',
+        ssn: '090786-122X',
+        dateOfBirth: '1980-01-01',
+        occupation: 'Developer',
+        gender: 'male'
+      }
+    });
+
+    // ensure the request succeeded before proceeding
+    expect(postResponse.ok()).toBeTruthy();
+
+    const patient = (await postResponse.json()) as NonSensitivePatient;
+
+    // Adds a new Hospital entry
+    await request.post(`${serverUrl}/api/patients/${patient.id}/entries`, {
+      data: {
+        type: "Hospital",
+        date: "2025-12-31",
+        specialist: "Doctor Tester",
+        diagnosisCodes: [
+          "S62.5"
+        ],
+        description: "Stable condition.",
+        discharge: {
+          "date": "2026-01-03",
+          "criteria": "Patient has healed."
+        }
+      }
+    });
+
+    // Adds a new HealthCheck entry
+    await request.post(`${serverUrl}/api/patients/${patient.id}/entries`, {
+      data: {
+        type: "HealthCheck",
+        date: "2026-01-20",
+        specialist: "Doctor Tester",
+        diagnosisCodes: [
+          "J10.1"
+        ],
+        description: "Patient showing classic flu symptoms.",
+        healthCheckRating: 1
+      }
+    });
+
+    // Adds a new OccupationalHealthcare entry
+    await request.post(`${serverUrl}/api/patients/${patient.id}/entries`, {
+      data: {
+        type: "OccupationalHealthcare",
+        date: "2026-02-15",
+        specialist: "Doctor Tester",
+        diagnosisCodes: [
+          "M51.2"
+        ],
+        description: "Patient is having recurring back pains.",
+        employerName: "Company",
+        sickLeave: {
+          "startDate": "2026-02-15",
+          "endDate": "2026-03-02"
+        }
+      }
+    });
+
+    await page.goto(clientUrl);
+    await expect(page.getByText('John Johns')).toBeVisible();
+  });
+
+  test("clicking on a patient's name should display all information", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+    await expect(page.getByTestId('MaleIcon')).toBeVisible();
+    await expect(page.locator('p', { hasText: 'ssn: 090786-122X' })).toBeVisible();
+    await expect(page.locator('p', { hasText: 'occupation: Developer' })).toBeVisible();
+  });
+
+  test("should display the list of entries if a patient has any", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 3 }).filter({ hasText: 'Entries' })).toContainText('(3 total)');
+    const entries = page.locator(".patient-entry");
+    await expect(entries).toHaveCount(3);
+  });
+
+  test("a Hospital entry should be properly displayed", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    const entries = page.locator(".patient-entry");
+    await expect(entries.nth(0).locator('p', { hasText: '2025-12-31'})).toBeVisible();
+    await expect(entries.nth(0).getByTestId('LocalHospitalIcon')).toBeVisible();
+    await expect(entries.nth(0).locator('p', { hasText: "Stable condition."})).toBeVisible();
+    await expect(entries.nth(0).getByRole('heading', { level: 3 }).filter({ hasText: 'Discharge:'})).toBeVisible();
+    await expect(entries.nth(0).locator('li', { hasText: 'Date: 2026-01-03'})).toBeVisible();
+    await expect(entries.nth(0).locator('li', { hasText: 'Criteria: Patient has healed.'})).toBeVisible();
+    await expect(entries.nth(0).locator('em', { hasText: 'diagnose by Doctor Tester'})).toBeVisible();
+  });
+
+  test("a HealthCheck entry should be properly displayed", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    const entries = page.locator(".patient-entry");
+    await expect(entries.nth(1).locator('p', { hasText: '2026-01-20'})).toBeVisible();
+    await expect(entries.nth(1).getByTestId('LocalHospitalIcon')).toBeVisible();
+    await expect(entries.nth(1).getByTestId('FavoriteIcon')).toHaveCSS('color', "rgb(255, 255, 0)");
+    await expect(entries.nth(1).locator('p', { hasText: "Patient showing classic flu symptoms."})).toBeVisible();
+    await expect(entries.nth(1).locator('em', { hasText: 'diagnose by Doctor Tester'})).toBeVisible();
+  });
+
+  test("an Occupational Healthcare entry should be properly displayed", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    const entries = page.locator(".patient-entry");
+    await expect(entries.nth(2).locator('p', { hasText: '2026-02-15'})).toBeVisible();
+    await expect(entries.nth(2).getByTestId('WorkIcon')).toBeVisible();
+    await expect(entries.nth(2).locator('p', { hasText: "Patient is having recurring back pains."})).toBeVisible();
+    await expect(entries.nth(2).locator('p', { hasText: "Company"})).toBeVisible();
+    await expect(entries.nth(2).getByRole('heading', { level: 3 }).filter({ hasText: 'Sick Leave:'})).toBeVisible();
+    await expect(entries.nth(2).locator('li', { hasText: 'Start date: 2026-02-15'})).toBeVisible();
+    await expect(entries.nth(2).locator('li', { hasText: 'End date: 2026-03-02'})).toBeVisible();
+    await expect(entries.nth(2).locator('em', { hasText: 'diagnose by Doctor Tester'})).toBeVisible();
   });
 });

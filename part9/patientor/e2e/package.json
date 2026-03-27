@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwroght test --debug",
     "test:report": "playwright test show-report"
   },
   "keywords": [],

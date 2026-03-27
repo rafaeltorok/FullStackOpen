@@ -6,6 +6,8 @@ Web app available on [Render⬈](https://patientorapp.onrender.com)
 - [CRUD operations](#crud-operations)
 - [Docker](#docker)
 - [Tests](#tests)
+  - [Integration tests](#integration-tests)
+  - [E2E (Playwright)](#e2e-playwright)
 
 
 ## Usage
@@ -159,4 +161,37 @@ Backend only tests, focused on the three main routes of the Express server: `/ap
 - Entries route
   ```bash
   cd ./patientor/server && npm run test -- --test ./tests/entries.test.ts
+  ```
+
+### E2E (Playwright)
+#### Setup
+- Start the frontend
+  ```bash
+  cd ./patientor/client && npm install && npm run dev
+  ```
+
+- Start the backend server in **testing mode**
+  ```bash
+  cd ./patientor/server && npm install && npm run start:test
+  ```
+
+- Install the Playwright dependencies
+  ```bash
+  cd ./patientor/e2e && npm install && npx playwright install
+  ```
+
+#### Running the tests
+- In CLI mode
+  ```bash
+  npm run test
+  ```
+
+- In UI mode
+  ```bash
+  npm run test:ui
+  ```
+
+- In debug mode
+  ```bash
+  npm run test:debug
   ```

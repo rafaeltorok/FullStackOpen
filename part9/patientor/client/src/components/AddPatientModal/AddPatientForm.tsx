@@ -103,8 +103,12 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
           }
         />
 
-        <InputLabel style={{ marginTop: 20 }}>Gender</InputLabel>
+        <InputLabel 
+          id="gender-label"
+          style={{ marginTop: 20 }}
+        >Gender</InputLabel>
         <Select
+          labelId="gender-label"
           label="Gender"
           fullWidth
           value={patientData.gender}

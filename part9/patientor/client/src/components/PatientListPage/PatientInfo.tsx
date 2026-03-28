@@ -1,6 +1,6 @@
 // Component dependencies
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useNotification from "../../hooks/useNotification";
 
 // Services
@@ -89,9 +89,6 @@ export default function PatientInfo() {
 
   return (
     <div>
-      <Button component={Link} to="/" variant="contained" color="primary">
-        Home
-      </Button>
       <h2>
         {patient.name} {getGenderIcon()}
       </h2>

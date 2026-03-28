@@ -109,6 +109,7 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           <DatePicker
             label="Date"
             value={date}
+            format="YYYY/MM/DD"
             onChange={(newValue) => setDate(newValue)}
           />
         </LocalizationProvider>

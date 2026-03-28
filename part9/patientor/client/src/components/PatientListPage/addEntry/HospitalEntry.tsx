@@ -132,6 +132,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
           <DatePicker
             label="Date"
             value={date}
+            format="YYYY/MM/DD"
             onChange={(newValue) => setDate(newValue)}
           />
         </LocalizationProvider>
@@ -178,6 +179,7 @@ export default function HospitalEntry(props: HospitalEntryProps) {
           <DatePicker
             label="Date"
             value={dischargeDate}
+            format="YYYY/MM/DD"
             onChange={(newValue) => setDischargeDate(newValue)}
           />
         </LocalizationProvider>

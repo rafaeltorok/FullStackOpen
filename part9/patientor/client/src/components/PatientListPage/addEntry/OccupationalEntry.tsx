@@ -133,6 +133,7 @@ export default function OccupationalHealthcareEntry(
           <DatePicker
             label="Date"
             value={date}
+            format="YYYY/MM/DD"
             onChange={(newValue) => setDate(newValue)}
           />
         </LocalizationProvider>
@@ -187,6 +188,7 @@ export default function OccupationalHealthcareEntry(
           <DatePicker
             label="Start date"
             value={sickLeaveInfo.startDate}
+            format="YYYY/MM/DD"
             onChange={(newValue) =>
               setSickLeaveInfo({ ...sickLeaveInfo, startDate: newValue })
             }
@@ -196,6 +198,7 @@ export default function OccupationalHealthcareEntry(
           <DatePicker
             label="End date"
             value={sickLeaveInfo.endDate}
+            format="YYYY/MM/DD"
             onChange={(newValue) =>
               setSickLeaveInfo({ ...sickLeaveInfo, endDate: newValue })
             }

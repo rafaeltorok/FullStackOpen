@@ -16,13 +16,13 @@ export default function HealthCheck(props: HealthCheckProps) {
   function HealthRating() {
     switch (props.entry.healthCheckRating) {
       case 0:
-        return <FavoriteIcon style={{ color: "green" }} />;
+        return <FavoriteIcon style={{ color: "rgb(0, 255, 0)" }} />;
       case 1:
-        return <FavoriteIcon style={{ color: "yellow" }} />;
+        return <FavoriteIcon style={{ color: "rgb(255, 255, 0)" }} />;
       case 2:
-        return <FavoriteIcon style={{ color: "orange" }} />;
+        return <FavoriteIcon style={{ color: "rgb(255, 125, 0)" }} />;
       case 3:
-        return <FavoriteIcon style={{ color: "red" }} />;
+        return <FavoriteIcon style={{ color: "rgb(255, 0, 0)" }} />;
     }
   }
 

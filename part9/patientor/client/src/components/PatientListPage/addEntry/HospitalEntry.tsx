@@ -144,8 +144,12 @@ export default function HospitalEntry(props: HospitalEntryProps) {
           }
         />
 
-        <InputLabel style={{ marginTop: 20 }}>Diagnosis code</InputLabel>
+        <InputLabel 
+          id="diagnosis-code-label"
+          style={{ marginTop: 20 }}
+        >Diagnosis code</InputLabel>
         <Select
+          labelId="diagnosis-code-label"
           fullWidth
           value={selectedCode}
           onChange={({ target }) => setSelectedCode(target.value)}

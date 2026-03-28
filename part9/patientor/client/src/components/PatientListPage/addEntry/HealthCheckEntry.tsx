@@ -121,8 +121,12 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
           }
         />
 
-        <InputLabel style={{ marginTop: 20 }}>Diagnosis code</InputLabel>
+        <InputLabel 
+          id="diagnosis-code-label"
+          style={{ marginTop: 20 }}
+        >Diagnosis code</InputLabel>
         <Select
+          labelId="diagnosis-code-label"
           fullWidth
           value={selectedCode}
           onChange={({ target }) => setSelectedCode(target.value)}
@@ -146,8 +150,12 @@ export default function HealthCheckEntry(props: HealthCheckEntryProps) {
 
         <p>{codesList.join(", ")}</p>
 
-        <InputLabel style={{ marginTop: 20 }}>Health Rating</InputLabel>
+        <InputLabel 
+          id="health-rating-label"
+          style={{ marginTop: 20 }}
+        >Health Rating</InputLabel>
         <Select
+          labelId="health-rating-label"
           label="Health Rating"
           fullWidth
           value={entryDetails.healthCheckRating}

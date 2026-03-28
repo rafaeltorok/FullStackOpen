@@ -459,4 +459,135 @@ test.describe("Patient full info page", () => {
     await expect(entries.nth(2).locator('li', { hasText: 'End date: 2026-03-02'})).toBeVisible();
     await expect(entries.nth(2).locator('em', { hasText: 'diagnose by Doctor Tester'})).toBeVisible();
   });
+
+  test("the home button should return to the main patient list", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+
+    await page.getByRole('link', { name: "Home" }).click();
+
+    await expect(page).toHaveTitle(/Patientor/);
+    await expect(page.getByText("Patient list")).toBeVisible();
+    const patients = page.locator("tbody").getByRole("row");
+    await expect(patients).toHaveCount(6);
+  });
+});
+
+test.describe("Adding new entries", () => {
+  test.beforeEach(async ({ page, request }) => {
+    await page.request.post(`${serverUrl}/api/testing/reset`);
+
+    const postResponse = await request.post(`${serverUrl}/api/patients`, {
+      data: {
+        name: 'John Johns',
+        ssn: '090786-122X',
+        dateOfBirth: '1980-01-01',
+        occupation: 'Developer',
+        gender: 'male'
+      }
+    });
+
+    // ensure the request succeeded before proceeding
+    expect(postResponse.ok()).toBeTruthy();
+
+    await page.goto(clientUrl);
+    await expect(page.getByText('John Johns')).toBeVisible();
+  });
+
+  test("the add new entry button should display a form", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+
+    await page.getByRole('button', { name: 'Add new entry' }).click();
+
+    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Description' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Date' }).first()).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Specialist' })).toBeVisible();
+    await expect(page.getByText('Diagnosis code')).toBeVisible();
+    await expect(page.locator('form').filter({ hasText: 'DescriptionDescriptionDateMM/' }).getByRole('combobox')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Diagnose' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeVisible();
+  });
+
+  test("the cancel button should hide the entry form", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+
+    await page.getByRole('button', { name: 'Add new entry' }).click();
+
+    // Confirms the form is displayed
+    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeVisible();
+
+    // Confirms the Cancel button exists and can be clicked on
+    const cancelButton = page.getByRole('button', { name: 'Cancel', exact: true });
+    await expect(cancelButton).toBeVisible();
+    await cancelButton.click();
+
+    // Checks if the form has been truly hidden
+    await expect(page.getByRole('button', { name: 'Add new entry' })).toBeVisible();
+    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeHidden();
+  });
+
+  test("should display all fields for a new Hospital entry", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+
+    await page.getByRole('button', { name: 'Add new entry' }).click();
+
+    await page
+      .getByText('Entry type')
+      .locator('..')
+      .getByRole('combobox')
+      .click();
+    await page.getByRole('option', { name: "Hospital", exact: true }).click();
+
+    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Description' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Date' }).first()).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Specialist' })).toBeVisible();
+    await expect(page.getByText('Diagnosis code')).toBeVisible();
+    await expect(page.getByText('Diagnosis code').locator('..').getByRole('combobox')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Diagnose' })).toBeVisible();
+    await expect(page.getByText('Discharge')).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Date' }).nth(1)).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Criteria' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+  });
+
+  test("should display all fields for a new HealthCheck entry", async ({ page }) => {
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+
+    await page.getByRole('button', { name: 'Add new entry' }).click();
+
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: "HealthCheck", exact: true }).click();
+
+    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Description' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Date' }).first()).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Specialist' })).toBeVisible();
+    await expect(page.getByText('Diagnosis code')).toBeVisible();
+    await expect(page.getByText('Diagnosis code').locator('..').getByRole('combobox')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add Diagnose' })).toBeVisible();
+    await expect(page.locator('label').filter({ hasText: 'Health Rating' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Add', exact: true })).toBeVisible();
+  });
 });

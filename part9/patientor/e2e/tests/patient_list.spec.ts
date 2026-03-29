@@ -26,32 +26,47 @@ test.describe("Testing the home page", () => {
     await expect(patients).toHaveCount(5);
   });
 
-  test("should display a patients' non-sensitive information", async ({ page }) => {
+  test("should display a patients' non-sensitive information", async ({
+    page,
+  }) => {
     const row = page
-      .locator('tbody')
-      .getByRole('row')
-      .filter({ has: page.getByRole('link', { name: 'John McClane' }) });
-    await expect(row.getByRole('link', { name: 'John McClane' })).toBeVisible();
-    await expect(row.getByRole('cell', { name: 'male' })).toBeVisible();
-    await expect(row.getByRole('cell', { name: 'New york city cop' })).toBeVisible();
+      .locator("tbody")
+      .getByRole("row")
+      .filter({ has: page.getByRole("link", { name: "John McClane" }) });
+    await expect(row.getByRole("link", { name: "John McClane" })).toBeVisible();
+    await expect(row.getByRole("cell", { name: "male" })).toBeVisible();
+    await expect(
+      row.getByRole("cell", { name: "New york city cop" }),
+    ).toBeVisible();
   });
 });
 
 test.describe("Testing the add new patient form", () => {
-  test("should display the form when clicking on the Add New Patient button", async ({ page }) => {
-    await page.getByRole('button', { name: "Add New Patient" }).click();
-    await expect(page.getByLabel('Name')).toBeVisible();
-    await expect(page.getByLabel('Social security number')).toBeVisible();
-    await expect(page.getByRole('group', { name: 'Date of birth' })).toBeVisible();
-    await expect(page.getByLabel('Occupation')).toBeVisible();
-    await expect(page.locator('label').filter({ hasText: 'Gender' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add' })).toBeVisible();
+  test("should display the form when clicking on the Add New Patient button", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "Add New Patient" }).click();
+    await expect(page.getByLabel("Name")).toBeVisible();
+    await expect(page.getByLabel("Social security number")).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "Date of birth" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Occupation")).toBeVisible();
+    await expect(
+      page.locator("label").filter({ hasText: "Gender" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Add" })).toBeVisible();
   });
 
-  test("should add a new patient when clicking on the Add button", async ({ page }) => {
+  test("should add a new patient when clicking on the Add button", async ({
+    page,
+  }) => {
     // wait for the expected initial data to be present first
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
     const patientData = {
       name: "John Johns",
@@ -59,10 +74,10 @@ test.describe("Testing the add new patient form", () => {
       dateOfBirth: {
         year: 1980,
         month: 1,
-        day: 1
+        day: 1,
       },
       occupation: "Developer",
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
@@ -70,140 +85,165 @@ test.describe("Testing the add new patient form", () => {
     await expect(patients).toHaveCount(initialPatientsLength + 1);
 
     const row = page
-      .locator('tbody')
-      .getByRole('row')
-      .filter({ has: page.getByRole('link', { name: 'John Johns' }) });
-    await expect(row.getByRole('link', { name: 'John Johns' })).toBeVisible();
-    await expect(row.getByRole('cell', { name: 'male' })).toBeVisible();
-    await expect(row.getByRole('cell', { name: 'Developer' })).toBeVisible();
+      .locator("tbody")
+      .getByRole("row")
+      .filter({ has: page.getByRole("link", { name: "John Johns" }) });
+    await expect(row.getByRole("link", { name: "John Johns" })).toBeVisible();
+    await expect(row.getByRole("cell", { name: "male" })).toBeVisible();
+    await expect(row.getByRole("cell", { name: "Developer" })).toBeVisible();
   });
 
   test("the cancel button should not add a new patient", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
-    await page.getByRole('button', { name: "Add New Patient" }).click();
-    await page.getByRole('textbox', { name: 'Name' }).fill("John Johns");
-    await page.getByRole('textbox', { name: 'Social security number' }).fill("01-010101");
-    const dateGroup = page.getByRole('group', { name: 'Date of birth' });
-    await dateGroup.getByRole('spinbutton', { name: 'Year' }).fill("1980");
-    await dateGroup.getByRole('spinbutton', { name: 'Month' }).fill("01");
-    await dateGroup.getByRole('spinbutton', { name: 'Day' }).fill("01");
-    await page.getByRole('textbox', { name: 'Occupation' }).fill("Developer");
-    await page.getByRole('combobox', { name: 'Gender' }).click();
-    await page.getByRole('option', { name: "male", exact: true }).click();
+    await page.getByRole("button", { name: "Add New Patient" }).click();
+    await page.getByRole("textbox", { name: "Name" }).fill("John Johns");
+    await page
+      .getByRole("textbox", { name: "Social security number" })
+      .fill("01-010101");
+    const dateGroup = page.getByRole("group", { name: "Date of birth" });
+    await dateGroup.getByRole("spinbutton", { name: "Year" }).fill("1980");
+    await dateGroup.getByRole("spinbutton", { name: "Month" }).fill("01");
+    await dateGroup.getByRole("spinbutton", { name: "Day" }).fill("01");
+    await page.getByRole("textbox", { name: "Occupation" }).fill("Developer");
+    await page.getByRole("combobox", { name: "Gender" }).click();
+    await page.getByRole("option", { name: "male", exact: true }).click();
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 
   test("missing the name field", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
     const patientData = {
       ssn: "01-010101",
       dateOfBirth: {
         year: 1980,
         month: 1,
-        day: 1
+        day: 1,
       },
       occupation: "Developer",
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toHaveText("Patient name is required");
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.getByRole("alert")).toHaveText(
+      "Patient name is required",
+    );
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 
   test("missing the ssn field", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
     const patientData = {
       name: "John Johns",
       dateOfBirth: {
         year: 1980,
         month: 1,
-        day: 1
+        day: 1,
       },
       occupation: "Developer",
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
     await expect(page.getByRole("alert")).toHaveText("Patient SSN is required");
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 
   test("missing the date of birth field", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
       occupation: "Developer",
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
     await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 
   test("missing the year on the date of birth field", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
       dateOfBirth: {
         month: 1,
-        day: 1
+        day: 1,
       },
       occupation: "Developer",
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
     await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 
   test("missing the month on the date of birth field", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
       dateOfBirth: {
         year: 1980,
-        day: 1
+        day: 1,
       },
       occupation: "Developer",
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
     await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 
   test("missing the day on the date of birth field", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
 
     const patientData = {
       name: "John Johns",
@@ -213,35 +253,40 @@ test.describe("Testing the add new patient form", () => {
         month: 1,
       },
       occupation: "Developer",
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
     await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 
   test("missing the occupation field", async ({ page }) => {
     await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page.locator("tbody").getByRole("row").count();
-    
+    const initialPatientsLength = await page
+      .locator("tbody")
+      .getByRole("row")
+      .count();
+
     const patientData = {
       name: "John Johns",
       ssn: "01-010101",
       dateOfBirth: {
         year: 1980,
         month: 1,
-        day: 1
+        day: 1,
       },
-      gender: 'male'
+      gender: "male",
     };
     await addPatient(page, patientData);
 
-    await expect(page.getByRole("alert")).toHaveText("Patient occupation is required");
+    await expect(page.getByRole("alert")).toHaveText(
+      "Patient occupation is required",
+    );
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await assertNotPresent(page, "John Johns", initialPatientsLength);
   });
 });

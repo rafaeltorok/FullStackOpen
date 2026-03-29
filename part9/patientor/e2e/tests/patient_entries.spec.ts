@@ -12,31 +12,34 @@ test.beforeEach(async ({ page, request }) => {
 
   const postResponse = await request.post(`/api/patients`, {
     data: {
-      name: 'John Johns',
-      ssn: '090786-122X',
-      dateOfBirth: '1980-01-01',
-      occupation: 'Developer',
-      gender: 'male'
-    }
+      name: "John Johns",
+      ssn: "090786-122X",
+      dateOfBirth: "1980-01-01",
+      occupation: "Developer",
+      gender: "male",
+    },
   });
 
   // ensure the request succeeded before proceeding
   expect(postResponse.ok()).toBeTruthy();
 
   await page.goto("/");
-  await expect(page.getByText('John Johns')).toBeVisible();
+  await expect(page.getByText("John Johns")).toBeVisible();
 });
 
 // E2E tests
 test.describe("Testing the add new entry form", () => {
   test("the add new entry button should display a form", async ({ page }) => {
     await page
-      .locator('tbody')
-      .getByRole('link', { name: 'John Johns' }).click();
+      .locator("tbody")
+      .getByRole("link", { name: "John Johns" })
+      .click();
 
-    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText(
+      "John Johns",
+    );
 
-    await page.getByRole('button', { name: 'Add new entry' }).click();
+    await page.getByRole("button", { name: "Add new entry" }).click();
 
     // Checks only the common fields between all entry types
     await checkCommonEntryFields(page);
@@ -44,24 +47,36 @@ test.describe("Testing the add new entry form", () => {
 
   test("the cancel button should hide the entry form", async ({ page }) => {
     await page
-      .locator('tbody')
-      .getByRole('link', { name: 'John Johns' }).click();
+      .locator("tbody")
+      .getByRole("link", { name: "John Johns" })
+      .click();
 
-    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText(
+      "John Johns",
+    );
 
-    await page.getByRole('button', { name: 'Add new entry' }).click();
+    await page.getByRole("button", { name: "Add new entry" }).click();
 
     // Confirms the form is displayed
-    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeVisible();
+    await expect(
+      page.locator("label").filter({ hasText: "Entry type" }),
+    ).toBeVisible();
 
     // Confirms the Cancel button exists and can be clicked on
-    const cancelButton = page.getByRole('button', { name: 'Cancel', exact: true });
+    const cancelButton = page.getByRole("button", {
+      name: "Cancel",
+      exact: true,
+    });
     await expect(cancelButton).toBeVisible();
     await cancelButton.click();
 
     // Checks if the form is truly hidden
-    await expect(page.getByRole('button', { name: 'Add new entry' })).toBeVisible();
-    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Add new entry" }),
+    ).toBeVisible();
+    await expect(
+      page.locator("label").filter({ hasText: "Entry type" }),
+    ).toBeHidden();
   });
 
   test("the cancel button should not add a new entry", async ({ page }) => {
@@ -70,94 +85,146 @@ test.describe("Testing the add new entry form", () => {
       date: {
         year: "2025",
         month: "12",
-        day: "31"
+        day: "31",
       },
       specialist: "Doctor Tester",
-      diagnosisCodes: [
-        "J10.1"
-      ],
+      diagnosisCodes: ["J10.1"],
       discharge: {
         date: {
           year: "2026",
           month: "01",
-          day: "03"
+          day: "03",
         },
         criteria: "Patient has healed.",
-      }
+      },
     };
 
     await page
-      .locator('tbody')
-      .getByRole('link', { name: 'John Johns' }).click();
+      .locator("tbody")
+      .getByRole("link", { name: "John Johns" })
+      .click();
 
-    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText(
+      "John Johns",
+    );
 
-    await page.getByRole('button', { name: 'Add new entry' }).click();
-    await page.getByRole('combobox', { name: 'Entry type' }).click();
-    await page.getByRole('option', { name: "Hospital", exact: true }).click();
-      
-    await page.getByRole('textbox', { name: 'Description' }).fill(data.description);
+    await page.getByRole("button", { name: "Add new entry" }).click();
+    await page.getByRole("combobox", { name: "Entry type" }).click();
+    await page.getByRole("option", { name: "Hospital", exact: true }).click();
+
+    await page
+      .getByRole("textbox", { name: "Description" })
+      .fill(data.description);
     // Fill date using MUI segmented inputs (DatePicker internal structure)
-    const dateGroup = page.getByRole('group', { name: 'Date' }).first();
-    await dateGroup.getByRole('spinbutton', { name: 'Year' }).fill(data.date.year);
-    await dateGroup.getByRole('spinbutton', { name: 'Month' }).fill(data.date.month);
-    await dateGroup.getByRole('spinbutton', { name: 'Day' }).fill(data.date.day);
-    await page.getByRole('textbox', { name: 'Specialist' }).fill(data.specialist);
-    await page.getByRole('combobox', { name: 'Diagnosis code' }).click();
-    await page.getByRole('option', { name: data.diagnosisCodes[0] }).click();
-    await page.getByRole('button', { name: 'Add Diagnose', exact: true }).click();
-    
-    const dischargeDate = page.getByRole('group', { name: 'Date' }).nth(1);
-    await dischargeDate.getByRole('spinbutton', { name: 'Year' }).fill(data.discharge.date.year);
-    await dischargeDate.getByRole('spinbutton', { name: 'Month' }).fill(data.discharge.date.month);
-    await dischargeDate.getByRole('spinbutton', { name: 'Day' }).fill(data.discharge.date.day);
-    await page.getByRole('textbox', { name: 'Criteria' }).fill(data.discharge.criteria);
+    const dateGroup = page.getByRole("group", { name: "Date" }).first();
+    await dateGroup
+      .getByRole("spinbutton", { name: "Year" })
+      .fill(data.date.year);
+    await dateGroup
+      .getByRole("spinbutton", { name: "Month" })
+      .fill(data.date.month);
+    await dateGroup
+      .getByRole("spinbutton", { name: "Day" })
+      .fill(data.date.day);
+    await page
+      .getByRole("textbox", { name: "Specialist" })
+      .fill(data.specialist);
+    await page.getByRole("combobox", { name: "Diagnosis code" }).click();
+    await page.getByRole("option", { name: data.diagnosisCodes[0] }).click();
+    await page
+      .getByRole("button", { name: "Add Diagnose", exact: true })
+      .click();
+
+    const dischargeDate = page.getByRole("group", { name: "Date" }).nth(1);
+    await dischargeDate
+      .getByRole("spinbutton", { name: "Year" })
+      .fill(data.discharge.date.year);
+    await dischargeDate
+      .getByRole("spinbutton", { name: "Month" })
+      .fill(data.discharge.date.month);
+    await dischargeDate
+      .getByRole("spinbutton", { name: "Day" })
+      .fill(data.discharge.date.day);
+    await page
+      .getByRole("textbox", { name: "Criteria" })
+      .fill(data.discharge.criteria);
 
     // Confirms the Cancel button exists and can be clicked on
-    const cancelButton = page.getByRole('button', { name: 'Cancel', exact: true });
+    const cancelButton = page.getByRole("button", {
+      name: "Cancel",
+      exact: true,
+    });
     await expect(cancelButton).toBeVisible();
     await cancelButton.click();
 
     // Checks if the form is truly hidden
-    await expect(page.getByRole('button', { name: 'Add new entry' })).toBeVisible();
-    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Add new entry" }),
+    ).toBeVisible();
+    await expect(
+      page.locator("label").filter({ hasText: "Entry type" }),
+    ).toBeHidden();
 
     // Confirms no entry has been added
-    await expect(page.locator('.patient-helper')).toHaveCount(0);
+    await expect(page.locator(".patient-helper")).toHaveCount(0);
   });
 
-  test("should display all fields for a new Hospital entry", async ({ page }) => {
+  test("should display all fields for a new Hospital entry", async ({
+    page,
+  }) => {
     await confirmPatientName(page, "John Johns");
-    await page.getByRole('button', { name: 'Add new entry' }).click();
-    await page.getByRole('combobox', { name: 'Entry type' }).click();
-    await page.getByRole('option', { name: "Hospital", exact: true }).click();
+    await page.getByRole("button", { name: "Add new entry" }).click();
+    await page.getByRole("combobox", { name: "Entry type" }).click();
+    await page.getByRole("option", { name: "Hospital", exact: true }).click();
 
     await checkCommonEntryFields(page);
-    await expect(page.locator('label').filter({ hasText: 'Discharge' })).toBeVisible();
-    await expect(page.getByRole('group', { name: 'Date' }).nth(1)).toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'Criteria' })).toBeVisible();
+    await expect(
+      page.locator("label").filter({ hasText: "Discharge" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "Date" }).nth(1),
+    ).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Criteria" })).toBeVisible();
   });
 
-  test("should display all fields for a new HealthCheck entry", async ({ page }) => {
+  test("should display all fields for a new HealthCheck entry", async ({
+    page,
+  }) => {
     await confirmPatientName(page, "John Johns");
-    await page.getByRole('button', { name: 'Add new entry' }).click();
-    await page.getByRole('combobox', { name: 'Entry type' }).click();
-    await page.getByRole('option', { name: "HealthCheck", exact: true }).click();
+    await page.getByRole("button", { name: "Add new entry" }).click();
+    await page.getByRole("combobox", { name: "Entry type" }).click();
+    await page
+      .getByRole("option", { name: "HealthCheck", exact: true })
+      .click();
 
     await checkCommonEntryFields(page);
-    await expect(page.locator('label').filter({ hasText: 'Health Rating' })).toBeVisible();
-    await expect(page.getByRole('combobox', { name: 'Health Rating' })).toBeVisible();
+    await expect(
+      page.locator("label").filter({ hasText: "Health Rating" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("combobox", { name: "Health Rating" }),
+    ).toBeVisible();
   });
 
-  test("should display all fields for a new Occupational Healthcare entry", async ({ page }) => {
+  test("should display all fields for a new Occupational Healthcare entry", async ({
+    page,
+  }) => {
     await confirmPatientName(page, "John Johns");
-    await page.getByRole('button', { name: 'Add new entry' }).click();
-    await page.getByRole('combobox', { name: 'Entry type' }).click();
-    await page.getByRole('option', { name: "OccupationalHealthcare", exact: true }).click();
+    await page.getByRole("button", { name: "Add new entry" }).click();
+    await page.getByRole("combobox", { name: "Entry type" }).click();
+    await page
+      .getByRole("option", { name: "OccupationalHealthcare", exact: true })
+      .click();
 
     await checkCommonEntryFields(page);
-    await expect(page.locator('label').filter({ hasText: 'Sick leave' })).toBeVisible();
-    await expect(page.getByRole('group', { name: 'Start date', exact: true })).toBeVisible();
-    await expect(page.getByRole('group', { name: 'End date', exact: true })).toBeVisible();
+    await expect(
+      page.locator("label").filter({ hasText: "Sick leave" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "Start date", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "End date", exact: true }),
+    ).toBeVisible();
   });
 });

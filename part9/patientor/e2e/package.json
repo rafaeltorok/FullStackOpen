@@ -13,7 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "playwright": "^1.58.2"
+    "playwright": "^1.58.2",
+    "prettier": "^3.8.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

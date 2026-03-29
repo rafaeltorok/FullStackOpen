@@ -1,11 +1,11 @@
 // Playwright dependencies
 import { expect } from "playwright/test";
 
-// TypeScript types
-import type { Page, Locator } from "playwright/test";
-
 // Helper functions
 import { formatDate } from "../date_helper";
+
+// TypeScript types
+import type { Page, Locator } from "playwright/test";
 
 type HealthCheckEntryInput = {
   description?: unknown;
@@ -17,6 +17,13 @@ type HealthCheckEntryInput = {
   specialist?: unknown;
   diagnosisCodes?: unknown[];
   healthCheckRating?: unknown;
+};
+
+const ratingValues = {
+  0: "Healthy",
+  1: "LowRisk",
+  2: "HighRisk",
+  3: "CriticalRisk"
 };
 
 export async function addHealthCheckEntry(page: Page, data: HealthCheckEntryInput) {
@@ -48,7 +55,12 @@ export async function addHealthCheckEntry(page: Page, data: HealthCheckEntryInpu
   }
   if (data.healthCheckRating) {
     await page.getByRole('combobox', { name: 'Health Rating' }).click();
-    await page.getByRole('option', { name: String(data.healthCheckRating), exact: true }).click();
+    await page
+      .getByRole('option', { 
+        name: ratingValues[data.healthCheckRating as keyof typeof ratingValues], 
+        exact: true 
+      })
+      .click();
   }
   
   await page.getByRole('button', { name: 'Add', exact: true }).click();

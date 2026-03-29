@@ -72,8 +72,8 @@ export async function assertHospitalEntry(entry: Locator, data: HospitalEntryInp
   })).toBeVisible();
   await expect(entry.getByTestId('LocalHospitalIcon')).toBeVisible();
   await expect(entry.locator('p', { hasText: String(data.description)})).toBeVisible();
-  await expect(entry.getByRole('heading', { level: 3 }).filter({ hasText: 'Diagnoses codes:' })).toBeVisible();
   if (data.diagnosisCodes) {
+    await expect(entry.getByRole('heading', { level: 3 }).filter({ hasText: 'Diagnoses codes:' })).toBeVisible();
     for (const code of data.diagnosisCodes) {
       await expect(entry.locator('li', { hasText: String(code) })).toBeVisible();
     }

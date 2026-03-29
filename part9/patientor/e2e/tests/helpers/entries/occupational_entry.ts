@@ -84,18 +84,20 @@ export async function assertOccupationalEntry(entry: Locator, data: Occupational
   await expect(entry.getByTestId('WorkIcon')).toBeVisible();
   await expect(entry.locator('p', { hasText: String(data.description)})).toBeVisible();
   await expect(entry.locator('p', { hasText: String(data.employerName)})).toBeVisible();
-  await expect(entry.getByRole('heading', { level: 3 }).filter({ hasText: 'Diagnoses codes:' })).toBeVisible();
   if (data.diagnosisCodes) {
+    await expect(entry.getByRole('heading', { level: 3 }).filter({ hasText: 'Diagnoses codes:' })).toBeVisible();
     for (const code of data.diagnosisCodes) {
       await expect(entry.locator('li', { hasText: String(code) })).toBeVisible();
     }
   }
-  await expect(entry.getByRole('heading', { level: 3 }).filter({ hasText: 'Sick leave:'})).toBeVisible();
-  await expect(entry.locator('li', { 
-    hasText: `Start date: ${formatDate(data.sickLeave?.startDate)}`
-  })).toBeVisible();
-  await expect(entry.locator('li', { 
-    hasText: `End date: ${formatDate(data.sickLeave?.endDate)}` 
-  })).toBeVisible();
+  if (data.sickLeave) {
+    await expect(entry.getByRole('heading', { level: 3 }).filter({ hasText: 'Sick leave:'})).toBeVisible();
+    await expect(entry.locator('li', { 
+      hasText: `Start date: ${formatDate(data.sickLeave?.startDate)}`
+    })).toBeVisible();
+    await expect(entry.locator('li', { 
+      hasText: `End date: ${formatDate(data.sickLeave?.endDate)}` 
+    })).toBeVisible();
+  }
   await expect(entry.locator('em', { hasText: `diagnose by ${data.specialist}` })).toBeVisible();
 }

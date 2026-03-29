@@ -45,21 +45,123 @@ test.beforeEach(async ({ page, request }) => {
 // E2E tests
 test.describe("Valid HealthCheck entries", () => {
   test("should add a new HealthCheck entry", async ({ page }) => {
+    const initialEntriesLength = await page.locator(".patient-entry").count();
     await confirmPatientName(page, "John Johns");
+
     await addHealthCheckEntry(page, healthCheckEntry);
     await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
 
     const entries = page.locator(".patient-entry");
     await assertHealthCheckEntry(entries.first(), healthCheckEntry);
+    await expect(page.locator(".patient-entry")).toHaveCount(initialEntriesLength + 1);
   });
 
   test("the diagnosis code field is optional", async ({ page }) => {
+    const initialEntriesLength = await page.locator(".patient-entry").count();
     await confirmPatientName(page, "John Johns");
+
     const { diagnosisCodes, ...otherFields } = healthCheckEntry;
     await addHealthCheckEntry(page, otherFields);
     await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
 
     const entries = page.locator(".patient-entry");
     await assertHealthCheckEntry(entries.first(), otherFields);
+    await expect(page.locator(".patient-entry")).toHaveCount(initialEntriesLength + 1);
+  });
+
+  test("multiple diagnosis codes can be added", async({ page }) => {
+    const initialEntriesLength = await page.locator(".patient-entry").count();
+    await confirmPatientName(page, "John Johns");
+
+    const codes = ["M24.2", "M51.2", "S03.5", "J10.1", "J06.9"];
+    
+    const { diagnosisCodes, ...otherFields } = healthCheckEntry;
+    await addHealthCheckEntry(page, { ...otherFields, diagnosisCodes: codes });
+    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
+
+    const entries = page.locator(".patient-entry");
+    await assertHealthCheckEntry(entries.first(), otherFields);
+    await expect(page.locator(".patient-entry")).toHaveCount(initialEntriesLength + 1);
+  });
+});
+
+test.describe("Invalid HealthCheck entries", () => {
+  test("missing the description field", async ({ page }) => {
+    const initialEntriesLength = await page.locator(".patient-entry").count();
+    await confirmPatientName(page, "John Johns");
+
+    const { description, ...otherFields } = healthCheckEntry;
+    await addHealthCheckEntry(page, otherFields);
+    await expect(page.getByRole('alert')).toHaveText("Missing required field(s): Description, Date or Specialist");
+    await expect(page.locator(".patient-entry")).toHaveCount(initialEntriesLength);
+  });
+
+  test("missing the date field", async ({ page }) => {
+    const initialEntriesLength = await page.locator(".patient-entry").count();
+    await confirmPatientName(page, "John Johns");
+
+    const { date, ...otherFields } = healthCheckEntry;
+    await addHealthCheckEntry(page, otherFields);
+    await expect(page.getByRole('alert')).toHaveText("Missing required field(s): Description, Date or Specialist");
+    await expect(page.locator(".patient-entry")).toHaveCount(initialEntriesLength);
+  });
+
+  test("missing the specialist field", async ({ page }) => {
+    const initialEntriesLength = await page.locator(".patient-entry").count();
+    await confirmPatientName(page, "John Johns");
+
+    const { specialist, ...otherFields } = healthCheckEntry;
+    await addHealthCheckEntry(page, otherFields);
+    await expect(page.getByRole('alert')).toHaveText("Missing required field(s): Description, Date or Specialist");
+    await expect(page.locator(".patient-entry")).toHaveCount(initialEntriesLength);
+  });
+});
+
+test.describe("Testing the Health Rating field", () => {
+  test("the 'Healthy' health rating is the default one", async ({ page }) => {
+    const initialEntriesLength = await page.locator(".patient-entry").count();
+    await confirmPatientName(page, "John Johns");
+
+    const { healthCheckRating, ...otherFields } = healthCheckEntry;
+    await addHealthCheckEntry(page, otherFields);
+    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
+
+    const entries = page.locator(".patient-entry");
+    await assertHealthCheckEntry(entries.first(), healthCheckEntry);
+    await expect(page.getByTestId('FavoriteIcon')).toHaveCSS('color', "rgb(0, 255, 0)");
+    await expect(page.locator(".patient-entry")).toHaveCount(initialEntriesLength + 1);
+  });
+
+  test("LowRisk rating has a yellow color", async ({ page }) => {
+    await confirmPatientName(page, "John Johns");
+
+    await addHealthCheckEntry(page, { ...healthCheckEntry, healthCheckRating: 1 });
+    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
+
+    const entries = page.locator(".patient-entry");
+    await assertHealthCheckEntry(entries.first(), { ...healthCheckEntry, healthCheckRating: 1 });
+    await expect(page.getByTestId('FavoriteIcon')).toHaveCSS('color', "rgb(255, 255, 0)");
+  });
+
+  test("HighRisk rating has an orange color", async ({ page }) => {
+    await confirmPatientName(page, "John Johns");
+
+    await addHealthCheckEntry(page, { ...healthCheckEntry, healthCheckRating: 2 });
+    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
+
+    const entries = page.locator(".patient-entry");
+    await assertHealthCheckEntry(entries.first(), { ...healthCheckEntry, healthCheckRating: 2 });
+    await expect(page.getByTestId('FavoriteIcon')).toHaveCSS('color', "rgb(255, 125, 0)");
+  });
+
+  test("CriticalRisk rating has a red color", async ({ page }) => {
+    await confirmPatientName(page, "John Johns");
+
+    await addHealthCheckEntry(page, { ...healthCheckEntry, healthCheckRating: 3 });
+    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
+
+    const entries = page.locator(".patient-entry");
+    await assertHealthCheckEntry(entries.first(), { ...healthCheckEntry, healthCheckRating: 3 });
+    await expect(page.getByTestId('FavoriteIcon')).toHaveCSS('color', "rgb(255, 0, 0)");
   });
 });

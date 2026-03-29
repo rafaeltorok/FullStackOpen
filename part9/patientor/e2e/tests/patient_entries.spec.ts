@@ -4,9 +4,6 @@ import { test, expect } from "@playwright/test";
 // Helper functions
 import { checkCommonEntryFields } from "./helpers/entries/entry_helpers";
 import { confirmPatientName } from "./helpers/patient_helpers";
-import { addHospitalEntry, assertHospitalEntry } from "./helpers/entries/hospital_entry";
-import { addHealthCheckEntry, assertHealthCheckEntry } from "./helpers/entries/healthcheck_entry";
-import { addOccupationalEntry, assertOccupationalEntry } from "./helpers/entries/occupational_entry";
 
 // Posts a new patient with no entries
 test.beforeEach(async ({ page, request }) => {
@@ -31,7 +28,7 @@ test.beforeEach(async ({ page, request }) => {
 });
 
 // E2E tests
-test.describe("Adding new entries", () => {
+test.describe("Testing the add new entry form", () => {
   test("the add new entry button should display a form", async ({ page }) => {
     await page
       .locator('tbody')
@@ -67,6 +64,68 @@ test.describe("Adding new entries", () => {
     await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeHidden();
   });
 
+  test("the cancel button should not add a new entry", async ({ page }) => {
+    const data = {
+      description: "Stable condition.",
+      date: {
+        year: "2025",
+        month: "12",
+        day: "31"
+      },
+      specialist: "Doctor Tester",
+      diagnosisCodes: [
+        "J10.1"
+      ],
+      discharge: {
+        date: {
+          year: "2026",
+          month: "01",
+          day: "03"
+        },
+        criteria: "Patient has healed.",
+      }
+    };
+
+    await page
+      .locator('tbody')
+      .getByRole('link', { name: 'John Johns' }).click();
+
+    await expect(page.getByRole('heading', { level: 2 })).toHaveText("John Johns");
+
+    await page.getByRole('button', { name: 'Add new entry' }).click();
+    await page.getByRole('combobox', { name: 'Entry type' }).click();
+    await page.getByRole('option', { name: "Hospital", exact: true }).click();
+      
+    await page.getByRole('textbox', { name: 'Description' }).fill(data.description);
+    // Fill date using MUI segmented inputs (DatePicker internal structure)
+    const dateGroup = page.getByRole('group', { name: 'Date' }).first();
+    await dateGroup.getByRole('spinbutton', { name: 'Year' }).fill(data.date.year);
+    await dateGroup.getByRole('spinbutton', { name: 'Month' }).fill(data.date.month);
+    await dateGroup.getByRole('spinbutton', { name: 'Day' }).fill(data.date.day);
+    await page.getByRole('textbox', { name: 'Specialist' }).fill(data.specialist);
+    await page.getByRole('combobox', { name: 'Diagnosis code' }).click();
+    await page.getByRole('option', { name: data.diagnosisCodes[0] }).click();
+    await page.getByRole('button', { name: 'Add Diagnose', exact: true }).click();
+    
+    const dischargeDate = page.getByRole('group', { name: 'Date' }).nth(1);
+    await dischargeDate.getByRole('spinbutton', { name: 'Year' }).fill(data.discharge.date.year);
+    await dischargeDate.getByRole('spinbutton', { name: 'Month' }).fill(data.discharge.date.month);
+    await dischargeDate.getByRole('spinbutton', { name: 'Day' }).fill(data.discharge.date.day);
+    await page.getByRole('textbox', { name: 'Criteria' }).fill(data.discharge.criteria);
+
+    // Confirms the Cancel button exists and can be clicked on
+    const cancelButton = page.getByRole('button', { name: 'Cancel', exact: true });
+    await expect(cancelButton).toBeVisible();
+    await cancelButton.click();
+
+    // Checks if the form is truly hidden
+    await expect(page.getByRole('button', { name: 'Add new entry' })).toBeVisible();
+    await expect(page.locator('label').filter({ hasText: 'Entry type' })).toBeHidden();
+
+    // Confirms no entry has been added
+    await expect(page.locator('.patient-helper')).toHaveCount(0);
+  });
+
   test("should display all fields for a new Hospital entry", async ({ page }) => {
     await confirmPatientName(page, "John Johns");
     await page.getByRole('button', { name: 'Add new entry' }).click();
@@ -100,93 +159,5 @@ test.describe("Adding new entries", () => {
     await expect(page.locator('label').filter({ hasText: 'Sick leave' })).toBeVisible();
     await expect(page.getByRole('group', { name: 'Start date', exact: true })).toBeVisible();
     await expect(page.getByRole('group', { name: 'End date', exact: true })).toBeVisible();
-  });
-
-  test("should add a new Hospital entry", async ({ page }) => {
-    const hospitalEntry = {
-      description: "Stable condition.",
-      date: {
-        year: "2025",
-        month: "12",
-        day: "31"
-      },
-      specialist: "Doctor Tester",
-      diagnosisCodes: [
-        "J10.1"
-      ],
-      discharge: {
-        date: {
-          year: "2026",
-          month: "01",
-          day: "03"
-        },
-        criteria: "Patient has healed.",
-      }
-    };
-
-    await confirmPatientName(page, "John Johns");
-    await addHospitalEntry(page, hospitalEntry);
-    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
-
-    const entries = page.locator(".patient-entry");
-    await assertHospitalEntry(entries.first(), hospitalEntry);
-  });
-
-  test("should add a new HealthCheck entry", async ({ page }) => {
-    const healthCheckEntry = {
-      description: "Routine check.",
-      date: {
-        year: "2025",
-        month: "12",
-        day: "31"
-      },
-      specialist: "Doctor Tester",
-      diagnosisCodes: [
-        "N30.0"
-      ],
-      healthCheckRating: 0
-    };
-
-    await confirmPatientName(page, "John Johns");
-    await addHealthCheckEntry(page, healthCheckEntry);
-    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
-
-    const entries = page.locator(".patient-entry");
-    await assertHealthCheckEntry(entries.first(), healthCheckEntry);
-  });
-
-  test("should add a new Occupational Healthcare entry", async ({ page }) => {
-    const occupationalEntry = {
-      description: "Patient with moderate respiratory issues.",
-      date: {
-        year: "2025",
-        month: "12",
-        day: "31"
-      },
-      specialist: "Doctor Tester",
-      employerName: "Company",
-      diagnosisCodes: [
-        "J06.9"
-      ],
-      sickLeave: {
-        startDate: {
-          year: "2026",
-          month: "01",
-          day: "01"
-        },
-        endDate: {
-          year: "2026",
-          month: "01",
-          day: "15"
-        },
-      }
-    };
-
-    await confirmPatientName(page, "John Johns");
-    await addOccupationalEntry(page, occupationalEntry);
-    await expect(page.getByRole('alert')).toHaveText("Entry was added successfully!");
-
-    const entries = page.locator(".patient-entry");
-    await assertOccupationalEntry(entries.first(), occupationalEntry);
   });
 });

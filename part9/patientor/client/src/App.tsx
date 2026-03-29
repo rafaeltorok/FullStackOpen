@@ -35,8 +35,8 @@ const App = () => {
             component={Link}
             to="/"
             sx={{
-              textDecoration: 'none',
-              color: 'inherit'
+              textDecoration: "none",
+              color: "inherit",
             }}
           >
             Patientor

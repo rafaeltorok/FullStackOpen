@@ -46,10 +46,16 @@ const PatientListPage = ({ patients, setPatients }: Props) => {
         if (e?.response?.data) {
           const data = e.response.data;
 
-          if (typeof data === 'string') {
-            setError(data.replace("Something went wrong. Error: ", "",));
-          } else if (typeof data === "object" && Array.isArray(data.error) && data.error.length > 0) {
-            setError(data.error.map((e: { message: string }) => e.message).join(", "));
+          if (typeof data === "string") {
+            setError(data.replace("Something went wrong. Error: ", ""));
+          } else if (
+            typeof data === "object" &&
+            Array.isArray(data.error) &&
+            data.error.length > 0
+          ) {
+            setError(
+              data.error.map((e: { message: string }) => e.message).join(", "),
+            );
           } else {
             setError("Unrecognized axios error");
           }

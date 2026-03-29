@@ -50,10 +50,9 @@ export default function AddEntryForm(props: AddEntryProps) {
   return (
     <div>
       <form className="add-entry-form">
-        <InputLabel 
-          id="entry-type-label"
-          style={{ marginTop: 20 }}
-        >Entry type</InputLabel>
+        <InputLabel id="entry-type-label" style={{ marginTop: 20 }}>
+          Entry type
+        </InputLabel>
         <Select
           labelId="entry-type-label"
           label="Entry type"

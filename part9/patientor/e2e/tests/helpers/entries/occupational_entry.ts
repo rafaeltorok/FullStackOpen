@@ -2,7 +2,12 @@
 import { expect } from "playwright/test";
 
 // TypeScript types
-import type { Page, Locator, APIResponse, APIRequestContext } from "playwright/test";
+import type {
+  Page,
+  Locator,
+  APIResponse,
+  APIRequestContext,
+} from "playwright/test";
 
 // Helper functions
 import { formatDate } from "../date_helper";
@@ -31,11 +36,8 @@ type OccupationalEntryInput = {
   };
 };
 
-// Adds a new entry through the frontend
-export async function addOccupationalEntry(
-  page: Page,
-  data: OccupationalEntryInput,
-) {
+// Fill the new entry form
+export async function fillEntryForm(page: Page, data: OccupationalEntryInput) {
   await page.getByRole("button", { name: "Add new entry" }).click();
   await page.getByRole("combobox", { name: "Entry type" }).click();
   await page
@@ -105,22 +107,66 @@ export async function addOccupationalEntry(
       .getByRole("spinbutton", { name: "Day" })
       .fill(String(data.sickLeave.endDate.day));
   }
+}
 
+// Add a new valid entry through the frontend
+export async function addOccupationalEntry(
+  page: Page,
+  data: OccupationalEntryInput,
+  initialEntriesLength: number,
+) {
+  // Add the new entry
+  await fillEntryForm(page, data);
   await page.getByRole("button", { name: "Add", exact: true }).click();
+
+  // Confirm it has been added
+  await expect(page.getByRole("alert")).toHaveText(
+    "Entry was added successfully!",
+  );
+  await expect(page.locator(".patient-entry")).toHaveCount(
+    initialEntriesLength + 1,
+  );
+}
+
+// Tests adding a new entry with a missing field
+export async function testMissingField(
+  page: Page,
+  newEntry: OccupationalEntryInput,
+  errorMessage: string,
+  initialEntriesLength: number,
+) {
+  // Try to add the patient with the missing field
+  await fillEntryForm(page, newEntry);
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+
+  // Confirm error message appears on the form
+  await expect(page.getByRole("alert")).toHaveText(errorMessage);
+
+  // Confirm no new entry have been added
+  await expect(page.locator(".patient-entry")).toHaveCount(
+    initialEntriesLength,
+  );
 }
 
 // Adds a new entry directly through a HTTP request to the backend server
-export async function postOccupationalRequest(id: string, request: APIRequestContext, newEntry: OccupationalEntryInput) {
-  const response: APIResponse = await request.post(`/api/patients/${id}/entries`, {
-    data: {
-      ...newEntry,
-      date: formatDate(newEntry.date),
-      sickLeave: {
-        startDate: formatDate(newEntry.sickLeave?.startDate),
-        endDate: formatDate(newEntry.sickLeave?.endDate),
+export async function postOccupationalRequest(
+  id: string,
+  request: APIRequestContext,
+  newEntry: OccupationalEntryInput,
+) {
+  const response: APIResponse = await request.post(
+    `/api/patients/${id}/entries`,
+    {
+      data: {
+        ...newEntry,
+        date: formatDate(newEntry.date),
+        sickLeave: {
+          startDate: formatDate(newEntry.sickLeave?.startDate),
+          endDate: formatDate(newEntry.sickLeave?.endDate),
+        },
       },
     },
-  });
+  );
   expect(response.ok()).toBeTruthy();
 }
 

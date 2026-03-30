@@ -90,14 +90,16 @@ export async function getPatientCount(page: Page): Promise<number> {
 
 // Tests adding a new patient with a missing field
 export async function testMissingField(
-  page: Page, 
+  page: Page,
   patientInfo: PatientInput,
-  errorMessage: string, 
-  patientCount: number
+  errorMessage: string,
+  patientCount: number,
 ) {
   // Wait for the expected initial data to be present first
-  await expect(page.locator("tbody").getByRole("row")).toHaveCount(patientCount);
-  
+  await expect(page.locator("tbody").getByRole("row")).toHaveCount(
+    patientCount,
+  );
+
   // Add a new patient
   await addPatient(page, patientInfo);
 

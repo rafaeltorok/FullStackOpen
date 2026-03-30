@@ -12,7 +12,7 @@ const newPatient = {
   dateOfBirth: "1980-01-01",
   occupation: "Developer",
   gender: "male",
-}
+};
 
 // Posts a new patient with no entries
 test.beforeEach(async ({ page, request }) => {
@@ -157,7 +157,9 @@ test.describe("Testing the add new entry form", () => {
     ).toBeHidden();
 
     // Confirm that no entry has been added
-    await expect(page.locator(".patient-helper")).toHaveCount(initialEntryCount);
+    await expect(page.locator(".patient-helper")).toHaveCount(
+      initialEntryCount,
+    );
   });
 
   test("should display all fields for a new Hospital entry", async ({

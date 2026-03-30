@@ -5,7 +5,12 @@ import { expect } from "playwright/test";
 import { formatDate } from "../date_helper";
 
 // TypeScript types
-import type { Page, Locator, APIResponse, APIRequestContext } from "playwright/test";
+import type {
+  Page,
+  Locator,
+  APIResponse,
+  APIRequestContext,
+} from "playwright/test";
 
 type HealthCheckEntryInput = {
   description?: unknown;
@@ -26,11 +31,8 @@ const ratingValues = {
   3: "CriticalRisk",
 };
 
-// Adds a new entry through the frontend
-export async function addHealthCheckEntry(
-  page: Page,
-  data: HealthCheckEntryInput,
-) {
+// Fill the new entry form
+export async function fillEntryForm(page: Page, data: HealthCheckEntryInput) {
   await page.getByRole("button", { name: "Add new entry" }).click();
   await page.getByRole("combobox", { name: "Entry type" }).click();
   await page.getByRole("option", { name: "HealthCheck", exact: true }).click();
@@ -78,18 +80,62 @@ export async function addHealthCheckEntry(
       })
       .click();
   }
+}
 
+// Add a new valid entry through the frontend
+export async function addHealthCheckEntry(
+  page: Page,
+  data: HealthCheckEntryInput,
+  initialEntriesLength: number,
+) {
+  // Add the new entry
+  await fillEntryForm(page, data);
   await page.getByRole("button", { name: "Add", exact: true }).click();
+
+  // Confirm it has been added
+  await expect(page.getByRole("alert")).toHaveText(
+    "Entry was added successfully!",
+  );
+  await expect(page.locator(".patient-entry")).toHaveCount(
+    initialEntriesLength + 1,
+  );
+}
+
+// Tests adding a new entry with a missing field
+export async function testMissingField(
+  page: Page,
+  newEntry: HealthCheckEntryInput,
+  errorMessage: string,
+  initialEntriesLength: number,
+) {
+  // Try to add the patient with the missing field
+  await fillEntryForm(page, newEntry);
+  await page.getByRole("button", { name: "Add", exact: true }).click();
+
+  // Confirm error message appears on the form
+  await expect(page.getByRole("alert")).toHaveText(errorMessage);
+
+  // Confirm no new entry have been added
+  await expect(page.locator(".patient-entry")).toHaveCount(
+    initialEntriesLength,
+  );
 }
 
 // Adds a new entry directly through a HTTP request to the backend server
-export async function postHealthCheckRequest(id: string, request: APIRequestContext, newEntry: HealthCheckEntryInput) {
-  const response: APIResponse = await request.post(`/api/patients/${id}/entries`, {
-    data: {
-      ...newEntry,
-      date: formatDate(newEntry.date),
+export async function postHealthCheckRequest(
+  id: string,
+  request: APIRequestContext,
+  newEntry: HealthCheckEntryInput,
+) {
+  const response: APIResponse = await request.post(
+    `/api/patients/${id}/entries`,
+    {
+      data: {
+        ...newEntry,
+        date: formatDate(newEntry.date),
+      },
     },
-  });
+  );
   expect(response.ok()).toBeTruthy();
 }
 

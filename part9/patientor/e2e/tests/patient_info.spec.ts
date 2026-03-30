@@ -5,9 +5,18 @@ import { test, expect } from "@playwright/test";
 import type { NonSensitivePatient } from "../../shared/types";
 
 // Helper functions
-import { assertHospitalEntry, postHospitalRequest } from "./helpers/entries/hospital_entry";
-import { assertHealthCheckEntry, postHealthCheckRequest } from "./helpers/entries/healthcheck_entry";
-import { assertOccupationalEntry, postOccupationalRequest } from "./helpers/entries/occupational_entry";
+import {
+  assertHospitalEntry,
+  postHospitalRequest,
+} from "./helpers/entries/hospital_entry";
+import {
+  assertHealthCheckEntry,
+  postHealthCheckRequest,
+} from "./helpers/entries/healthcheck_entry";
+import {
+  assertOccupationalEntry,
+  postOccupationalRequest,
+} from "./helpers/entries/occupational_entry";
 import { accessPatientInfo } from "./helpers/patient_helpers";
 
 // Constants
@@ -74,7 +83,7 @@ const newEntries = [
         day: "02",
       },
     },
-  }
+  },
 ];
 
 // Creates a new patient with one entry for each type

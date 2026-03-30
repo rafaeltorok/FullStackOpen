@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 
 // Helper functions
-import { confirmPatientName } from "../helpers/patient_helpers";
+import { accessPatientInfo } from "../helpers/patient_helpers";
 import {
   addOccupationalEntry,
   assertOccupationalEntry,
@@ -59,7 +59,7 @@ test.beforeEach(async ({ page, request }) => {
 test.describe("Valid Occupational Healthcare entries", () => {
   test("should add a new Occupational Healthcare entry", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     await addOccupationalEntry(page, occupationalEntry);
     await expect(page.getByRole("alert")).toHaveText(
@@ -75,7 +75,7 @@ test.describe("Valid Occupational Healthcare entries", () => {
 
   test("the diagnosis code field is optional", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { diagnosisCodes, ...otherFields } = occupationalEntry;
     await addOccupationalEntry(page, otherFields);
@@ -92,7 +92,7 @@ test.describe("Valid Occupational Healthcare entries", () => {
 
   test("the sick leave field is optional", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { sickLeave, ...otherFields } = occupationalEntry;
     await addOccupationalEntry(page, otherFields);
@@ -109,7 +109,7 @@ test.describe("Valid Occupational Healthcare entries", () => {
 
   test("multiple diagnosis codes can be added", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const codes = ["M24.2", "M51.2", "S03.5", "J10.1", "J06.9"];
 
@@ -130,7 +130,7 @@ test.describe("Valid Occupational Healthcare entries", () => {
 test.describe("Invalid Occupational Healthcare entries", () => {
   test("missing the description field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { description, ...otherFields } = occupationalEntry;
     await addOccupationalEntry(page, otherFields);
@@ -144,7 +144,7 @@ test.describe("Invalid Occupational Healthcare entries", () => {
 
   test("missing the date field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { date, ...otherFields } = occupationalEntry;
     await addOccupationalEntry(page, otherFields);
@@ -158,7 +158,7 @@ test.describe("Invalid Occupational Healthcare entries", () => {
 
   test("missing the specialist field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { specialist, ...otherFields } = occupationalEntry;
     await addOccupationalEntry(page, otherFields);
@@ -173,7 +173,7 @@ test.describe("Invalid Occupational Healthcare entries", () => {
   // The sick leave field might be optional, but if one of its fields are filled, the other must be filled too
   test("missing the start date of the sick leave field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const {
       sickLeave: { startDate: sickLeaveDate, ...otherDate },
@@ -190,7 +190,7 @@ test.describe("Invalid Occupational Healthcare entries", () => {
 
   test("missing the end date of the sick leave field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const {
       sickLeave: { endDate: sickLeaveDate, ...otherDate },

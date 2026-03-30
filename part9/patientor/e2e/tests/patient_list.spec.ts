@@ -1,8 +1,26 @@
+// Data
+import patients from "../../server/src/data/patients";
+
 // Playwright dependencies
 import { test, expect } from "@playwright/test";
 
 // Helper functions
-import { addPatient, assertNotPresent } from "./helpers/patient_helpers";
+import { addPatient, assertNotPresent, testMissingField } from "./helpers/patient_helpers";
+
+// Constants
+const getPatientCount = patients.length;
+
+const newPatient = {
+  name: "John Johns",
+  ssn: "01-010101",
+  dateOfBirth: {
+    year: 1980,
+    month: 1,
+    day: 1,
+  },
+  occupation: "Developer",
+  gender: "male",
+};
 
 test.beforeEach(async ({ page }) => {
   // Resets the database to the original state before each test
@@ -23,16 +41,21 @@ test.describe("Testing the home page", () => {
 
   test("should display the list of patients", async ({ page }) => {
     const patients = page.locator("tbody").getByRole("row");
-    await expect(patients).toHaveCount(5);
+    
+    // Confirms the total number of patients is present
+    await expect(patients).toHaveCount(getPatientCount);
   });
 
   test("should display a patients' non-sensitive information", async ({
     page,
   }) => {
+    // Filter a patient based on its name
     const row = page
       .locator("tbody")
       .getByRole("row")
       .filter({ has: page.getByRole("link", { name: "John McClane" }) });
+
+    // Assert the data is correct
     await expect(row.getByRole("link", { name: "John McClane" })).toBeVisible();
     await expect(row.getByRole("cell", { name: "male" })).toBeVisible();
     await expect(
@@ -40,12 +63,15 @@ test.describe("Testing the home page", () => {
     ).toBeVisible();
   });
 });
-
+  
 test.describe("Testing the add new patient form", () => {
   test("should display the form when clicking on the Add New Patient button", async ({
     page,
   }) => {
+    // Open the add form
     await page.getByRole("button", { name: "Add New Patient" }).click();
+
+    // Assert all fields are present
     await expect(page.getByLabel("Name")).toBeVisible();
     await expect(page.getByLabel("Social security number")).toBeVisible();
     await expect(
@@ -61,232 +87,159 @@ test.describe("Testing the add new patient form", () => {
   test("should add a new patient when clicking on the Add button", async ({
     page,
   }) => {
-    // wait for the expected initial data to be present first
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Wait for the expected initial data to be present first
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(getPatientCount);
 
-    const patientData = {
-      name: "John Johns",
-      ssn: "01-010101",
-      dateOfBirth: {
-        year: 1980,
-        month: 1,
-        day: 1,
-      },
-      occupation: "Developer",
-      gender: "male",
-    };
-    await addPatient(page, patientData);
+    // Add a new patient
+    await addPatient(page, newPatient);
 
+    // Confirm the list of patients has increased
     const patients = page.locator("tbody").getByRole("row");
-    await expect(patients).toHaveCount(initialPatientsLength + 1);
+    await expect(patients).toHaveCount(getPatientCount + 1);
 
+    // Assert the patient data is correct
     const row = page
       .locator("tbody")
       .getByRole("row")
-      .filter({ has: page.getByRole("link", { name: "John Johns" }) });
-    await expect(row.getByRole("link", { name: "John Johns" })).toBeVisible();
-    await expect(row.getByRole("cell", { name: "male" })).toBeVisible();
-    await expect(row.getByRole("cell", { name: "Developer" })).toBeVisible();
+      .filter({ has: page.getByRole("link", { name: newPatient.name }) });
+    await expect(row.getByRole("cell", { name: newPatient.gender })).toBeVisible();
+    await expect(row.getByRole("cell", { name: newPatient.occupation })).toBeVisible();
   });
 
   test("the cancel button should not add a new patient", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Wait for the expected initial data to be present first
+    await expect(page.locator("tbody").getByRole("row")).toHaveCount(getPatientCount);
 
+    // Open the add form
     await page.getByRole("button", { name: "Add New Patient" }).click();
+
+    // Fill patient information
     await page.getByRole("textbox", { name: "Name" }).fill("John Johns");
     await page
       .getByRole("textbox", { name: "Social security number" })
-      .fill("01-010101");
+      .fill(newPatient.ssn);
     const dateGroup = page.getByRole("group", { name: "Date of birth" });
-    await dateGroup.getByRole("spinbutton", { name: "Year" }).fill("1980");
-    await dateGroup.getByRole("spinbutton", { name: "Month" }).fill("01");
-    await dateGroup.getByRole("spinbutton", { name: "Day" }).fill("01");
-    await page.getByRole("textbox", { name: "Occupation" }).fill("Developer");
+    await dateGroup.getByRole("spinbutton", { name: "Year" }).fill(String(newPatient.dateOfBirth.year));
+    await dateGroup.getByRole("spinbutton", { name: "Month" }).fill(String(newPatient.dateOfBirth.month));
+    await dateGroup.getByRole("spinbutton", { name: "Day" }).fill(String(newPatient.dateOfBirth.day));
+    await page.getByRole("textbox", { name: "Occupation" }).fill(newPatient.occupation);
     await page.getByRole("combobox", { name: "Gender" }).click();
-    await page.getByRole("option", { name: "male", exact: true }).click();
+    await page.getByRole("option", { name: newPatient.gender, exact: true }).click();
 
+    // Click on the cancel button and confirm no new patient has been added
     await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 
   test("missing the name field", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Remove the field to test
+    const { name, ...otherFields } = newPatient;
+    const errorMessage = "Patient name is required";
 
-    const patientData = {
-      ssn: "01-010101",
-      dateOfBirth: {
-        year: 1980,
-        month: 1,
-        day: 1,
-      },
-      occupation: "Developer",
-      gender: "male",
-    };
-    await addPatient(page, patientData);
-
-    await expect(page.getByRole("alert")).toHaveText(
-      "Patient name is required",
-    );
+    // Test the form with the missing field
+    await testMissingField(page, otherFields, errorMessage, getPatientCount);
+    
+    // Assert no patient has been added
     await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 
   test("missing the ssn field", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Remove the field to test
+    const { ssn, ...otherFields } = newPatient;
+    const errorMessage = "Patient SSN is required";
 
-    const patientData = {
-      name: "John Johns",
-      dateOfBirth: {
-        year: 1980,
-        month: 1,
-        day: 1,
-      },
-      occupation: "Developer",
-      gender: "male",
-    };
-    await addPatient(page, patientData);
+    // Test the form with the missing field
+    await testMissingField(page, otherFields, errorMessage, getPatientCount);
 
-    await expect(page.getByRole("alert")).toHaveText("Patient SSN is required");
+    // Assert no patient has been added
     await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 
   test("missing the date of birth field", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Remove the field to test
+    const { dateOfBirth, ...otherFields } = newPatient;
+    const errorMessage = "Invalid ISO date";
 
-    const patientData = {
-      name: "John Johns",
-      ssn: "01-010101",
-      occupation: "Developer",
-      gender: "male",
-    };
-    await addPatient(page, patientData);
-
-    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
-
-    await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    // Test the form with the missing field
+    await testMissingField(page, otherFields, errorMessage, getPatientCount);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 
   test("missing the year on the date of birth field", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Remove the field to test
+    const { 
+      dateOfBirth: { year: birthYear, ...otherDateOfBirthFields },
+      ...otherFields
+    } = newPatient;
+    const errorMessage = "Invalid ISO date";
 
-    const patientData = {
-      name: "John Johns",
-      ssn: "01-010101",
-      dateOfBirth: {
-        month: 1,
-        day: 1,
-      },
-      occupation: "Developer",
-      gender: "male",
-    };
-    await addPatient(page, patientData);
-
-    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
-
+    // Test the form with the missing field
+    await testMissingField(
+      page, 
+      { ...otherFields, dateOfBirth: otherDateOfBirthFields },
+      errorMessage,
+      getPatientCount
+    );
+    
+    // Assert no patient has been added
     await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 
   test("missing the month on the date of birth field", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Remove the field to test
+    const { 
+      dateOfBirth: { month: birthMonth, ...otherDateOfBirthFields },
+      ...otherFields
+    } = newPatient;
+    const errorMessage = "Invalid ISO date";
 
-    const patientData = {
-      name: "John Johns",
-      ssn: "01-010101",
-      dateOfBirth: {
-        year: 1980,
-        day: 1,
-      },
-      occupation: "Developer",
-      gender: "male",
-    };
-    await addPatient(page, patientData);
-
-    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
-
+    // Test the form with the missing field
+    await testMissingField(
+      page, 
+      { ...otherFields, dateOfBirth: otherDateOfBirthFields },
+      errorMessage,
+      getPatientCount
+    );
+    
+    // Assert no patient has been added
     await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 
   test("missing the day on the date of birth field", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Remove the field to test
+    const { 
+      dateOfBirth: { day: birthDay, ...otherDateOfBirthFields },
+      ...otherFields
+    } = newPatient;
+    const errorMessage = "Invalid ISO date";
 
-    const patientData = {
-      name: "John Johns",
-      ssn: "01-010101",
-      dateOfBirth: {
-        year: 1980,
-        month: 1,
-      },
-      occupation: "Developer",
-      gender: "male",
-    };
-    await addPatient(page, patientData);
-
-    await expect(page.getByRole("alert")).toHaveText("Invalid ISO date");
-
+    // Test the form with the missing field
+    await testMissingField(
+      page, 
+      { ...otherFields, dateOfBirth: otherDateOfBirthFields },
+      errorMessage,
+      getPatientCount
+    );
+    
+    // Assert no patient has been added
     await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 
   test("missing the occupation field", async ({ page }) => {
-    await expect(page.locator("tbody").getByRole("row")).toHaveCount(5);
-    const initialPatientsLength = await page
-      .locator("tbody")
-      .getByRole("row")
-      .count();
+    // Remove the field to test
+    const { occupation, ...otherFields } = newPatient;
+    const errorMessage = "Patient occupation is required";
 
-    const patientData = {
-      name: "John Johns",
-      ssn: "01-010101",
-      dateOfBirth: {
-        year: 1980,
-        month: 1,
-        day: 1,
-      },
-      gender: "male",
-    };
-    await addPatient(page, patientData);
-
-    await expect(page.getByRole("alert")).toHaveText(
-      "Patient occupation is required",
-    );
-
+    // Test the form with the missing field
+    await testMissingField(page, otherFields, errorMessage, getPatientCount);
+    
+    // Assert no patient has been added
     await page.getByRole("button", { name: "Cancel" }).click();
-    await assertNotPresent(page, "John Johns", initialPatientsLength);
+    await assertNotPresent(page, newPatient.name, getPatientCount);
   });
 });

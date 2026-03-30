@@ -16,6 +16,7 @@ type PatientInput = {
   gender?: unknown;
 };
 
+// Adds a new patient through the frontend
 export async function addPatient(page: Page, data: PatientInput) {
   await page.getByRole("button", { name: "Add New Patient" }).click();
 
@@ -55,14 +56,16 @@ export async function addPatient(page: Page, data: PatientInput) {
   await page.getByRole("button", { name: "Add" }).click();
 }
 
-export async function confirmPatientName(page: Page, name: string) {
+// Access a patients' information page
+export async function accessPatientInfo(page: Page, name: string) {
   await page.locator("tbody").getByRole("link", { name: name }).click();
   await expect(page.getByRole("heading", { level: 2 })).toHaveText(name);
 }
 
+// Asserts a patient is not present on the main page list
 export async function assertNotPresent(
   page: Page,
-  name: string,
+  patientName: string,
   initialPatientsLength: number,
 ) {
   const patients = page.locator("tbody").getByRole("row");
@@ -72,6 +75,32 @@ export async function assertNotPresent(
     page
       .locator("tbody")
       .getByRole("row")
-      .filter({ has: page.getByRole("link", { name: "John Johns" }) }),
+      .filter({ has: page.getByRole("link", { name: patientName }) }),
   ).toHaveCount(0);
+}
+
+// Gets the total number of patients fro the main page list
+export async function getPatientCount(page: Page): Promise<number> {
+  const patientListLength = await page
+    .locator("tbody")
+    .getByRole("row")
+    .count();
+  return patientListLength;
+}
+
+// Tests adding a new patient with a missing field
+export async function testMissingField(
+  page: Page, 
+  patientInfo: PatientInput,
+  errorMessage: string, 
+  patientCount: number
+) {
+  // Wait for the expected initial data to be present first
+  await expect(page.locator("tbody").getByRole("row")).toHaveCount(patientCount);
+  
+  // Add a new patient
+  await addPatient(page, patientInfo);
+
+  // Confirm error message appears on the form
+  await expect(page.getByRole("alert")).toHaveText(errorMessage);
 }

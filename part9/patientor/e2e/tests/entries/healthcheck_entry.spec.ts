@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 
 // Helper functions
-import { confirmPatientName } from "../helpers/patient_helpers";
+import { accessPatientInfo } from "../helpers/patient_helpers";
 import {
   addHealthCheckEntry,
   assertHealthCheckEntry,
@@ -47,7 +47,7 @@ test.beforeEach(async ({ page, request }) => {
 test.describe("Valid HealthCheck entries", () => {
   test("should add a new HealthCheck entry", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     await addHealthCheckEntry(page, healthCheckEntry);
     await expect(page.getByRole("alert")).toHaveText(
@@ -63,7 +63,7 @@ test.describe("Valid HealthCheck entries", () => {
 
   test("the diagnosis code field is optional", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { diagnosisCodes, ...otherFields } = healthCheckEntry;
     await addHealthCheckEntry(page, otherFields);
@@ -80,7 +80,7 @@ test.describe("Valid HealthCheck entries", () => {
 
   test("multiple diagnosis codes can be added", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const codes = ["M24.2", "M51.2", "S03.5", "J10.1", "J06.9"];
 
@@ -101,7 +101,7 @@ test.describe("Valid HealthCheck entries", () => {
 test.describe("Invalid HealthCheck entries", () => {
   test("missing the description field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { description, ...otherFields } = healthCheckEntry;
     await addHealthCheckEntry(page, otherFields);
@@ -115,7 +115,7 @@ test.describe("Invalid HealthCheck entries", () => {
 
   test("missing the date field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { date, ...otherFields } = healthCheckEntry;
     await addHealthCheckEntry(page, otherFields);
@@ -129,7 +129,7 @@ test.describe("Invalid HealthCheck entries", () => {
 
   test("missing the specialist field", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { specialist, ...otherFields } = healthCheckEntry;
     await addHealthCheckEntry(page, otherFields);
@@ -145,7 +145,7 @@ test.describe("Invalid HealthCheck entries", () => {
 test.describe("Testing the Health Rating field", () => {
   test("the 'Healthy' health rating is the default one", async ({ page }) => {
     const initialEntriesLength = await page.locator(".patient-entry").count();
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     const { healthCheckRating, ...otherFields } = healthCheckEntry;
     await addHealthCheckEntry(page, otherFields);
@@ -165,7 +165,7 @@ test.describe("Testing the Health Rating field", () => {
   });
 
   test("LowRisk rating has a yellow color", async ({ page }) => {
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     await addHealthCheckEntry(page, {
       ...healthCheckEntry,
@@ -187,7 +187,7 @@ test.describe("Testing the Health Rating field", () => {
   });
 
   test("HighRisk rating has an orange color", async ({ page }) => {
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     await addHealthCheckEntry(page, {
       ...healthCheckEntry,
@@ -209,7 +209,7 @@ test.describe("Testing the Health Rating field", () => {
   });
 
   test("CriticalRisk rating has a red color", async ({ page }) => {
-    await confirmPatientName(page, "John Johns");
+    await accessPatientInfo(page, "John Johns");
 
     await addHealthCheckEntry(page, {
       ...healthCheckEntry,

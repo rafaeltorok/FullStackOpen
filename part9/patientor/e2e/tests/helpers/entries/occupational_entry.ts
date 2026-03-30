@@ -2,7 +2,7 @@
 import { expect } from "playwright/test";
 
 // TypeScript types
-import type { Page, Locator } from "playwright/test";
+import type { Page, Locator, APIResponse, APIRequestContext } from "playwright/test";
 
 // Helper functions
 import { formatDate } from "../date_helper";
@@ -31,6 +31,7 @@ type OccupationalEntryInput = {
   };
 };
 
+// Adds a new entry through the frontend
 export async function addOccupationalEntry(
   page: Page,
   data: OccupationalEntryInput,
@@ -106,6 +107,21 @@ export async function addOccupationalEntry(
   }
 
   await page.getByRole("button", { name: "Add", exact: true }).click();
+}
+
+// Adds a new entry directly through a HTTP request to the backend server
+export async function postOccupationalRequest(id: string, request: APIRequestContext, newEntry: OccupationalEntryInput) {
+  const response: APIResponse = await request.post(`/api/patients/${id}/entries`, {
+    data: {
+      ...newEntry,
+      date: formatDate(newEntry.date),
+      sickLeave: {
+        startDate: formatDate(newEntry.sickLeave?.startDate),
+        endDate: formatDate(newEntry.sickLeave?.endDate),
+      },
+    },
+  });
+  expect(response.ok()).toBeTruthy();
 }
 
 export async function assertOccupationalEntry(

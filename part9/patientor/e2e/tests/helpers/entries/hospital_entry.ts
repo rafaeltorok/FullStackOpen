@@ -2,7 +2,7 @@
 import { expect } from "playwright/test";
 
 // TypeScript types
-import type { Page, Locator } from "playwright/test";
+import type { Page, Locator, APIResponse, APIRequestContext } from "playwright/test";
 
 // Helper functions
 import { formatDate } from "../date_helper";
@@ -26,6 +26,7 @@ type HospitalEntryInput = {
   };
 };
 
+// Adds a new entry through the frontend
 export async function addHospitalEntry(page: Page, data: HospitalEntryInput) {
   await page.getByRole("button", { name: "Add new entry" }).click();
   await page.getByRole("combobox", { name: "Entry type" }).click();
@@ -84,6 +85,21 @@ export async function addHospitalEntry(page: Page, data: HospitalEntryInput) {
   }
 
   await page.getByRole("button", { name: "Add", exact: true }).click();
+}
+
+// Adds a new entry directly through a HTTP request to the backend server
+export async function postHospitalRequest(id: string, request: APIRequestContext, newEntry: HospitalEntryInput) {
+  const response: APIResponse = await request.post(`/api/patients/${id}/entries`, {
+    data: {
+      ...newEntry,
+      date: formatDate(newEntry.date),
+      discharge: {
+        ...newEntry.discharge,
+        date: formatDate(newEntry.discharge?.date),
+      },
+    },
+  });
+  expect(response.ok()).toBeTruthy();
 }
 
 export async function assertHospitalEntry(

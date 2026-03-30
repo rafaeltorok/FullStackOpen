@@ -5,7 +5,7 @@ import { expect } from "playwright/test";
 import { formatDate } from "../date_helper";
 
 // TypeScript types
-import type { Page, Locator } from "playwright/test";
+import type { Page, Locator, APIResponse, APIRequestContext } from "playwright/test";
 
 type HealthCheckEntryInput = {
   description?: unknown;
@@ -26,6 +26,7 @@ const ratingValues = {
   3: "CriticalRisk",
 };
 
+// Adds a new entry through the frontend
 export async function addHealthCheckEntry(
   page: Page,
   data: HealthCheckEntryInput,
@@ -79,6 +80,17 @@ export async function addHealthCheckEntry(
   }
 
   await page.getByRole("button", { name: "Add", exact: true }).click();
+}
+
+// Adds a new entry directly through a HTTP request to the backend server
+export async function postHealthCheckRequest(id: string, request: APIRequestContext, newEntry: HealthCheckEntryInput) {
+  const response: APIResponse = await request.post(`/api/patients/${id}/entries`, {
+    data: {
+      ...newEntry,
+      date: formatDate(newEntry.date),
+    },
+  });
+  expect(response.ok()).toBeTruthy();
 }
 
 export async function assertHealthCheckEntry(

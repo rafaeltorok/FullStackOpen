@@ -138,6 +138,21 @@ cd ./patientor && docker compose up -d
 
 - Access the Web UI on http://localhost:3001
 
+### Running E2E tests in Docker
+- Run the tests
+  ```bash
+  cd ./patientor && docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from e2e
+  ```
+
+- After the tests finish, all containers will be stopped automatically.
+
+- Tests results will be stored on the `/e2e/test-results` folder.
+
+- (OPTIONAL) Removed the unused containers after testing
+  ```bash
+  cd ./patientor && docker compose -f docker-compose.test.yml down -v
+  ```
+
 
 ## Tests
 ### Integration tests

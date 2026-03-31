@@ -3,7 +3,7 @@ import filterSensitiveInfo from "../utils/filterSensitiveInfo";
 import { v4 as uuidv4 } from "uuid";
 
 // Data
-import patientsData from "../data/patients";
+import patientsData from "../../../shared/data/patients";
 
 // TypeScript types
 import type {

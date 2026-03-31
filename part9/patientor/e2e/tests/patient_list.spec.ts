@@ -1,5 +1,5 @@
 // Data
-import patients from "../../server/src/data/patients";
+import patients from "../../shared/data/patients";
 
 // Playwright dependencies
 import { test, expect } from "@playwright/test";

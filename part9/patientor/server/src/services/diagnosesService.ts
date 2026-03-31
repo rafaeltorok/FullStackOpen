@@ -1,5 +1,5 @@
 // Data
-import diagnosesData from "../data/diagnoses";
+import diagnosesData from "../../../shared/data/diagnoses";
 
 // TypeScript types
 import type { Diagnosis } from "../../../shared/types";

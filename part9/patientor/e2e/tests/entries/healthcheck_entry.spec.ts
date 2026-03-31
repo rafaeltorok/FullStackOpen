@@ -2,6 +2,7 @@
 import { test, expect } from "@playwright/test";
 
 // Helper functions
+import { setupTestPatient } from "../helpers/setup";
 import { accessPatientInfo } from "../helpers/patient_helpers";
 import {
   addHealthCheckEntry,
@@ -10,42 +11,11 @@ import {
 } from "../helpers/entries/healthcheck_entry";
 
 // Constants
-const healthCheckEntry = {
-  description: "Routine check.",
-  date: {
-    year: "2025",
-    month: "12",
-    day: "31",
-  },
-  specialist: "Doctor Tester",
-  diagnosisCodes: ["N30.0"],
-  healthCheckRating: 0,
-};
-
-const newPatient = {
-  name: "John Johns",
-  ssn: "090786-122X",
-  dateOfBirth: "1980-01-01",
-  occupation: "Developer",
-  gender: "male",
-};
+import { newPatient, healthCheckEntry } from "../helpers/constants";
 
 // Posts a new patient with no entries
 test.beforeEach(async ({ page, request }) => {
-  // Resets the database to the original state before each test
-  await page.request.post(`/api/testing/reset`);
-
-  // Add a new patient through the backend server
-  const postResponse = await request.post(`/api/patients`, {
-    data: { ...newPatient },
-  });
-
-  // ensure the request succeeded before proceeding
-  expect(postResponse.ok()).toBeTruthy();
-
-  // Navigate to the main page and assert the new patient is present
-  await page.goto("/");
-  await expect(page.getByText(newPatient.name)).toBeVisible();
+  await setupTestPatient(page, request);
 });
 
 // E2E tests
@@ -70,6 +40,7 @@ test.describe("Valid HealthCheck entries", () => {
     await accessPatientInfo(page, newPatient.name);
     const initialEntriesLength = await page.locator(".patient-entry").count();
 
+    // Add a new entry without a diagnosis code
     const { diagnosisCodes, ...otherFields } = healthCheckEntry;
     await addHealthCheckEntry(page, otherFields, initialEntriesLength);
 
@@ -185,7 +156,7 @@ test.describe("Testing the Health Rating field", () => {
     );
   });
 
-  test("LowRisk rating has a yellow color", async ({ page }) => {
+  test("LowRisk rating has the correct color", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
     await accessPatientInfo(page, newPatient.name);
     const initialEntriesLength = await page.locator(".patient-entry").count();
@@ -216,7 +187,7 @@ test.describe("Testing the Health Rating field", () => {
     );
   });
 
-  test("HighRisk rating has an orange color", async ({ page }) => {
+  test("HighRisk rating has the correct color", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
     await accessPatientInfo(page, newPatient.name);
     const initialEntriesLength = await page.locator(".patient-entry").count();
@@ -247,7 +218,7 @@ test.describe("Testing the Health Rating field", () => {
     );
   });
 
-  test("CriticalRisk rating has a red color", async ({ page }) => {
+  test("CriticalRisk rating has the correct color", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
     await accessPatientInfo(page, newPatient.name);
     const initialEntriesLength = await page.locator(".patient-entry").count();

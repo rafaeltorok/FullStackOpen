@@ -3,23 +3,13 @@ import { expect } from "@playwright/test";
 
 // TypeScript types
 import type { Page } from "playwright/test";
-
-type PatientInput = {
-  name?: unknown;
-  ssn?: unknown;
-  dateOfBirth?: {
-    year?: unknown;
-    month?: unknown;
-    day?: unknown;
-  };
-  occupation?: unknown;
-  gender?: unknown;
-};
+import type { PatientInput } from "./types";
 
 // Adds a new patient through the frontend
 export async function addPatient(page: Page, data: PatientInput) {
   await page.getByRole("button", { name: "Add New Patient" }).click();
 
+  // Fill only the fields that are present on the patient's data
   if (data.name !== undefined) {
     await page.getByRole("textbox", { name: "Name" }).fill(String(data.name));
   }
@@ -68,9 +58,11 @@ export async function assertNotPresent(
   patientName: string,
   initialPatientsLength: number,
 ) {
+  // Get the initial patient count
   const patients = page.locator("tbody").getByRole("row");
   await expect(patients).toHaveCount(initialPatientsLength);
 
+  // Confirm a particular patient name is not present on the list
   await expect(
     page
       .locator("tbody")
@@ -79,16 +71,14 @@ export async function assertNotPresent(
   ).toHaveCount(0);
 }
 
-// Gets the total number of patients fro the main page list
+// Get the total number of patients from the main page list
 export async function getPatientCount(page: Page): Promise<number> {
-  const patientListLength = await page
-    .locator("tbody")
-    .getByRole("row")
-    .count();
-  return patientListLength;
+  const rows = page.locator("tbody").getByRole("row");
+  await expect(rows.first()).toBeVisible();
+  return await rows.count();
 }
 
-// Tests adding a new patient with a missing field
+// Try to add a new patient with a missing required field
 export async function testMissingField(
   page: Page,
   patientInfo: PatientInput,
@@ -100,7 +90,7 @@ export async function testMissingField(
     patientCount,
   );
 
-  // Add a new patient
+  // Try to add the patient
   await addPatient(page, patientInfo);
 
   // Confirm error message appears on the form

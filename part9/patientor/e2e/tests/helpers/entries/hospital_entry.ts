@@ -12,24 +12,8 @@ import type {
 // Helper functions
 import { formatDate } from "../date_helper";
 
-type HospitalEntryInput = {
-  description?: unknown;
-  date?: {
-    year?: unknown;
-    month?: unknown;
-    day?: unknown;
-  };
-  specialist?: unknown;
-  diagnosisCodes?: unknown[];
-  discharge?: {
-    date?: {
-      year?: unknown;
-      month?: unknown;
-      day?: unknown;
-    };
-    criteria?: unknown;
-  };
-};
+// TypeScript types
+import type { HospitalEntryInput } from "../types";
 
 // Fill the new entry form
 export async function fillEntryForm(page: Page, data: HospitalEntryInput) {
@@ -109,7 +93,7 @@ export async function addHospitalEntry(
   );
 }
 
-// Tests adding a new entry with a missing field
+// Test adding a new invalid entry with a missing required field
 export async function testMissingField(
   page: Page,
   newEntry: HospitalEntryInput,
@@ -129,7 +113,7 @@ export async function testMissingField(
   );
 }
 
-// Adds a new entry directly through a HTTP request to the backend server
+// Add a new entry directly through a HTTP request to the backend server
 export async function postHospitalRequest(
   id: string,
   request: APIRequestContext,
@@ -151,6 +135,7 @@ export async function postHospitalRequest(
   expect(response.ok()).toBeTruthy();
 }
 
+// Assert a new Hospital entry is properly displayed
 export async function assertHospitalEntry(
   entry: Locator,
   data: HospitalEntryInput,

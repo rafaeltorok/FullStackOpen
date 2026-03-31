@@ -4,6 +4,7 @@ import { expect } from "@playwright/test";
 // TypeScript types
 import type { Page } from "playwright/test";
 
+// Check if the common fields between all available types are present on a form
 export async function checkCommonEntryFields(page: Page) {
   await expect(
     page.locator("label").filter({ hasText: "Entry type" }),

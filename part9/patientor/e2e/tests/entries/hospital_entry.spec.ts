@@ -1,7 +1,8 @@
 // Playwright dependencies
-import { test, expect } from "@playwright/test";
+import { test } from "@playwright/test";
 
 // Helper functions
+import { setupTestPatient } from "../helpers/setup";
 import { accessPatientInfo } from "../helpers/patient_helpers";
 import {
   addHospitalEntry,
@@ -10,49 +11,11 @@ import {
 } from "../helpers/entries/hospital_entry";
 
 // Constants
-const hospitalEntry = {
-  description: "Stable condition.",
-  date: {
-    year: "2025",
-    month: "12",
-    day: "31",
-  },
-  specialist: "Doctor Tester",
-  diagnosisCodes: ["J10.1"],
-  discharge: {
-    date: {
-      year: "2026",
-      month: "01",
-      day: "03",
-    },
-    criteria: "Patient has healed.",
-  },
-};
-
-const newPatient = {
-  name: "John Johns",
-  ssn: "090786-122X",
-  dateOfBirth: "1980-01-01",
-  occupation: "Developer",
-  gender: "male",
-};
+import { newPatient, hospitalEntry } from "../helpers/constants";
 
 // Posts a new patient with no entries
 test.beforeEach(async ({ page, request }) => {
-  // Resets the database to the original state before each test
-  await page.request.post(`/api/testing/reset`);
-
-  // Add a new patient through the backend server
-  const postResponse = await request.post(`/api/patients`, {
-    data: { ...newPatient },
-  });
-
-  // ensure the request succeeded before proceeding
-  expect(postResponse.ok()).toBeTruthy();
-
-  // Navigate to the main page and assert the new patient is present
-  await page.goto("/");
-  await expect(page.getByText(newPatient.name)).toBeVisible();
+  await setupTestPatient(page, request);
 });
 
 // E2E tests
@@ -77,6 +40,7 @@ test.describe("Valid Hospital entries", () => {
     await accessPatientInfo(page, newPatient.name);
     const initialEntriesLength = await page.locator(".patient-entry").count();
 
+    // Add a new entry without a diagnosis code
     const { diagnosisCodes, ...otherFields } = hospitalEntry;
     await addHospitalEntry(page, otherFields, initialEntriesLength);
 
@@ -164,7 +128,7 @@ test.describe("Invalid Hospital entries", () => {
     );
   });
 
-  test("missing both of the discharge fields", async ({ page }) => {
+  test("missing both the discharge fields", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
     await accessPatientInfo(page, newPatient.name);
     const initialEntriesLength = await page.locator(".patient-entry").count();

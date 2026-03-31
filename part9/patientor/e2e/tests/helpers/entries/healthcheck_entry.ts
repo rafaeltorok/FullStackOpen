@@ -11,18 +11,7 @@ import type {
   APIResponse,
   APIRequestContext,
 } from "playwright/test";
-
-type HealthCheckEntryInput = {
-  description?: unknown;
-  date?: {
-    year?: unknown;
-    month?: unknown;
-    day?: unknown;
-  };
-  specialist?: unknown;
-  diagnosisCodes?: unknown[];
-  healthCheckRating?: unknown;
-};
+import type { HealthCheckEntryInput } from "../types";
 
 const ratingValues = {
   0: "Healthy",
@@ -101,7 +90,7 @@ export async function addHealthCheckEntry(
   );
 }
 
-// Tests adding a new entry with a missing field
+// Test adding a new invalid entry with a missing required field
 export async function testMissingField(
   page: Page,
   newEntry: HealthCheckEntryInput,
@@ -121,7 +110,7 @@ export async function testMissingField(
   );
 }
 
-// Adds a new entry directly through a HTTP request to the backend server
+// Add a new entry directly through a HTTP request to the backend server
 export async function postHealthCheckRequest(
   id: string,
   request: APIRequestContext,
@@ -139,6 +128,7 @@ export async function postHealthCheckRequest(
   expect(response.ok()).toBeTruthy();
 }
 
+// Assert a new HealthCheck entry is properly displayed
 export async function assertHealthCheckEntry(
   entry: Locator,
   data: HealthCheckEntryInput,

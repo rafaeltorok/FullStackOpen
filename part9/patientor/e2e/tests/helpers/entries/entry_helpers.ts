@@ -1,8 +1,30 @@
 // Playwright dependencies
 import { expect } from "@playwright/test";
 
+// Helper functions
+import { accessPatientInfo } from "../patient_helpers";
+
 // TypeScript types
 import type { Page } from "playwright/test";
+
+// Access the patient info page and count the number of entries
+export async function accessPatientEntries(
+  page: Page,
+  patientName: string,
+): Promise<number> {
+  await accessPatientInfo(page, patientName);
+
+  // Count the number of initial entries
+  const entries = page.locator(".patient-entry");
+  const count = await entries.count();
+
+  // Wait for the entries to be rendered on the page
+  if (count > 0) {
+    await expect(entries.first()).toBeVisible();
+  }
+
+  return count;
+}
 
 // Check if the common fields between all available types are present on a form
 export async function checkCommonEntryFields(page: Page) {

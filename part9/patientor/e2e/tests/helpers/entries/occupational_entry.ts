@@ -75,14 +75,14 @@ export async function fillEntryForm(page: Page, data: OccupationalEntryInput) {
       .fill(String(data.sickLeave.startDate.day));
   }
   if (data.sickLeave?.endDate) {
-    const startDate = page.getByRole("group", { name: "End date" });
-    await startDate
+    const endDate = page.getByRole("group", { name: "End date" });
+    await endDate
       .getByRole("spinbutton", { name: "Year" })
       .fill(String(data.sickLeave.endDate.year));
-    await startDate
+    await endDate
       .getByRole("spinbutton", { name: "Month" })
       .fill(String(data.sickLeave.endDate.month));
-    await startDate
+    await endDate
       .getByRole("spinbutton", { name: "Day" })
       .fill(String(data.sickLeave.endDate.day));
   }
@@ -156,7 +156,7 @@ export async function assertOccupationalEntry(
 ) {
   await expect(
     entry.locator("p", {
-      hasText: `${data.date?.year}-${data.date?.month}-${data.date?.day}`,
+      hasText: `${formatDate(data.date)}`,
     }),
   ).toBeVisible();
   await expect(entry.getByTestId("WorkIcon")).toBeVisible();

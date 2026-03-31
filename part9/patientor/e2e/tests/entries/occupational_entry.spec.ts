@@ -3,7 +3,7 @@ import { test } from "@playwright/test";
 
 // Helper functions
 import { setupTestPatient } from "../helpers/setup";
-import { accessPatientInfo } from "../helpers/patient_helpers";
+import { accessPatientEntries } from "../helpers/entries/entry_helpers";
 import {
   addOccupationalEntry,
   assertOccupationalEntry,
@@ -22,8 +22,10 @@ test.beforeEach(async ({ page, request }) => {
 test.describe("Valid Occupational Healthcare entries", () => {
   test("should add a new Occupational Healthcare entry", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry
     await addOccupationalEntry(page, occupationalEntry, initialEntriesLength);
@@ -37,8 +39,10 @@ test.describe("Valid Occupational Healthcare entries", () => {
 
   test("the diagnosis code field is optional", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry without a diagnosis code
     const { diagnosisCodes, ...otherFields } = occupationalEntry;
@@ -53,8 +57,10 @@ test.describe("Valid Occupational Healthcare entries", () => {
 
   test("multiple diagnosis codes can be added", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const codes = ["M24.2", "M51.2", "S03.5", "J10.1", "J06.9"];
 
@@ -78,8 +84,10 @@ test.describe("Valid Occupational Healthcare entries", () => {
 
   test("the sick leave field is optional", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Remove the field and try to add a new entry
     const { sickLeave, ...otherFields } = occupationalEntry;
@@ -96,8 +104,10 @@ test.describe("Valid Occupational Healthcare entries", () => {
 test.describe("Invalid Occupational Healthcare entries", () => {
   test("missing the description field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -114,8 +124,10 @@ test.describe("Invalid Occupational Healthcare entries", () => {
 
   test("missing the date field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -132,8 +144,10 @@ test.describe("Invalid Occupational Healthcare entries", () => {
 
   test("missing the specialist field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -152,8 +166,10 @@ test.describe("Invalid Occupational Healthcare entries", () => {
   // the other must be filled too
   test("missing the start date of the sick leave field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage = "Missing one of the sick leave dates";
 
@@ -172,8 +188,10 @@ test.describe("Invalid Occupational Healthcare entries", () => {
 
   test("missing the end date of the sick leave field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage = "Missing one of the sick leave dates";
 

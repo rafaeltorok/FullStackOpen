@@ -2,7 +2,7 @@
 import patients from "../../server/src/data/patients";
 
 // Playwright dependencies
-import { test, expect, request } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 // Helper functions
 import { setupTestPatient } from "./helpers/setup";

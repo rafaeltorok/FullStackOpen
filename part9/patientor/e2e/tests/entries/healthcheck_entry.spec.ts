@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 
 // Helper functions
 import { setupTestPatient } from "../helpers/setup";
-import { accessPatientInfo } from "../helpers/patient_helpers";
+import { accessPatientEntries } from "../helpers/entries/entry_helpers";
 import {
   addHealthCheckEntry,
   assertHealthCheckEntry,
@@ -22,8 +22,10 @@ test.beforeEach(async ({ page, request }) => {
 test.describe("Valid HealthCheck entries", () => {
   test("should add a new HealthCheck entry", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry
     await addHealthCheckEntry(page, healthCheckEntry, initialEntriesLength);
@@ -37,8 +39,10 @@ test.describe("Valid HealthCheck entries", () => {
 
   test("the diagnosis code field is optional", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry without a diagnosis code
     const { diagnosisCodes, ...otherFields } = healthCheckEntry;
@@ -53,8 +57,10 @@ test.describe("Valid HealthCheck entries", () => {
 
   test("multiple diagnosis codes can be added", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const codes = ["M24.2", "M51.2", "S03.5", "J10.1", "J06.9"];
 
@@ -80,8 +86,10 @@ test.describe("Valid HealthCheck entries", () => {
 test.describe("Invalid HealthCheck entries", () => {
   test("missing the description field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -98,8 +106,10 @@ test.describe("Invalid HealthCheck entries", () => {
 
   test("missing the date field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -116,8 +126,10 @@ test.describe("Invalid HealthCheck entries", () => {
 
   test("missing the specialist field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -136,8 +148,10 @@ test.describe("Invalid HealthCheck entries", () => {
 test.describe("Testing the Health Rating field", () => {
   test("the 'Healthy' health rating is the default one", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry
     const { healthCheckRating, ...otherFields } = healthCheckEntry;
@@ -158,8 +172,10 @@ test.describe("Testing the Health Rating field", () => {
 
   test("LowRisk rating has the correct color", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry
     await addHealthCheckEntry(
@@ -189,8 +205,10 @@ test.describe("Testing the Health Rating field", () => {
 
   test("HighRisk rating has the correct color", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry
     await addHealthCheckEntry(
@@ -220,8 +238,10 @@ test.describe("Testing the Health Rating field", () => {
 
   test("CriticalRisk rating has the correct color", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry
     await addHealthCheckEntry(

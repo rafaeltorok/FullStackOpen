@@ -60,7 +60,7 @@ export async function fillEntryForm(page: Page, data: HealthCheckEntryInput) {
       }
     }
   }
-  if (data.healthCheckRating) {
+  if (data.healthCheckRating !== undefined) {
     await page.getByRole("combobox", { name: "Health Rating" }).click();
     await page
       .getByRole("option", {

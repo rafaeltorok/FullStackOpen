@@ -3,7 +3,7 @@ import { test } from "@playwright/test";
 
 // Helper functions
 import { setupTestPatient } from "../helpers/setup";
-import { accessPatientInfo } from "../helpers/patient_helpers";
+import { accessPatientEntries } from "../helpers/entries/entry_helpers";
 import {
   addHospitalEntry,
   assertHospitalEntry,
@@ -22,8 +22,10 @@ test.beforeEach(async ({ page, request }) => {
 test.describe("Valid Hospital entries", () => {
   test("should add a new valid entry", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry
     await addHospitalEntry(page, hospitalEntry, initialEntriesLength);
@@ -37,8 +39,10 @@ test.describe("Valid Hospital entries", () => {
 
   test("the diagnosis code field is optional", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     // Add a new entry without a diagnosis code
     const { diagnosisCodes, ...otherFields } = hospitalEntry;
@@ -53,8 +57,10 @@ test.describe("Valid Hospital entries", () => {
 
   test("multiple diagnosis codes can be added", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const codes = ["M24.2", "M51.2", "S03.5", "J10.1", "J06.9"];
 
@@ -76,8 +82,11 @@ test.describe("Valid Hospital entries", () => {
 
 test.describe("Invalid Hospital entries", () => {
   test("missing the description field", async ({ page }) => {
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    // Access a patient's info page and get the initial number of entries
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -94,8 +103,10 @@ test.describe("Invalid Hospital entries", () => {
 
   test("missing the date field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -112,8 +123,10 @@ test.describe("Invalid Hospital entries", () => {
 
   test("missing the specialist field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage =
       "Missing required field(s): Description, Date or Specialist";
@@ -130,8 +143,10 @@ test.describe("Invalid Hospital entries", () => {
 
   test("missing both the discharge fields", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage = "The discharge field is required";
 
@@ -147,8 +162,10 @@ test.describe("Invalid Hospital entries", () => {
 
   test("missing the date of the discharge field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage = "Missing one of the discharge fields";
 
@@ -167,8 +184,10 @@ test.describe("Invalid Hospital entries", () => {
 
   test("missing the criteria of the discharge field", async ({ page }) => {
     // Access a patient's info page and get the initial number of entries
-    await accessPatientInfo(page, newPatient.name);
-    const initialEntriesLength = await page.locator(".patient-entry").count();
+    const initialEntriesLength = await accessPatientEntries(
+      page,
+      newPatient.name,
+    );
 
     const errorMessage = "Missing one of the discharge fields";
 
